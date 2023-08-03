@@ -437,7 +437,7 @@ class Route implements RouteInterface
 
 
     /**
-     * Determine if route match current request
+     * @inheritdoc
     */
     public function match(string $method, string $path): bool
     {

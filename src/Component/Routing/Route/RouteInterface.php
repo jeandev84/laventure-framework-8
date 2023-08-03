@@ -123,8 +123,16 @@ interface RouteInterface extends \ArrayAccess
 
     /**
      * Determine if route match current request
+     *
+     * @param string $method
+     *
+     * @param string $path
+     *
+     * @return bool
     */
     public function match(string $method, string $path): bool;
+
+
 
 
 
