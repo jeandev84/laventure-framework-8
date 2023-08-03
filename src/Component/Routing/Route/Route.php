@@ -429,8 +429,8 @@ class Route implements RouteInterface
         $path = $this->getPath();
 
         foreach ($parameters as $name => $value) {
-            if (! empty($this->patterns[$name])) {
-                $path = preg_replace(array_keys($this->patterns[$name]), [$value, $value], $path);
+            if (! empty(self::$wheres[$name])) {
+                $path = preg_replace(array_keys(self::$wheres[$name]), [$value, $value], $path);
             }
         }
 
