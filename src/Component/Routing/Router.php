@@ -384,12 +384,11 @@ class Router implements RouterInterface
     */
     public function makeRoute($methods, $path, $action, $name): Route
     {
-          $resolver = new RouteResolver($this->group);
-          $route    = new Route(
+          $route = new Route(
               $this->domain,
               $methods,
-              $resolver->resolvePath($path),
-              $resolver->resolveAction($action),
+              $this->resolvePath($path),
+              $this->resolveAction($action),
               $name
           );
 
@@ -455,5 +454,63 @@ class Router implements RouterInterface
     public function addRoute(Route $route): Route
     {
         return $this->collection->addRoute($route);
+    }
+
+
+
+
+
+    /**
+     * @param string $path
+     *
+     * @return string
+    */
+    private function resolvePath(string $path): string
+    {
+        if ($prefix = $this->group->getPath()) {
+            $path = trim($prefix, '/') . '/' . ltrim($path, '/');
+        }
+
+        return $path;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param mixed $action
+     *
+     * @return mixed
+    */
+    private function resolveAction(mixed $action): mixed
+    {
+        if (is_string($action)) {
+            $action = $this->resolveActionFromString($action);
+        }
+
+        return $action;
+    }
+
+
+
+
+
+    /**
+     * @param string $action
+     *
+     * @return array|string
+    */
+    private function resolveActionFromString(string $action): array|string
+    {
+        if (stripos($action, '@') !== false) {
+            $action     = explode('@', $action, 2);
+            $controller = sprintf('%s\\%s', $this->group->getNamespace(), $action[0]);
+            return [$controller, $action[1]];
+        }
+
+        return $action;
     }
 }
