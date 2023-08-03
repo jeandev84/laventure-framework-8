@@ -55,13 +55,15 @@ class RouteCollection implements RouteCollectionInterface
     */
     public function addRoute(Route $route): Route
     {
-        $this->methods[$route->getMethod()][] = $route;
-
         if ($controller = $route->getController()) {
-            $this->controllers[$controller][] = $controller;
-        } elseif ($name = $route->getName()) {
+            $this->controllers[$controller][] = $route;
+        }
+
+        if($name = $route->getName()) {
             $this->namedRoutes[$name] = $route;
         }
+
+        $this->methods[$route->getMethod()][] = $route;
 
         return $this->routes[] = $route;
     }

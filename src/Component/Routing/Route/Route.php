@@ -342,6 +342,7 @@ class Route implements RouteInterface
 
 
 
+
     /**
      * @param string $name
      * @return $this
@@ -359,7 +360,7 @@ class Route implements RouteInterface
     /**
      * @param string $name
      * @return $this
-     */
+    */
     public function alphaNumeric(string $name): self
     {
         return $this->where($name, '[^a-z_\-0-9]');
@@ -382,10 +383,12 @@ class Route implements RouteInterface
 
 
 
+
     /**
      * @param string $name
+     *
      * @return $this
-     */
+    */
     public function anything(string $name): self
     {
         return $this->where($name, '.*');
@@ -919,9 +922,9 @@ class Route implements RouteInterface
     /**
      * @param array $action
      *
-     * @return array
+     * @return string
     */
-    private function resolveActionFromArray(array $action): array
+    private function resolveActionFromArray(array $action): string
     {
          if (empty($action[0])) {
              throw new \InvalidArgumentException("Controller name is required parameter.");
@@ -932,7 +935,7 @@ class Route implements RouteInterface
 
          $this->options(compact('controller', 'action'));
 
-         return [$controller, $action];
+         return sprintf('%s::%s', $controller, $action);
     }
 
 
