@@ -703,17 +703,6 @@ class Route implements RouteInterface
 
 
 
-    /**
-     * @return array
-    */
-    public function getMatches(): array
-    {
-        return $this->matches;
-    }
-
-
-
-
 
     /**
      * @return array
@@ -846,7 +835,7 @@ class Route implements RouteInterface
     private function action(mixed $action): static
     {
          if (is_array($action)) {
-             $this->options(['controller' => $action[0], 'action' => $action[1] ?? '__invoke']);
+             $action = $this->resolveActionFromArray($action);
          }
 
          $this->action = $action;
@@ -921,6 +910,29 @@ class Route implements RouteInterface
         return array_filter($matches, function ($key) {
             return ! is_numeric($key);
         }, ARRAY_FILTER_USE_KEY);
+    }
+
+
+
+
+
+    /**
+     * @param array $action
+     *
+     * @return array
+    */
+    private function resolveActionFromArray(array $action): array
+    {
+         if (empty($action[0])) {
+             throw new \InvalidArgumentException("Controller name is required parameter.");
+         }
+
+         $controller = $action[0];
+         $action     = (string)($action[1] ?? '__invoke');
+
+         $this->options(compact('controller', 'action'));
+
+         return [$controller, $action];
     }
 
 
