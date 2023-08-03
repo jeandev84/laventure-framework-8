@@ -299,7 +299,7 @@ class Route implements RouteInterface
     */
     public function where(string $name, string $pattern): static
     {
-        self::$wheres[$name]    = $this->makePatterns($name, $pattern);
+        self::$wheres[$name]    = $this->resolvePatterns($name, $pattern);
         $this->patterns[$name]  = $pattern;
 
         return $this;
@@ -762,24 +762,6 @@ class Route implements RouteInterface
 
 
 
-    /**
-     * @param string $name
-     *
-     * @param string $pattern
-     *
-     * @return array
-    */
-    private function makePatterns(string $name, string $pattern): array
-    {
-        $pattern       = str_replace('(', '(?:', $pattern);
-        $patterns      = ["#{{$name}}#" => "(?P<$name>$pattern)", "#{{$name}.?}#" => "?(?P<$name>$pattern)?"];
-        $this->pattern = preg_replace(array_keys($patterns), array_values($patterns), $this->pattern);
-
-        return $patterns;
-    }
-
-
-
 
 
     /**
@@ -889,6 +871,25 @@ class Route implements RouteInterface
 
 
 
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @param string $pattern
+     *
+     * @return array
+    */
+    private function resolvePatterns(string $name, string $pattern): array
+    {
+        $pattern       = str_replace('(', '(?:', $pattern);
+        $patterns      = ["#{{$name}}#" => "(?P<$name>$pattern)", "#{{$name}.?}#" => "?(?P<$name>$pattern)?"];
+        $this->pattern = preg_replace(array_keys($patterns), array_values($patterns), $this->pattern);
+
+        return $patterns;
+    }
 
 
 
