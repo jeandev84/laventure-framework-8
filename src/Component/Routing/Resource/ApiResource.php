@@ -17,7 +17,7 @@ class ApiResource extends Resource
     */
     public function map(Router $router): static
     {
-        $router->get($this->path(), $this->action('index'), $this->name('index'));
+        $router->map('GET|HEAD', $this->path(), $this->action('index'), $this->name('index'));
         $router->get($this->path('/{id}'), $this->action('show'), $this->name('show'));
         $router->post($this->path(), $this->action('store'), $this->name('store'));
         $router->map('PUT|PATCH', $this->path('/{id}'), $this->action('update'), $this->name('update'));
