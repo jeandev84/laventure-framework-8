@@ -314,4 +314,79 @@ class RouteGroup implements RouteGroupInterface
             'name'        => $this->getName()
         ];
     }
+
+
+
+
+
+    /**
+     * @param string $path
+     *
+     * @return string
+    */
+    public function resolvePath(string $path): string
+    {
+        if ($prefix = $this->getPath()) {
+            $path = trim($prefix, '/') . '/' . ltrim($path, '/');
+        }
+
+        return $path;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param mixed $action
+     *
+     * @return mixed
+    */
+    public function resolveAction(mixed $action): mixed
+    {
+        if (is_string($action)) {
+            $action = $this->resolveActionFromString($action);
+        }
+
+        return $action;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return string
+    */
+    public function resolveName(string $name): string
+    {
+        return sprintf('%s%s', $this->getName(), $name);
+    }
+
+
+
+
+
+
+    /**
+     * @param string $action
+     *
+     * @return array|string
+    */
+    private function resolveActionFromString(string $action): array|string
+    {
+        if (stripos($action, '@') !== false) {
+            $action     = explode('@', $action, 2);
+            $controller = sprintf('%s\\%s', $this->getNamespace(), $action[0]);
+            return [$controller, $action[1]];
+        }
+
+        return $action;
+    }
 }

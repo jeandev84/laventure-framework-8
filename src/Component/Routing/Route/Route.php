@@ -497,20 +497,6 @@ class Route implements RouteInterface
 
 
 
-    /**
-     * @param string $path
-     *
-     * @return string
-    */
-    public function url(string $path): string
-    {
-        return sprintf('%s%s', trim($this->domain, '/'), $path);
-    }
-
-
-
-
-
 
     /**
      * @return bool
@@ -866,6 +852,23 @@ class Route implements RouteInterface
 
 
 
+    /**
+     * @param string $path
+     *
+     * @return string
+    */
+    private function url(string $path): string
+    {
+        return sprintf('%s%s', $this->domain, $path);
+    }
+
+
+
+
+
+
+
+
 
     /**
      * @param string $name
@@ -937,6 +940,8 @@ class Route implements RouteInterface
 
          return sprintf('%s::%s', $controller, $action);
     }
+
+
 
 
 

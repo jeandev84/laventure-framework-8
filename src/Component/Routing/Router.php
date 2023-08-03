@@ -3,10 +3,13 @@ namespace Laventure\Component\Routing;
 
 
 use Closure;
+use Laventure\Component\Routing\Resource\ApiResource;
+use Laventure\Component\Routing\Resource\Types\ResourceType;
+use Laventure\Component\Routing\Resource\WebResource;
 use Laventure\Component\Routing\Route\Collection\RouteCollection;
 use Laventure\Component\Routing\Route\Group\RouteGroup;
 use Laventure\Component\Routing\Route\Route;
-use Laventure\Component\Routing\Resolver\RouteResolver;
+use Laventure\Component\Routing\Resource\Contract\Resource;
 
 
 
@@ -67,7 +70,7 @@ class Router implements RouterInterface
     /**
      * @var Resource[]
     */
-    public $resources = [];
+    public array $resources = [];
 
 
 
@@ -196,6 +199,140 @@ class Router implements RouterInterface
 
         return $this;
     }
+
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @param string $controller
+     *
+     * @return $this
+    */
+    public function resource(string $name, string $controller): static
+    {
+        return $this->addResource(new WebResource($name, $controller));
+    }
+
+
+
+
+
+
+
+    /**
+     * @param array $resources
+     *
+     * @return $this
+     */
+    public function resources(array $resources): static
+    {
+        foreach ($resources as $name => $controller) {
+            $this->resource($name, $controller);
+        }
+
+        return $this;
+    }
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasResource(string $name): bool
+    {
+        return isset($this->resources[ResourceType::WEB][$name]);
+    }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return WebResource|null
+    */
+    public function getResource(string $name): ?WebResource
+    {
+        return $this->resources[ResourceType::WEB][$name] ?? null;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @param string $controller
+     *
+     * @return $this
+     */
+    public function apiResource(string $name, string $controller): static
+    {
+        return $this->addResource(new ApiResource($name, $controller));
+    }
+
+
+
+
+
+
+    /**
+     * @param array $resources
+     *
+     * @return $this
+     */
+    public function apiResources(array $resources): static
+    {
+         foreach ($resources as $name => $controller) {
+            $this->apiResource($name, $controller);
+         }
+
+         return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+    */
+    public function hasApiResource(string $name): bool
+    {
+        return isset($this->resources[ResourceType::API][$name]);
+    }
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return ApiResource|null
+    */
+    public function getApiResource(string $name): ?ApiResource
+    {
+        return $this->resources[ResourceType::API][$name] ?? null;
+    }
+
 
 
 
@@ -367,31 +504,25 @@ class Router implements RouterInterface
     }
 
 
-
-
-
-
-
     /**
-     * @param $methods
+     * @param array|string $methods
      *
-     * @param $path
+     * @param string $path
      *
-     * @param $action
+     * @param mixed $action
      *
-     * @param $name
+     * @param string $name
      *
      * @return Route
     */
-    public function makeRoute($methods, $path, $action, $name): Route
+    public function makeRoute(array|string $methods, string $path, mixed $action, string $name): Route
     {
-          $resolver = new RouteResolver($this->group);
-          $route    = new Route(
+          $route = new Route(
               $this->domain,
               $methods,
-              $resolver->resolvePath($path),
-              $resolver->resolveAction($action),
-              $name
+              $this->group->resolvePath($path),
+              $this->group->resolveAction($action),
+              $this->group->resolveName($name)
           );
 
           $route->middlewareStack($this->middlewares)
@@ -456,5 +587,27 @@ class Router implements RouterInterface
     public function addRoute(Route $route): Route
     {
         return $this->collection->addRoute($route);
+    }
+
+
+
+
+
+
+    /**
+     * @param Resource $resource
+     *
+     * @return $this
+    */
+    public function addResource(Resource $resource): static
+    {
+        $resource->map($this);
+
+        $type = $resource->getTypeName();
+        $name = $resource->getName();
+
+        $this->resources[$type][$name] = $resource;
+
+        return $this;
     }
 }
