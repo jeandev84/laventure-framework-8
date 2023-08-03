@@ -399,7 +399,7 @@ class Route implements RouteInterface
     /**
      * Determine if route match current request method
     */
-    public function matchMethod(string $requestMethod): bool
+    public function matchRequestMethod(string $requestMethod): bool
     {
         return in_array($requestMethod, $this->methods);
     }
@@ -414,7 +414,7 @@ class Route implements RouteInterface
     /**
      * Determine if route match current request path
     */
-    public function matchPath(string $requestPath): bool
+    public function matchRequestPath(string $requestPath): bool
     {
         $requestUrl = $this->url($requestPath);
         $path       = $this->url(parse_url($requestPath, PHP_URL_PATH));
@@ -441,11 +441,14 @@ class Route implements RouteInterface
     */
     public function match(string $method, string $path): bool
     {
-        if ($this->matchPath($path) && !$this->matchMethod($method)) {
+        $matchedPath   = $this->matchRequestPath($path);
+        $matchedMethod = $this->matchRequestMethod($method);
+
+        if ($matchedPath && !$matchedMethod) {
              $this->createAllowedMethodsException($path);
         }
 
-        return $this->matchPath($path) && $this->matchMethod($method);
+        return $matchedPath && $matchedMethod;
     }
 
 
