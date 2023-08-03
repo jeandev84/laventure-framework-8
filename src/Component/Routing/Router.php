@@ -6,7 +6,8 @@ use Closure;
 use Laventure\Component\Routing\Route\Collection\RouteCollection;
 use Laventure\Component\Routing\Route\Group\RouteGroup;
 use Laventure\Component\Routing\Route\Route;
-use Laventure\Component\Routing\Route\RouteResolver;
+use Laventure\Component\Routing\Resolver\RouteResolver;
+
 
 
 /**
@@ -384,13 +385,8 @@ class Router implements RouterInterface
     */
     public function makeRoute($methods, $path, $action, $name): Route
     {
-          $route = new Route(
-              $this->domain,
-              $methods,
-              $this->resolvePath($path),
-              $this->resolveAction($action),
-              $name
-          );
+          $resolver = new RouteResolver($this->group);
+          $route    = new Route($this->domain, $methods, $resolver->resolvePath($path), $resolver->resolveAction($action), $name);
 
           $route->middlewareStack($this->middlewares)
                ->wheres($this->patterns)
@@ -454,63 +450,5 @@ class Router implements RouterInterface
     public function addRoute(Route $route): Route
     {
         return $this->collection->addRoute($route);
-    }
-
-
-
-
-
-    /**
-     * @param string $path
-     *
-     * @return string
-    */
-    private function resolvePath(string $path): string
-    {
-        if ($prefix = $this->group->getPath()) {
-            $path = trim($prefix, '/') . '/' . ltrim($path, '/');
-        }
-
-        return $path;
-    }
-
-
-
-
-
-
-
-    /**
-     * @param mixed $action
-     *
-     * @return mixed
-    */
-    private function resolveAction(mixed $action): mixed
-    {
-        if (is_string($action)) {
-            $action = $this->resolveActionFromString($action);
-        }
-
-        return $action;
-    }
-
-
-
-
-
-    /**
-     * @param string $action
-     *
-     * @return array|string
-    */
-    private function resolveActionFromString(string $action): array|string
-    {
-        if (stripos($action, '@') !== false) {
-            $action     = explode('@', $action, 2);
-            $controller = sprintf('%s\\%s', $this->group->getNamespace(), $action[0]);
-            return [$controller, $action[1]];
-        }
-
-        return $action;
     }
 }
