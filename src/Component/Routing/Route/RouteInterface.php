@@ -46,6 +46,17 @@ interface RouteInterface extends \ArrayAccess
 
 
     /**
+     * Returns route pattern
+     *
+     * @return string
+    */
+    public function getPattern(): string;
+
+
+
+
+
+    /**
      * Returns route handler will be done something
      *
      * @return mixed
@@ -63,9 +74,10 @@ interface RouteInterface extends \ArrayAccess
      * Return name of route
      *
      * @return string
-     */
+    */
     public function getName(): string;
 
+    
 
 
 
@@ -81,6 +93,7 @@ interface RouteInterface extends \ArrayAccess
 
 
 
+    
     /**
      * Return route middlewares
      *
@@ -103,36 +116,20 @@ interface RouteInterface extends \ArrayAccess
 
 
 
-    /**
-     * Determine if route match method
-     *
-     * @param string $requestMethod
-     *
-     * @return bool
-    */
-    public function matchMethod(string $requestMethod): bool;
-
-
-
 
 
 
 
 
     /**
-     * Determine if route match path
-     *
-     * @param string $requestPath
-     *
-     * @return bool
+     * Determine if route match current request
     */
-    public function matchPath(string $requestPath): bool;
+    public function match(string $method, string $path): bool;
 
 
 
-
-
-
+    
+    
     /**
      * Generate route uri from given params
      *

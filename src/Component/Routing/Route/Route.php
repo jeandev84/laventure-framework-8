@@ -40,6 +40,14 @@ class Route implements RouteInterface
 
 
 
+    /**
+     * Route pattern
+     *
+     * @var string
+    */
+    protected string $pattern;
+
+
 
 
 
@@ -59,6 +67,9 @@ class Route implements RouteInterface
      * @var string
     */
     protected string $name = '';
+
+
+
 
 
 
@@ -111,17 +122,6 @@ class Route implements RouteInterface
 
 
 
-    /**
-     * Matches request params
-     *
-     * @var array
-    */
-    protected array $matches = [];
-
-
-
-
-
 
 
 
@@ -167,11 +167,11 @@ class Route implements RouteInterface
     */
     public function __construct(string $domain, array|string $methods, string $path, mixed $action, string $name = '')
     {
-         $this->domain  = $this->resolveDomain($domain);
-         $this->methods = $this->resolveMethods($methods);
-         $this->path    = $this->resolvePath($path);
-         $this->action  = $this->resolveAction($action);
-         $this->name    = $name;
+         $this->domain($domain)
+              ->methods($methods)
+              ->path($path)
+              ->action($action)
+              ->name($name);
     }
 
 
@@ -205,6 +205,8 @@ class Route implements RouteInterface
     */
     public function middleware(string|array $middlewares): static
     {
+        $middlewares = $this->resolveMiddlewares((array)$middlewares);
+
         $this->middlewares = array_merge($this->middlewares, $middlewares);
 
         return $this;
@@ -263,6 +265,23 @@ class Route implements RouteInterface
     }
 
 
+    
+    
+    
+    
+    
+    /**
+     * @param callable $action
+     * 
+     * @return $this
+    */
+    public function callback(callable $action): static
+    {
+        $this->action = $action;
+        
+        return $this;
+    }
+
 
 
 
@@ -280,7 +299,7 @@ class Route implements RouteInterface
     */
     public function where(string $name, string $pattern): static
     {
-        self::$wheres[$name]    = $this->replacePattern($name, $pattern);
+        self::$wheres[$name]    = $this->makePatterns($name, $pattern);
         $this->patterns[$name]  = $pattern;
 
         return $this;
@@ -378,7 +397,7 @@ class Route implements RouteInterface
 
 
     /**
-     * @inheritdoc
+     * Determine if route match current request method
     */
     public function matchMethod(string $requestMethod): bool
     {
@@ -393,11 +412,21 @@ class Route implements RouteInterface
 
 
     /**
-     * @inheritdoc
+     * Determine if route match current request path
     */
     public function matchPath(string $requestPath): bool
     {
-        return true;
+        $requestUrl = $this->url($requestPath);
+        $path       = $this->url(parse_url($requestPath, PHP_URL_PATH));
+        $pattern    = $this->url($this->getPattern());
+
+        if(preg_match("#^$pattern$#i", $path, $matches)) {
+            $this->params  = $this->resolveParams($matches);
+            $this->options(compact('requestPath', 'requestUrl'));
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -412,8 +441,13 @@ class Route implements RouteInterface
     */
     public function match(string $method, string $path): bool
     {
+        if ($this->matchPath($path) && !$this->matchMethod($method)) {
+             $this->createAllowedMethodsException($path);
+        }
+
         return $this->matchPath($path) && $this->matchMethod($method);
     }
+
 
 
 
@@ -552,6 +586,19 @@ class Route implements RouteInterface
 
 
 
+
+
+    /**
+     * @inheritdoc
+    */
+    public function getPattern(): string
+    {
+        return $this->pattern;
+    }
+
+
+
+    
 
 
 
@@ -719,7 +766,7 @@ class Route implements RouteInterface
      *
      * @return array
     */
-    private function replacePattern(string $name, string $pattern): array
+    private function makePatterns(string $name, string $pattern): array
     {
         $pattern  = str_replace('(', '(?:', $pattern);
         $patterns = [
@@ -730,7 +777,7 @@ class Route implements RouteInterface
         $searched = array_keys($patterns);
         $replaces = array_values($patterns);
 
-        $this->path = preg_replace($searched, $replaces, $this->path);
+        $this->pattern = preg_replace($searched, $replaces, $this->pattern);
 
         return $patterns;
     }
@@ -741,11 +788,13 @@ class Route implements RouteInterface
     /**
      * @param string $domain
      *
-     * @return string
+     * @return $this
     */
-    private function resolveDomain(string $domain): string
+    private function domain(string $domain): static
     {
-        return rtrim($domain, '/');
+        $this->domain = rtrim($domain, '/');
+
+        return $this;
     }
 
 
@@ -756,15 +805,17 @@ class Route implements RouteInterface
     /**
      * @param array|string $methods
      *
-     * @return array
+     * @return $this
     */
-    private function resolveMethods(array|string $methods): array
+    private function methods(array|string $methods): static
     {
         if (is_string($methods)) {
             $methods = explode('|', $methods);
         }
 
-        return $methods;
+        $this->methods = $methods;
+
+        return $this;
     }
 
 
@@ -776,14 +827,32 @@ class Route implements RouteInterface
     /**
      * @param string $path
      *
-     * @return string
+     * @return $this
     */
-    private function resolvePath(string $path): string
+    private function path(string $path): static
     {
-        return sprintf('/%s', trim($path, '/'));
+         $this->path = sprintf('/%s', trim($path, '/'));
+
+         return $this->pattern($this->path);
     }
 
 
+
+
+
+
+
+    /**
+     * @param string $pattern
+     *
+     * @return $this
+    */
+    private function pattern(string $pattern): static
+    {
+        $this->pattern = $pattern;
+
+        return $this;
+    }
 
 
 
@@ -793,15 +862,82 @@ class Route implements RouteInterface
     /**
      * @param mixed $action
      *
-     * @return mixed
+     * @return $this
     */
-    private function resolveAction(mixed $action): mixed
+    private function action(mixed $action): static
     {
          if (is_array($action)) {
              $this->options(['controller' => $action[0], 'action' => $action[1] ?? '__invoke']);
          }
 
-         return $action;
+         $this->action = $action;
+
+         return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return void
+    */
+    private function name(string $name): void
+    {
+        $this->name = $name;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param array $middlewares
+     *
+     * @return array
+    */
+    private function resolveMiddlewares(array $middlewares): array
+    {
+        return array_map(function ($middleware) {
+            $named = array_key_exists($middleware, self::$middlewareStack);
+            return $named ? self::$middlewareStack[$middleware] : $middleware;
+        }, $middlewares);
+    }
+
+
+
+
+
+    /**
+     * @param array $matches
+     *
+     * @return array
+    */
+    private function resolveParams(array $matches): array
+    {
+        return array_filter($matches, function ($key) {
+            return ! is_numeric($key);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+
+
+
+    /**
+     * @param string $requestPath
+     *
+     * @return void
+    */
+    private function createAllowedMethodsException(string $requestPath): void
+    {
+        (function () use ($requestPath) {
+             throw new RouteException("Route $requestPath allowed methods: {$this->getMethod(',')}");
+        })();
     }
 
 
