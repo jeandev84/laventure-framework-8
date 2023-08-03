@@ -771,19 +771,13 @@ class Route implements RouteInterface
     */
     private function makePatterns(string $name, string $pattern): array
     {
-        $pattern  = str_replace('(', '(?:', $pattern);
-        $patterns = [
-            "#{{$name}}#" => "(?P<$name>$pattern)",
-            "#{{$name}.?}#" => "?(?P<$name>$pattern)?"
-        ];
-
-        $searched = array_keys($patterns);
-        $replaces = array_values($patterns);
-
-        $this->pattern = preg_replace($searched, $replaces, $this->pattern);
+        $pattern       = str_replace('(', '(?:', $pattern);
+        $patterns      = ["#{{$name}}#" => "(?P<$name>$pattern)", "#{{$name}.?}#" => "?(?P<$name>$pattern)?"];
+        $this->pattern = preg_replace(array_keys($patterns), array_values($patterns), $this->pattern);
 
         return $patterns;
     }
+
 
 
 

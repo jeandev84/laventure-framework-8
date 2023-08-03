@@ -395,8 +395,8 @@ class Router implements RouterInterface
           );
 
           $route->middlewareStack($this->middlewares)
-               ->wheres($this->patterns)
-               ->middleware($this->group->getMiddlewares());
+                ->wheres($this->patterns)
+                ->middleware($this->group->getMiddlewares());
 
           return $route;
     }
