@@ -37,7 +37,7 @@ class RouteResolver
     public function resolvePath(string $path): string
     {
         if ($prefix = $this->group->getPath()) {
-            $path = trim($prefix, '/') . 'RouteResolver.php/' . ltrim($path, '/');
+            $path = trim($prefix, '/') . '/' . ltrim($path, '/');
         }
 
         return $path;
