@@ -136,6 +136,14 @@ class Route implements RouteInterface
 
 
 
+    /**
+     * @var array
+    */
+    private static array $wheres = [];
+
+
+
+
 
     /**
      * @var array
@@ -272,8 +280,8 @@ class Route implements RouteInterface
     */
     public function where(string $name, string $pattern): static
     {
-        $patterns = $this->replacePattern($name, $pattern);
-        $this->patterns[$name] = $patterns;
+        self::$wheres[$name]    = $this->replacePattern($name, $pattern);
+        $this->patterns[$name]  = $pattern;
 
         return $this;
     }
