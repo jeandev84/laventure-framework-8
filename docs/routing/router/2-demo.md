@@ -95,4 +95,5 @@ try {
 echo "\n";
 echo $router->generate('hello', ['id' => 3]) . "\n";
 
+dd($router->getCollection()->getRoutesByController(\App\Controller\Api\UserController::class));
 ```

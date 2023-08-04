@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Routing\Route\Group;
+namespace Laventure\Component\Routing\Group;
 
 
 use Closure;
@@ -11,7 +11,7 @@ use Closure;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Routing\Route\Group
+ * @package Laventure\Component\Routing\Group
 */
 interface RouteGroupInterface
 {

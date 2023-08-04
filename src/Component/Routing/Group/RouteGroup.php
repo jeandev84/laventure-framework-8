@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Routing\Route\Group;
+namespace Laventure\Component\Routing\Group;
 
 
 use Closure;
@@ -327,7 +327,7 @@ class RouteGroup implements RouteGroupInterface
     public function resolvePath(string $path): string
     {
         if ($prefix = $this->getPath()) {
-            $path = trim($prefix, '/') . '/' . ltrim($path, '/');
+            $path = sprintf('%s/%s', trim($prefix, '/'), ltrim($path, '/'));
         }
 
         return $path;

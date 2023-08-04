@@ -6,8 +6,8 @@ use Closure;
 use Laventure\Component\Routing\Resource\ApiResource;
 use Laventure\Component\Routing\Resource\Types\ResourceType;
 use Laventure\Component\Routing\Resource\WebResource;
-use Laventure\Component\Routing\Route\Collection\RouteCollection;
-use Laventure\Component\Routing\Route\Group\RouteGroup;
+use Laventure\Component\Routing\Collection\RouteCollection;
+use Laventure\Component\Routing\Group\RouteGroup;
 use Laventure\Component\Routing\Route\Route;
 use Laventure\Component\Routing\Resource\Contract\Resource;
 
@@ -514,12 +514,15 @@ class Router implements RouterInterface
     */
     public function generate(string $name, array $parameters = []): ?string
     {
-         if (! $route = $this->collection->getRouteByName($name)) {
+         if (! $route = $this->collection->getRoute($name)) {
              return null;
          }
 
          return $route->generateUri($parameters);
     }
+
+
+
 
 
     /**
@@ -556,7 +559,7 @@ class Router implements RouterInterface
 
     /**
      * @inheritDoc
-     */
+    */
     public function getDomain(): string
     {
         return $this->domain;

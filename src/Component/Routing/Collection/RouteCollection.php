@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Routing\Route\Collection;
+namespace Laventure\Component\Routing\Collection;
 
 
 use Laventure\Component\Routing\Route\Route;
@@ -14,16 +14,8 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * @var Route[]
-     */
-    protected array $routes = [];
-
-
-
-
-    /**
-     * @var Route[]
-     */
-    protected array $methods = [];
+    */
+    protected ?array $routes = [];
 
 
 
@@ -31,7 +23,15 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * @var Route[]
     */
-    protected array $controllers = [];
+    protected ?array $methods = [];
+
+
+
+
+    /**
+     * @var Route[]
+    */
+    protected ?array $controllers = [];
 
 
 
@@ -41,7 +41,7 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * @var Route[]
     */
-    protected array $namedRoutes = [];
+    protected ?array $namedRoutes = [];
 
 
 
@@ -110,23 +110,58 @@ class RouteCollection implements RouteCollectionInterface
 
 
 
+
     /**
+     * Returns routes by method
+     *
      * @return Route[]
-     */
-    public function getRoutesByMethod(): array
+    */
+    public function getMethods(): array
     {
         return $this->methods;
+    }
+
+    
+    
+    
+
+    /**
+     * Returns all routes of method
+     *
+     * @return Route[]
+    */
+    public function getRoutesByMethod(string $method): array
+    {
+        return $this->methods[$method] ?? [];
+    }
+
+
+
+    
+
+
+    /**
+     * Returns all routes of controller
+     *
+     * @param string $controller
+     *
+     * @return Route[]
+    */
+    public function getRoutesByController(string $controller): array
+    {
+         return $this->controllers[$controller] ?? [];
     }
 
 
 
 
 
-
     /**
+     * Returns all routes by controller
+     *
      * @return Route[]
     */
-    public function getRoutesByController(): array
+    public function getControllers(): array
     {
         return $this->controllers;
     }
@@ -136,9 +171,11 @@ class RouteCollection implements RouteCollectionInterface
 
 
     /**
+     * Returns all named routes
+     *
      * @return Route[]
     */
-    public function getRoutesByName(): array
+    public function getNamedRoutes(): array
     {
         return $this->namedRoutes;
     }
@@ -149,12 +186,24 @@ class RouteCollection implements RouteCollectionInterface
 
 
     /**
-     * @param string $name
-     *
-     * @return Route|null
+     * @inheritdoc
     */
-    public function getRouteByName(string $name): ?Route
+    public function getRoute(string $name): ?Route
     {
         return $this->namedRoutes[$name] ?? null;
+    }
+
+
+
+
+
+
+
+    /**
+     * @inheritdoc
+    */
+    public function hasRoute(string $name): bool
+    {
+        return isset($this->namedRoutes[$name]);
     }
 }
