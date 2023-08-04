@@ -1,17 +1,17 @@
 <?php
-namespace Laventure\Component\Templating\Mapper;
+namespace Laventure\Component\Templating\Asset;
 
 
 /**
- * @AssetMapperInterface
+ * @AssetInterface
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Templating\Mapper
+ * @package Laventure\Component\Templating\Asset
 */
-interface AssetMapperInterface
+interface AssetInterface
 {
 
 
@@ -20,7 +20,7 @@ interface AssetMapperInterface
         *
         * @return string
        */
-       public function loadResource(string $path): string;
+       public function resource(string $path): string;
 
 
 

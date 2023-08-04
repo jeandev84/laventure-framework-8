@@ -1,11 +1,11 @@
 <?php
-namespace Laventure\Component\Templating\Mapper;
+namespace Laventure\Component\Templating\Asset;
 
 
 /**
  * @inheritdoc
 */
-class AssetMapper implements AssetMapperInterface
+class Asset implements AssetInterface
 {
 
     /**
@@ -64,7 +64,7 @@ class AssetMapper implements AssetMapperInterface
     /**
      * @inheritDoc
     */
-    public function loadResource(string $path): string
+    public function resource(string $path): string
     {
         return  $this->url . '/' . trim($path, '/');
     }
@@ -163,7 +163,7 @@ class AssetMapper implements AssetMapperInterface
     public function css(array $stylesheets): static
     {
          foreach ($stylesheets as $stylesheet) {
-              $this->addStyle(sprintf('<link href="%s" rel="stylesheet">', $this->loadResource($stylesheet)));
+              $this->addStyle(sprintf('<link href="%s" rel="stylesheet">', $this->resource($stylesheet)));
          }
 
          return $this;
@@ -182,7 +182,7 @@ class AssetMapper implements AssetMapperInterface
     public function js(array $scripts): static
     {
           foreach ($scripts as $script) {
-              $this->addScript(sprintf('<script src="%s" type="application/javascript"></script>', $this->loadResource($script)));
+              $this->addScript(sprintf('<script src="%s" type="application/javascript"></script>', $this->resource($script)));
           }
 
           return $this;
