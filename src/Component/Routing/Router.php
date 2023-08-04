@@ -118,6 +118,24 @@ class Router implements RouterInterface
 
 
 
+    /**
+     * Add route middlewares stack, named middlewares
+     *
+     * @param array $middlewares
+     *
+     * @return $this
+    */
+    public function middlewares(array $middlewares): static
+    {
+        $this->middlewares = array_merge($this->middlewares, $middlewares);
+
+        return $this;
+    }
+
+
+
+
+
 
     /**
      * @param string $namespace
