@@ -3,6 +3,7 @@ namespace Laventure\Component\Routing\Group;
 
 
 use Closure;
+use Laventure\Component\Routing\Router;
 
 /**
  * @RouteGroupInterface
@@ -25,19 +26,16 @@ interface RouteGroupInterface
     public function attributes(array $attributes): mixed;
 
 
-
-
-
     /**
      * Map routes
      *
      * @param Closure $routes
      *
-     * @param array $arguments
+     * @param Router $router
      *
      * @return mixed
     */
-    public function callRoutes(Closure $routes, array $arguments = []): mixed;
+    public function callRoutes(Closure $routes, Router $router): mixed;
 
 
 

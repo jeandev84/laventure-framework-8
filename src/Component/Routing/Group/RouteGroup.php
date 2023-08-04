@@ -3,6 +3,7 @@ namespace Laventure\Component\Routing\Group;
 
 
 use Closure;
+use Laventure\Component\Routing\Router;
 
 /**
  * @inheritdoc
@@ -251,15 +252,12 @@ class RouteGroup implements RouteGroupInterface
     /**
      * @inheritDoc
     */
-    public function callRoutes(Closure $routes, array $arguments = []): static
+    public function callRoutes(Closure $routes, Router $router): static
     {
-         call_user_func_array($routes, $arguments);
+         call_user_func($routes, $router);
 
          return $this;
     }
-
-
-
 
 
     /**
@@ -267,14 +265,14 @@ class RouteGroup implements RouteGroupInterface
      *
      * @param Closure $routes
      *
-     * @param array $arguments
+     * @param Router $router
      *
      * @return $this
     */
-    public function map(array $attributes, Closure $routes, array $arguments): static
+    public function map(array $attributes, Closure $routes, Router $router): static
     {
          $this->attributes($attributes);
-         $this->callRoutes($routes, $arguments);
+         $this->callRoutes($routes, $router);
          $this->rewind();
 
          return $this;

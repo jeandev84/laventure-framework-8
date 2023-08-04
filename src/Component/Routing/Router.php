@@ -213,7 +213,7 @@ class Router implements RouterInterface
     */
     public function group(array $attributes, Closure $routes): static
     {
-        $this->group->map($attributes, $routes, [$this]);
+        $this->group->map($attributes, $routes, $this);
 
         return $this;
     }
