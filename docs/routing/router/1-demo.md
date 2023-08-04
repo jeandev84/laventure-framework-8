@@ -14,6 +14,10 @@ $router->middlewares([
     'session' => \App\Middleware\SessionMiddleware::class
 ]);
 
+$router->map('GET', '/', function () {
+    return 'Welcome';
+});
+
 
 $router->get('/', [\App\Controller\HomeController::class, 'index'], 'home');
 $router->get( '/contact', [\App\Controller\HomeController::class, 'contact'], 'contact');
