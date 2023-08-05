@@ -16,17 +16,6 @@ interface TemplateInterface
 
 
     /**
-     * Returns cache key
-     *
-     * @return string
-    */
-    public function getCacheKey(): string;
-
-
-
-
-
-    /**
      * Returns path of template
      *
      * @return string

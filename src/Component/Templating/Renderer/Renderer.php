@@ -55,40 +55,6 @@ class Renderer implements RendererInterface
 
 
 
-      /**
-       * @param string $resourcePath
-       *
-       * @return $this
-      */
-      public function resourcePath(string $resourcePath): static
-      {
-          $this->engine->resourcePath($resourcePath);
-
-          return $this;
-      }
-
-
-
-
-
-
-
-      /**
-       * Returns full template path
-       *
-       * @param string $path
-       *
-       * @return string
-      */
-      public function locatePath(string $path): string
-      {
-           return $this->engine->locateTemplate($path);
-      }
-
-
-
-
-
 
       /**
        * @param array $data
@@ -123,14 +89,12 @@ class Renderer implements RendererInterface
       /**
        * @param string $path
        *
-       * @param array $parameters
+       * @param array $data
        *
        * @return Template
       */
-      public function createTemplate(string $path, array $parameters = []): Template
+      public function createTemplate(string $path, array $data = []): Template
       {
-          $template = new Template($this->locatePath($path), array_merge($this->data, $parameters));
-          $template->setCacheKey($path);
-          return $template;
+          return new Template($path, array_merge($this->data, $data));
       }
 }

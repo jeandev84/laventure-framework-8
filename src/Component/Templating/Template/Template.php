@@ -53,35 +53,6 @@ class Template implements TemplateInterface
 
 
 
-    /**
-     * @param string $cacheKey
-     *
-     * @return $this
-    */
-    public function setCacheKey(string $cacheKey): static
-    {
-        $this->cacheKey = $cacheKey;
-
-        return $this;
-    }
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function getCacheKey(): string
-    {
-        return $this->cacheKey;
-    }
-
-
-
-
-
 
 
 

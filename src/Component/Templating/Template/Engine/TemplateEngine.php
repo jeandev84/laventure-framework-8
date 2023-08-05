@@ -57,6 +57,9 @@ class TemplateEngine implements TemplateEngineInterface
     protected array $blocks = [];
 
 
+
+
+
     /**
      * @param string $resourcePath
      *
@@ -135,7 +138,7 @@ class TemplateEngine implements TemplateEngineInterface
          $content   = $this->compileEscapedEchos($content);
          $content   = $this->compileEchos($content);
          $content   = $this->compilePHP($content);
-         $cachePath = $this->cache->cache($template->getCacheKey(), $content);
+         $cachePath = $this->cache->cache($template->getPath(), $content);
          $engine    = $this->createTemplate($cachePath, $template->getParameters());
          return $this->compressed ? $this->compressor->compress($engine) : $engine;
     }
@@ -172,12 +175,12 @@ class TemplateEngine implements TemplateEngineInterface
     private function includePaths(TemplateInterface $template): string
     {
         $pattern = '/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i';
-        $content = $this->content($template->getPath());
+        $content = $this->content($this->locateTemplate($template->getPath()));
 
         preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $value) {
-            $included = $this->createTemplate($this->locateTemplate($value[2]));
+            $included = $this->createTemplate($value[2]);
             $content  = str_replace($value[0], $this->includePaths($included), $content);
         }
 
