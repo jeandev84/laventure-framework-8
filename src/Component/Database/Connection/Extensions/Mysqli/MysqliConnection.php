@@ -317,8 +317,8 @@ class MysqliConnection implements ConnectionInterface
     /**
      * @inheritDoc
     */
-    public function getQueriesLog(): mixed
+    public function getQueries(): array
     {
-        // TODO: Implement getQueriesLog() method.
+         return [];
     }
 }
