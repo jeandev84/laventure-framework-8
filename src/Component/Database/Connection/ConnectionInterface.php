@@ -317,13 +317,11 @@ interface ConnectionInterface
 
 
     /**
-     * Return database tables
+     * Returns database tables
      *
      * @return array
     */
     public function getTables(): array;
-
-
 
 
 

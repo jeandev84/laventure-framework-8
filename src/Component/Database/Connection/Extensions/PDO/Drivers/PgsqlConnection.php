@@ -80,7 +80,7 @@ class PgsqlConnection extends DriverConnection
 
     /**
      * @inheritDoc
-     */
+    */
     public function getTables(): array
     {
         return [];
