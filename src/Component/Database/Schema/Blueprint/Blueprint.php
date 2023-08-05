@@ -64,6 +64,16 @@ abstract class Blueprint implements BlueprintInterface
 
 
     /**
+     * @var array
+    */
+    protected array $indexes = [];
+
+
+
+
+
+
+    /**
      * @param ConnectionInterface $connection
      *
      * @param string $table
@@ -156,9 +166,6 @@ abstract class Blueprint implements BlueprintInterface
     {
         return in_array($this->getTable(), $this->getTables());
     }
-
-
-
 
 
 
@@ -275,12 +282,17 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+
     /**
      * @return string
     */
-    public function printNewColumns(): string
+    public function printCreatedColumns(): string
     {
-        return join(', ', array_values($this->newColumns));
+        return join(',', [
+            join(', ', array_values($this->newColumns)),
+            join(', ', array_values($this->constraints)),
+            join(', ', array_values($this->indexes))
+        ]);
     }
 
 
@@ -293,7 +305,11 @@ abstract class Blueprint implements BlueprintInterface
     */
     public function printUpdatedColumns(): string
     {
-         return '';
+         if (! $this->hasTable()) {
+             return '';
+         }
+
+         return join(', ', array_values($this->updatedColumns));
     }
 
 
@@ -306,9 +322,9 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @inheritDoc
     */
-    public function dropTable(): mixed
+    public function dropTable(): bool|int
     {
-        // TODO: Implement dropTable() method.
+        return $this->exec(sprintf('DROP TABLE %s;', $this->getTable()));
     }
 
 
@@ -319,9 +335,9 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @inheritDoc
     */
-    public function dropTableIfExists(): mixed
+    public function dropTableIfExists(): bool|int
     {
-        // TODO: Implement dropTableIfExists() method.
+        return $this->exec(sprintf('DROP TABLE IF EXISTS %s;', $this->getTable()));
     }
 
 
@@ -331,9 +347,9 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @inheritDoc
     */
-    public function truncateTable(): mixed
+    public function truncateTable(): bool|int
     {
-        // TODO: Implement truncateTable() method.
+        return $this->exec(sprintf('TRUNCATE TABLE %s;', $this->getTable()));
     }
 
 
@@ -343,9 +359,9 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @inheritDoc
     */
-    public function truncateTableCascade(): mixed
+    public function truncateTableCascade(): bool|int
     {
-        // TODO: Implement truncateTableCascade() method.
+        return $this->exec(sprintf('TRUNCATE TABLE CASCADE %s;', $this->getTable()));
     }
 
 
@@ -479,6 +495,21 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+
+
+
+
+    /**
+     * Designate that the column allows NULL values
+     *
+     * @return void
+    */
+    public function nullable(): void
+    {
+         foreach ($this->newColumns as $name => $column) {
+             $this->newColumns[$name] = $column->nullable();
+         }
+    }
 
 
 
@@ -768,7 +799,7 @@ abstract class Blueprint implements BlueprintInterface
      * @param $value
      *
      * @return Column
-     */
+    */
     abstract public function char(string $name, $value): Column;
 
 
@@ -795,21 +826,11 @@ abstract class Blueprint implements BlueprintInterface
      * Set column default value
      *
      * @param $value
-     */
+    */
     abstract public function default($value);
 
 
 
-
-
-
-
-    /**
-     * Designate that the column allows NULL values
-     *
-     * @return mixed
-    */
-    abstract public function nullable(): mixed;
 
 
 

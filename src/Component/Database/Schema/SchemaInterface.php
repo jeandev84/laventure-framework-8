@@ -152,6 +152,25 @@ interface SchemaInterface
 
 
      /**
+      * Determine if columns exists in given table
+      *
+      * @param string $table
+      *
+      * @param string $column
+      *
+      * @return bool
+     */
+     public function hasColumn(string $table, string $column): bool;
+
+
+
+
+
+
+
+
+
+     /**
       * Return database tables
       *
       * @return array

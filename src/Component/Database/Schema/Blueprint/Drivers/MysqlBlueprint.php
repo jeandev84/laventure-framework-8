@@ -16,7 +16,7 @@ class MysqlBlueprint extends Blueprint
     */
     public function increments(string $name): Column
     {
-        return $this->bigIncrements($name)->primaryKey();
+        return $this->bigIncrements($name)->primary();
     }
 
 
@@ -275,19 +275,6 @@ class MysqlBlueprint extends Blueprint
 
 
 
-
-    /**
-     * @inheritDoc
-    */
-    public function nullable(): mixed
-    {
-        // TODO: Implement nullable() method.
-    }
-
-
-
-
-
     /**
      * @inheritDoc
     */
@@ -330,9 +317,9 @@ class MysqlBlueprint extends Blueprint
     /**
      * @inheritDoc
     */
-    public function createTable(): mixed
+    public function createTable(): bool
     {
-         dd($this->newColumns);
+
     }
 
 

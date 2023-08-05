@@ -160,6 +160,19 @@ class Schema implements SchemaInterface
 
 
     /**
+     * @inheritDoc
+    */
+    public function hasColumn(string $table, string $column): bool
+    {
+        return $this->blueprint($table)->hasColumn($column);
+    }
+
+
+
+
+
+
+    /**
      * @param string $table
      *
      * @return Blueprint

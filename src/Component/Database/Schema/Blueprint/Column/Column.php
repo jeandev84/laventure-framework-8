@@ -96,7 +96,7 @@ class Column implements ColumnInterface
     /**
      * @return $this
     */
-    public function primaryKey(): static
+    public function primary(): static
     {
         $this->constraints = "PRIMARY KEY";
 
