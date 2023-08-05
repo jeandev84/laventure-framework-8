@@ -5,11 +5,7 @@ namespace Laventure\Component\Database\Schema\Blueprint;
 use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
-use Laventure\Component\Database\Schema\Blueprint\Column\AddColumn;
 use Laventure\Component\Database\Schema\Blueprint\Column\Column;
-use Laventure\Component\Database\Schema\Blueprint\Column\DropColumn;
-use Laventure\Component\Database\Schema\Blueprint\Column\ModifyColumn;
-use Laventure\Component\Database\Schema\Blueprint\Column\RenameColumn;
 use Laventure\Component\Database\Schema\Blueprint\Constraints\Contract\ConstraintInterface;
 use Laventure\Component\Database\Schema\Blueprint\Constraints\ForeignKey;
 use Laventure\Component\Database\Schema\Blueprint\Constraints\Index;
@@ -48,12 +44,21 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+    /**
+     * @var Column[]
+    */
+    public array $dropColumns = [];
+
+
+
+
 
 
     /**
      * @var Column[]
     */
-    protected array $updatedColumns = [];
+    public array $renameColumns = [];
+
 
 
 
@@ -95,12 +100,216 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+
+
+
+    /**
+     * @param string $name
+     *
+     * @param string $type
+     *
+     * @param string $constraints
+     *
+     * @return Column
+    */
+    public function addColumn(string $name, string $type, string $constraints = ''): Column
+    {
+        $column = new Column($name, $type, $constraints);
+
+        if ($this->hasTable()) {
+             $column = new Column("ADD COLUMN $name", $type, $constraints);
+        }
+
+        return $this->newColumns[$name] = $column;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string|array $columns
+     *
+     * @return $this
+    */
+    public function dropColumn(string|array $columns): static
+    {
+        $this->dropColumns[] = "DROP COLUMN ". join(", ", (array)$columns);
+
+        return $this;
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @param string $to
+     *
+     * @return $this
+    */
+    public function renameColumn(string $name, string $to): static
+    {
+        $this->renameColumns[$name] = "RENAME COLUMN $name TO $to";
+
+        return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param ConstraintInterface $constraint
+     *
+     * @return $this
+    */
+    public function addConstraint(ConstraintInterface $constraint): static
+    {
+        $this->constraints[] = $constraint;
+
+        return $this;
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Add primary keys
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+     */
+    public function primary(string|array $columns): static
+    {
+        return $this->addConstraint(new PrimaryKey($columns));
+    }
+
+
+
+
+
+
+    /**
+     * Add unique columns
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+     */
+    public function unique(string|array $columns): static
+    {
+        return $this->addConstraint(new Unique($columns));
+    }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return ForeignKey
+     */
+    public function foreign(string $name): ForeignKey
+    {
+        return $this->constraints[] = new ForeignKey($name, $this->foreignKeyName($name));
+    }
+
+
+
+
+
+
+    /**
+     * @return ForeignKey
+     */
+    public function foreignId(): ForeignKey
+    {
+        return $this->foreign('id');
+    }
+
+
+
+
+
+
+    /**
+     * Add indexes columns
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+    */
+    public function index(string|array $columns): static
+    {
+        return $this->addConstraint(new Index($columns));
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    public function printCreateColumns(): string
+    {
+        return join([
+            join(', ', array_values($this->newColumns)),
+            join(', ', array_values($this->constraints)),
+            join(', ', array_values($this->indexes))
+        ]);
+    }
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    public function printUpdateColumns(): string
+    {
+        if (! $this->hasTable()) {
+            return '';
+        }
+
+        return join(', ', [
+            array_values($this->newColumns),
+            array_values($this->dropColumns),
+            array_values($this->renameColumns)
+        ]);
+    }
+
+
+
+
     /**
      * @param string $sql
      *
      * @return QueryInterface
     */
-    protected function statement(string $sql): QueryInterface
+    public function statement(string $sql): QueryInterface
     {
          return $this->connection->statement($sql);
     }
@@ -151,6 +360,7 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+
     /**
      * @return array
     */
@@ -170,171 +380,6 @@ abstract class Blueprint implements BlueprintInterface
     public function hasTable(): bool
     {
         return in_array($this->getTable(), $this->getTables());
-    }
-
-
-
-
-
-
-
-
-    /**
-     * @param string $name
-     *
-     * @param string $type
-     *
-     * @param string $constraints
-     *
-     * @return Column
-     */
-    public function addColumn(string $name, string $type, string $constraints = ''): Column
-    {
-        $column = new Column($name, $type, $constraints);
-
-        if ($this->hasTable()) {
-            if (! $this->hasColumn($name)) {
-                 return $this->updatedColumns[$name] = new AddColumn($name, $type, $constraints);
-            }
-            return $this->updatedColumns[$name] = new ModifyColumn($name, $type, $constraints);
-        }
-
-        return $this->newColumns[$name] = $column;
-    }
-
-
-
-
-
-
-
-    /**
-     * @param string $name
-     *
-     * @return $this
-    */
-    public function dropColumn(string $name): static
-    {
-        $this->updatedColumns[$name] = new DropColumn($name);
-
-        return $this;
-    }
-
-
-
-
-
-
-    /**
-     * @param string $name
-     *
-     * @param string $to
-     *
-     * @return $this
-    */
-    public function renameColumn(string $name, string $to): static
-    {
-        $this->updatedColumns[$name] = new RenameColumn($name, $to);
-
-        return $this;
-    }
-
-
-
-
-
-    /**
-     * @param ConstraintInterface $constraint
-     *
-     * @return $this
-    */
-    public function addConstraint(ConstraintInterface $constraint): static
-    {
-        $this->constraints[] = $constraint;
-
-        return $this;
-    }
-
-
-
-
-
-
-
-
-
-    /**
-     * Add primary keys
-     *
-     * @param string|array $columns
-     *
-     * @return $this
-    */
-    public function primary(string|array $columns): static
-    {
-        return $this->addConstraint(new PrimaryKey($columns));
-    }
-
-
-
-
-
-
-    /**
-     * Add unique columns
-     *
-     * @param string|array $columns
-     *
-     * @return $this
-    */
-    public function unique(string|array $columns): static
-    {
-        return $this->addConstraint(new Unique($columns));
-    }
-
-
-
-
-
-
-    /**
-     * @param string $name
-     *
-     * @return ForeignKey
-    */
-    public function foreign(string $name): ForeignKey
-    {
-         return $this->constraints[] = new ForeignKey($name, $this->foreignKeyName($name));
-    }
-
-
-
-
-
-
-    /**
-     * @return ForeignKey
-    */
-    public function foreignId(): ForeignKey
-    {
-        return $this->foreign('id');
-    }
-
-
-
-
-
-
-    /**
-     * Add indexes columns
-     *
-     * @param string|array $columns
-     *
-     * @return $this
-    */
-    public function index(string|array $columns): static
-    {
-        return $this->addConstraint(new Index($columns));
     }
 
 
@@ -369,17 +414,6 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
-    /**
-     * @return Column[]
-    */
-    public function getNewColumns(): array
-    {
-         return $this->newColumns;
-    }
-
-
-
-
 
 
 
@@ -395,40 +429,6 @@ abstract class Blueprint implements BlueprintInterface
         return in_array($name, $this->getColumns());
     }
 
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function printNewColumns(): string
-    {
-        return join([
-            join(', ', array_values($this->newColumns)),
-            join(', ', array_values($this->constraints)),
-            join(', ', array_values($this->indexes))
-        ]);
-    }
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function printUpdateColumns(): string
-    {
-         if (! $this->hasTable()) {
-             return '';
-         }
-
-         return join(', ', array_values($this->updatedColumns));
-    }
 
 
 
@@ -645,9 +645,9 @@ abstract class Blueprint implements BlueprintInterface
     */
     public function nullable(): void
     {
-         foreach ($this->newColumns as $name => $column) {
+         foreach ($this->created as $name => $column) {
              if (! $column->isPrimary()) {
-                 $this->newColumns[$name] = $column->nullable();
+                 $this->created[$name] = $column->nullable();
              }
          }
     }

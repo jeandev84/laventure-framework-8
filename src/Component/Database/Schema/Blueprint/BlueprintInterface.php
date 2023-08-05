@@ -146,15 +146,4 @@ interface BlueprintInterface
        * @return mixed
       */
       public function truncateTableCascade(): mixed;
-
-
-
-
-
-      /**
-       * Describe table
-       *
-       * @return mixed
-      */
-      public function describeTable(): mixed;
 }

@@ -104,21 +104,6 @@ interface SchemaInterface
 
 
 
-      /**
-       * Describe table columns
-       *
-       * @param string $table
-       *
-       * @return mixed
-      */
-      public function describe(string $table): mixed;
-
-
-
-
-
-
-
 
      /**
       * Returns table columns

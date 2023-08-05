@@ -319,7 +319,7 @@ class MysqlBlueprint extends Blueprint
     */
     public function createTable(): bool
     {
-        if (! $columns = $this->printNewColumns()) {
+        if (! $columns = $this->printCreateColumns()) {
              return false;
         }
 
@@ -330,17 +330,6 @@ class MysqlBlueprint extends Blueprint
 
 
 
-
-
-
-
-    /**
-     * @inheritDoc
-    */
-    public function describeTable(): mixed
-    {
-
-    }
 
 
 

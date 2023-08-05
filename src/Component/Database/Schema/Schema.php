@@ -28,6 +28,10 @@ class Schema implements SchemaInterface
     */
     public function create(string $table, Closure $closure): bool
     {
+        if ($this->exists($table)) {
+             return true;
+        }
+
         $blueprint = $this->blueprint($table);
 
         call_user_func($closure, $blueprint);
@@ -66,6 +70,10 @@ class Schema implements SchemaInterface
     */
     public function drop(string $table): bool
     {
+        if (! $this->exists($table)) {
+            return false;
+        }
+
         return $this->blueprint($table)->dropTable();
     }
 
@@ -89,6 +97,10 @@ class Schema implements SchemaInterface
     */
     public function truncate(string $table): bool
     {
+        if (! $this->exists($table)) {
+            return false;
+        }
+
         return $this->blueprint($table)->truncateTable();
     }
 
@@ -101,6 +113,10 @@ class Schema implements SchemaInterface
     */
     public function truncateCascade(string $table): mixed
     {
+        if (! $this->exists($table)) {
+            return false;
+        }
+
         return $this->blueprint($table)->truncateTableCascade();
     }
 
@@ -112,20 +128,12 @@ class Schema implements SchemaInterface
     /**
      * @inheritDoc
     */
-    public function describe(string $table): mixed
-    {
-        return $this->blueprint($table)->describeTable();
-    }
-
-
-
-
-
-    /**
-     * @inheritDoc
-    */
     public function getColumns(string $table): array
     {
+        if (! $this->exists($table)) {
+             return [];
+        }
+
         return $this->blueprint($table)->getColumns();
     }
 
@@ -164,6 +172,10 @@ class Schema implements SchemaInterface
     */
     public function hasColumn(string $table, string $column): bool
     {
+        if (! $this->exists($table)) {
+            return false;
+        }
+
         return $this->blueprint($table)->hasColumn($column);
     }
 

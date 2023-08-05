@@ -73,8 +73,9 @@ class Column implements ColumnInterface
 
 
 
-    
-    
+
+
+
     /**
      * @param string $name
      *
@@ -88,6 +89,7 @@ class Column implements ColumnInterface
          $this->type = $type;
          $this->constraints = $constraints ?: 'NOT NULL';
     }
+
 
 
 
@@ -249,6 +251,20 @@ class Column implements ColumnInterface
     public function isPrimary(): bool
     {
         return $this->primaryKey;
+    }
+
+
+
+
+
+    /**
+     * @return $this
+    */
+    public function change(): static
+    {
+        $this->name = "MODIFY COLUMN $this->name";
+
+        return $this;
     }
 
 
