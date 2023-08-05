@@ -72,6 +72,7 @@ interface QueryResultInterface
 
 
 
+
     /**
      * Fetch all columns
      *
@@ -79,18 +80,6 @@ interface QueryResultInterface
     */
     public function columns(): mixed;
 
-
-
-
-
-    /**
-     * Fetch object
-     *
-     * @param string|null $class
-     *
-     * @return mixed
-    */
-    public function object(string $class = null): mixed;
 
 
 
@@ -104,4 +93,18 @@ interface QueryResultInterface
      * @return int
     */
     public function numRows(): int;
+
+
+
+
+
+
+
+
+    /**
+     * Returns all object records
+     *
+     * @return object[]
+    */
+    public function getMapped(): array;
 }

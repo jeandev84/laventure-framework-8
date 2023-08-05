@@ -38,10 +38,25 @@ class Query implements QueryInterface
 
 
 
+
+
+
+//    /**
+//     * @var QueryResultInterface
+//    */
+//    protected QueryResultInterface $hydrate;
+
+
+
+
+
     /**
      * @var QueryLogger
     */
     protected QueryLogger $logger;
+
+
+
 
 
 
@@ -53,10 +68,16 @@ class Query implements QueryInterface
 
 
 
+
+
+
     /**
      * @var array
     */
     protected array $parameters = [];
+
+
+
 
 
 
@@ -73,6 +94,7 @@ class Query implements QueryInterface
 
 
 
+
     /**
      * @param PDO $pdo
     */
@@ -82,6 +104,8 @@ class Query implements QueryInterface
         $this->statement = new PDOStatement();
         $this->logger    = new QueryLogger();
     }
+
+
 
 
 
@@ -102,7 +126,7 @@ class Query implements QueryInterface
 
     /**
      * @inheritDoc
-     */
+    */
     public function query(string $sql): static
     {
         $this->statement = $this->pdo->query($sql);
@@ -116,7 +140,7 @@ class Query implements QueryInterface
 
     /**
      * @inheritDoc
-     */
+    */
     public function bindParams(array $params): static
     {
         foreach ($params as $key => $value) {
@@ -207,6 +231,8 @@ class Query implements QueryInterface
 
 
 
+
+
     /**
      * @inheritDoc
     */
@@ -216,7 +242,7 @@ class Query implements QueryInterface
 
             if ($status = $this->statement->execute($this->parameters)) {
 
-                $this->logger->log([
+                $this->logger->logExecutedQuery([
                     'sql'            => $this->statement->queryString,
                     'bindings'       => $this->bindings,
                     'parameters'     => $this->parameters
@@ -243,7 +269,7 @@ class Query implements QueryInterface
 
             $this->pdo->exec($sql);
 
-            $this->logger->log(compact('sql'));
+            $this->logger->logExecutedQuery(compact('sql'));
 
             return true;
 
@@ -267,8 +293,10 @@ class Query implements QueryInterface
     {
         $this->execute();
 
-        return new QueryResult($this->statement);
+        return $this->logger->setQueryResult(new QueryResult($this->statement));
     }
+
+
 
 
 
@@ -277,10 +305,11 @@ class Query implements QueryInterface
     /**
      * @inheritDoc
     */
-    public function getQueryLog(): array
+    public function getLogger(): QueryLogger
     {
-        return $this->logger->getQueries();
+        return $this->logger;
     }
+
 
 
 

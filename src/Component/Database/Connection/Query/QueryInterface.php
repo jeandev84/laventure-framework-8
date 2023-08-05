@@ -119,6 +119,9 @@ interface QueryInterface
 
 
 
+
+
+
         /**
          * Fetch Result
          *
@@ -131,10 +134,14 @@ interface QueryInterface
 
 
 
+
+
+
+
         /**
-         * Returns executed query params
+         * Returns executed queries
          *
-         * @return array
+         * @return QueryLogger
         */
-        public function getQueryLog(): array;
+        public function getLogger(): QueryLogger;
 }

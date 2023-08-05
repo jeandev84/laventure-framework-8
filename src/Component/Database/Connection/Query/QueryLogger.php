@@ -6,22 +6,40 @@ class QueryLogger
 
 
      /**
+      * @var QueryResultInterface
+     */
+     protected QueryResultInterface $queryResult;
+
+
+
+
+
+     /**
       * @var array
      */
-     protected $params = [];
+     protected array $executedQueries = [];
 
 
 
 
 
-    /**
+     public function __construct()
+     {
+         $this->queryResult = new NullQueryResult();
+     }
+
+
+
+
+
+     /**
      * @param array $params
      *
      * @return $this
     */
-    public function log(array $params): static
+    public function logExecutedQuery(array $params): static
     {
-         $this->params[] = $params;
+         $this->executedQueries[] = $params;
 
          return $this;
     }
@@ -30,11 +48,44 @@ class QueryLogger
 
 
 
+
+    /**
+     * @param QueryResultInterface $queryResult
+     *
+     * @return QueryResultInterface
+    */
+    public function setQueryResult(QueryResultInterface $queryResult): QueryResultInterface
+    {
+        $this->queryResult = $queryResult;
+
+        return $queryResult;
+    }
+
+
+
+
+
+
+
+    /**
+     * @return QueryResultInterface
+    */
+    public function getQueryResult(): QueryResultInterface
+    {
+        return $this->queryResult;
+    }
+
+
+
+
+
+
+
     /**
      * @return array
     */
-    public function getQueries(): array
+    public function getExecutedQueries(): array
     {
-        return $this->params;
+        return $this->executedQueries;
     }
 }

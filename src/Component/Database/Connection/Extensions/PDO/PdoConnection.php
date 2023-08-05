@@ -24,17 +24,18 @@ class PdoConnection implements PdoConnectionInterface
 
 
     /**
-     * @var PDO
+     * @var PDO|null
     */
-    protected $pdo;
+    protected ?PDO $pdo;
 
 
 
 
     /**
-     * @var Query
+     * @var Query|null
     */
-    protected $statement;
+    protected ?Query $statement;
+
 
 
 
@@ -121,12 +122,17 @@ class PdoConnection implements PdoConnectionInterface
 
 
 
+
+
+
+
+
     /**
      * @return QueryInterface
     */
     public function createQuery(): QueryInterface
     {
-        return $this->queries[] = new Query($this->getPdo());
+        return $this->addQuery(new Query($this->getPdo()));
     }
 
 
@@ -149,6 +155,9 @@ class PdoConnection implements PdoConnectionInterface
 
 
 
+
+
+
     /**
      * @param string $sql
      *
@@ -158,9 +167,9 @@ class PdoConnection implements PdoConnectionInterface
     */
     public function statement(string $sql, array $params = []): QueryInterface
     {
-        return $this->createQuery()->prepare($sql)
-                                   ->setParameters($params);
+        return $this->createQuery()->prepare($sql)->setParameters($params);
     }
+
 
 
 
@@ -274,6 +283,7 @@ class PdoConnection implements PdoConnectionInterface
 
 
 
+
     /**
      * @inheritDoc
     */
@@ -320,12 +330,26 @@ class PdoConnection implements PdoConnectionInterface
 
 
     /**
-     * @return array
+     * @return QueryInterface[]
     */
-    public function getQueriesLog(): array
+    public function getQueries(): array
     {
-        return array_filter($this->queries, function (QueryInterface $query) {
-              return ! empty($query->getQueryLog());
-        });
+        return $this->queries;
+    }
+
+
+
+
+
+    /**
+     * @param Query $query
+     *
+     * @return QueryInterface
+    */
+    private function addQuery(Query $query): QueryInterface
+    {
+        $this->queries[] = $query;
+
+        return $query;
     }
 }

@@ -3,7 +3,7 @@ namespace Laventure\Component\Database\Connection\Extensions\PDO\Drivers;
 
 use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\Extensions\PDO\DriverConnection;
-use Laventure\Component\Database\Connection\Query\QueryInterface;
+
 
 
 /**
@@ -97,7 +97,7 @@ class MysqlConnection extends DriverConnection
     /**
      * @inheritDoc
     */
-    public function getDatabaseTables(): array
+    public function getTables(): array
     {
         return $this->statement("SHOW FULL TABLES FROM {$this->getDatabase()};")
                     ->fetch()

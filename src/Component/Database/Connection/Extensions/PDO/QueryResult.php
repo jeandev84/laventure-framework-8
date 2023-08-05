@@ -2,6 +2,7 @@
 namespace Laventure\Component\Database\Connection\Extensions\PDO;
 
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
+use Laventure\Component\Database\Connection\Query\QueryResultLogger;
 use PDO;
 use PDOStatement;
 
@@ -14,11 +15,35 @@ class QueryResult implements QueryResultInterface
 
 
     /**
+     * @var QueryResultLogger
+    */
+    protected QueryResultLogger $logger;
+
+
+
+
+    /**
+     * @var bool
+    */
+    protected bool $mapped = false;
+
+
+
+    /**
+     * @var object[]
+    */
+    protected array $mapping = [];
+
+
+
+
+    /**
      * @param PDOStatement $statement
     */
     public function __construct(protected PDOStatement $statement)
     {
     }
+
 
 
 
@@ -30,8 +55,11 @@ class QueryResult implements QueryResultInterface
     {
         $this->statement->setFetchMode(PDO::FETCH_CLASS, $classname);
 
+        $this->mapped = true;
+
         return $this;
     }
+
 
 
 
@@ -42,7 +70,13 @@ class QueryResult implements QueryResultInterface
     */
     public function all(): array
     {
-        return $this->statement->fetchAll();
+        $records = $this->statement->fetchAll();
+
+        if ($this->mapped) {
+            $this->mapping[] = $records;
+        }
+
+        return $records;
     }
 
 
@@ -54,7 +88,13 @@ class QueryResult implements QueryResultInterface
     */
     public function one(): mixed
     {
-        return $this->statement->fetch();
+        $record = $this->statement->fetch();
+
+        if ($this->mapped) {
+            $this->mapping[] = $record;
+        }
+
+        return $record;
     }
 
 
@@ -87,21 +127,9 @@ class QueryResult implements QueryResultInterface
     /**
      * @inheritDoc
     */
-    public function columns(): bool|array
+    public function columns(): array|false
     {
         return $this->statement->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-
-
-
-
-    /**
-     * @inheritDoc
-    */
-    public function object($class = null): mixed
-    {
-        return $this->statement->fetchObject($class);
     }
 
 
@@ -115,5 +143,17 @@ class QueryResult implements QueryResultInterface
     public function numRows(): int
     {
         return $this->statement->rowCount();
+    }
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function getMapped(): array
+    {
+         return $this->mapping;
     }
 }

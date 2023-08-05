@@ -79,7 +79,7 @@ class OracleConnection extends DriverConnection
     /**
      * @inheritDoc
     */
-    public function getDatabaseTables(): array
+    public function getTables(): array
     {
         return [];
     }

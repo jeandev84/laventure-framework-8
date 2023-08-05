@@ -304,7 +304,7 @@ class MysqliConnection implements ConnectionInterface
     /**
      * @inheritDoc
     */
-    public function getDatabaseTables(): array
+    public function getTables(): array
     {
         // TODO: Implement getTables() method.
     }

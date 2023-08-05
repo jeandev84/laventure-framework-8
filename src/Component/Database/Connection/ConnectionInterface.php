@@ -5,7 +5,8 @@ namespace Laventure\Component\Database\Connection;
 use Closure;
 use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
-
+use Laventure\Component\Database\Connection\Query\QueryLogger;
+use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 
 
 /**
@@ -102,6 +103,7 @@ interface ConnectionInterface
      * @return bool
     */
     public function disconnected(): bool;
+
 
 
 
@@ -319,7 +321,9 @@ interface ConnectionInterface
      *
      * @return array
     */
-    public function getDatabaseTables(): array;
+    public function getTables(): array;
+
+
 
 
 
@@ -328,7 +332,7 @@ interface ConnectionInterface
 
 
     /**
-     * @return mixed
+     * @return QueryInterface[]
     */
-    public function getQueriesLog(): mixed;
+    public function getQueries(): array;
 }
