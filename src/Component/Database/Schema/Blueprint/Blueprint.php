@@ -10,6 +10,11 @@ use Laventure\Component\Database\Schema\Blueprint\Column\Column;
 use Laventure\Component\Database\Schema\Blueprint\Column\DropColumn;
 use Laventure\Component\Database\Schema\Blueprint\Column\ModifyColumn;
 use Laventure\Component\Database\Schema\Blueprint\Column\RenameColumn;
+use Laventure\Component\Database\Schema\Blueprint\Constraints\Contract\ConstraintInterface;
+use Laventure\Component\Database\Schema\Blueprint\Constraints\ForeignKey;
+use Laventure\Component\Database\Schema\Blueprint\Constraints\Index;
+use Laventure\Component\Database\Schema\Blueprint\Constraints\PrimaryKey;
+use Laventure\Component\Database\Schema\Blueprint\Constraints\Unique;
 
 
 /**
@@ -188,10 +193,9 @@ abstract class Blueprint implements BlueprintInterface
         $column = new Column($name, $type, $constraints);
 
         if ($this->hasTable()) {
-            $column = new AddColumn($name, $type, $constraints);
-        }
-
-        if ($this->hasColumn($name)) {
+            if (! $this->hasColumn($name)) {
+                 return $this->updatedColumns[$name] = new AddColumn($name, $type, $constraints);
+            }
             return $this->updatedColumns[$name] = new ModifyColumn($name, $type, $constraints);
         }
 
@@ -233,6 +237,120 @@ abstract class Blueprint implements BlueprintInterface
         $this->updatedColumns[$name] = new RenameColumn($name, $to);
 
         return $this;
+    }
+
+
+
+
+
+    /**
+     * @param ConstraintInterface $constraint
+     *
+     * @return $this
+    */
+    public function addConstraint(ConstraintInterface $constraint): static
+    {
+        $this->constraints[] = $constraint;
+
+        return $this;
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Add primary keys
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+    */
+    public function primary(string|array $columns): static
+    {
+        return $this->addConstraint(new PrimaryKey($columns));
+    }
+
+
+
+
+
+
+    /**
+     * Add unique columns
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+    */
+    public function unique(string|array $columns): static
+    {
+        return $this->addConstraint(new Unique($columns));
+    }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return ForeignKey
+    */
+    public function foreign(string $name): ForeignKey
+    {
+         return $this->constraints[] = new ForeignKey($name, $this->foreignKeyName($name));
+    }
+
+
+
+
+
+
+    /**
+     * @return ForeignKey
+    */
+    public function foreignId(): ForeignKey
+    {
+        return $this->foreign('id');
+    }
+
+
+
+
+
+
+    /**
+     * Add indexes columns
+     *
+     * @param string|array $columns
+     *
+     * @return $this
+    */
+    public function index(string|array $columns): static
+    {
+        return $this->addConstraint(new Index($columns));
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return void
+    */
+    public function createIndex(string $name)
+    {
+
     }
 
 
@@ -286,9 +404,9 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @return string
     */
-    public function printCreatedColumns(): string
+    public function printNewColumns(): string
     {
-        return join(',', [
+        return join([
             join(', ', array_values($this->newColumns)),
             join(', ', array_values($this->constraints)),
             join(', ', array_values($this->indexes))
@@ -303,7 +421,7 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @return string
     */
-    public function printUpdatedColumns(): string
+    public function printUpdateColumns(): string
     {
          if (! $this->hasTable()) {
              return '';
@@ -317,14 +435,33 @@ abstract class Blueprint implements BlueprintInterface
 
 
 
+    /**
+     * @return bool
+    */
+    public function updateTable(): bool
+    {
+        if (! $columns = $this->printUpdateColumns()) {
+            return false;
+        }
+
+        return $this->exec(sprintf('ALTER TABLE %s %s;', $this->getTable(), $columns));
+    }
+
+
+
+
+
+
 
 
     /**
      * @inheritDoc
     */
-    public function dropTable(): bool|int
+    public function dropTable(): bool
     {
-        return $this->exec(sprintf('DROP TABLE %s;', $this->getTable()));
+         $this->exec(sprintf('DROP TABLE %s;', $this->getTable()));
+
+         return ! $this->hasTable();
     }
 
 
@@ -335,9 +472,11 @@ abstract class Blueprint implements BlueprintInterface
     /**
      * @inheritDoc
     */
-    public function dropTableIfExists(): bool|int
+    public function dropTableIfExists(): bool
     {
-        return $this->exec(sprintf('DROP TABLE IF EXISTS %s;', $this->getTable()));
+        $this->exec(sprintf('DROP TABLE IF EXISTS %s;', $this->getTable()));
+
+        return ! $this->hasTable();
     }
 
 
@@ -507,9 +646,27 @@ abstract class Blueprint implements BlueprintInterface
     public function nullable(): void
     {
          foreach ($this->newColumns as $name => $column) {
-             $this->newColumns[$name] = $column->nullable();
+             if (! $column->isPrimary()) {
+                 $this->newColumns[$name] = $column->nullable();
+             }
          }
     }
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return string
+    */
+    protected function foreignKeyName(string $name): string
+    {
+        return sprintf('fk_%s_%s', $this->getTable(), $name);
+    }
+
 
 
 

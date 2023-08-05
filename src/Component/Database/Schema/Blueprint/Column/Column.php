@@ -246,7 +246,7 @@ class Column implements ColumnInterface
     /**
      * @inheritDoc
     */
-    public function isPrimaryKey(): bool
+    public function isPrimary(): bool
     {
         return $this->primaryKey;
     }

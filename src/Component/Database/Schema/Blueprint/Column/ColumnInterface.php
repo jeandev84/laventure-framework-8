@@ -78,7 +78,7 @@ interface ColumnInterface
     /**
      * @return bool
     */
-    public function isPrimaryKey(): bool;
+    public function isPrimary(): bool;
 
 
 

@@ -319,19 +319,17 @@ class MysqlBlueprint extends Blueprint
     */
     public function createTable(): bool
     {
+        if (! $columns = $this->printNewColumns()) {
+             return false;
+        }
 
+        $this->exec(sprintf("CREATE TABLE IF NOT EXISTS %s (%s);", $this->getTable(), $columns));
+
+        return $this->hasTable();
     }
 
 
 
-
-    /**
-     * @inheritDoc
-    */
-    public function updateTable(): mixed
-    {
-        // TODO: Implement updateTable() method.
-    }
 
 
 
