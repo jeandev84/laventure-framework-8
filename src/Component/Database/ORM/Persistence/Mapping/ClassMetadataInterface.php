@@ -93,4 +93,48 @@ interface ClassMetadataInterface
     */
     public function hasField(string $field): bool;
 
+
+
+
+
+
+
+    /**
+     * Determine if the given field has association fields
+     *
+     * @param string $field
+     *
+     * @return bool
+    */
+    public function hasAssociation(string $field): bool;
+
+
+
+
+
+
+    /**
+     * Determine if field has value object or other value
+     *
+     * @param string $field
+     *
+     * @return bool
+    */
+    public function isSingleValueAssociation(string $field): bool;
+
+
+
+
+
+
+
+    /**
+     * Determine if field is collection
+     *
+     * @param string $field
+     *
+     * @return bool
+    */
+    public function isCollectionValueAssociation(string $field): bool;
+
 }

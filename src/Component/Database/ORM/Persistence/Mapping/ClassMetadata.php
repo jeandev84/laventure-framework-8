@@ -152,4 +152,42 @@ class ClassMetadata implements ClassMetadataInterface
       {
            return in_array($field, $this->getFieldNames());
       }
+
+
+
+
+
+      /**
+       * @inheritDoc
+      */
+      public function hasAssociation(string $field): bool
+      {
+
+      }
+
+
+
+
+
+
+     /**
+      * @inheritDoc
+     */
+     public function isSingleValueAssociation(string $field): bool
+     {
+
+     }
+
+
+
+
+     /**
+      * @inheritDoc
+     */
+     public function isCollectionValueAssociation(string $field): bool
+     {
+          if (! $this->hasField($field)) {
+              return false;
+          }
+     }
 }
