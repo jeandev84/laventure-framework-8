@@ -14,26 +14,6 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping;
 interface ObjectPersistenceInterface
 {
 
-
-     /**
-      * @return bool
-     */
-     public function isOpen(): bool;
-
-
-
-
-     /**
-      * @param bool $enabled
-      *
-      * @return mixed
-     */
-     public function open(bool $enabled): mixed;
-
-
-
-
-
      /**
       * @param string $classname
       *
@@ -63,14 +43,4 @@ interface ObjectPersistenceInterface
       * @return string
      */
      public function getMapped(): string;
-
-
-
-
-
-
-     /**
-      * @return void
-     */
-     public function close(): void;
 }

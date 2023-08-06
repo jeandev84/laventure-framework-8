@@ -15,42 +15,10 @@ class ObjectPersistence implements ObjectPersistenceInterface
 
 
      /**
-      * @var bool
-     */
-     protected bool $enabled = false;
-
-
-
-
-     /**
       * @var array
      */
      protected array $persisted = [];
 
-
-
-
-     /**
-      * @inheritDoc
-     */
-     public function open(bool $enabled): static
-     {
-          $this->enabled = $enabled;
-
-          return $this;
-     }
-
-
-
-
-
-     /**
-      * @inheritDoc
-     */
-     public function isOpen(): bool
-     {
-         return $this->enabled;
-     }
 
 
 
@@ -60,7 +28,7 @@ class ObjectPersistence implements ObjectPersistenceInterface
      */
      public function persistence(array $objects): static
      {
-           if ($this->isOpen()) {
+           if ($this->classname) {
                $this->persisted[] = $objects;
            }
 
@@ -84,6 +52,7 @@ class ObjectPersistence implements ObjectPersistenceInterface
 
 
 
+
     /**
      * @inheritDoc
     */
@@ -91,6 +60,8 @@ class ObjectPersistence implements ObjectPersistenceInterface
     {
         return $this->classname;
     }
+
+
 
 
 

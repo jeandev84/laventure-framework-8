@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectBuilderInterface;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
@@ -122,7 +123,6 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function persistence(ObjectPersistenceInterface $persistence): static
     {
-        $persistence->open(true);
         $this->persistence  = $persistence;
 
         return $this;
@@ -365,16 +365,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
-     * @return Query
+     * @inheritdoc
     */
-    public function getQuery(): Query
+    public function getQuery(): SelectQueryInterface
     {
-        $mapped  = $this->persistence->getMapped();
-        $hydrate = $this->fetch();
-
-        if ($mapped) { $hydrate->map($mapped); }
-
-        return new Query($hydrate, $this->persistence);
+        return new Query($this->fetch(), $this->persistence);
     }
 
 
@@ -382,12 +377,14 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
-     * @return ObjectPersistenceInterface
+     * @inheritdoc
     */
     public function getPersistence(): ObjectPersistenceInterface
     {
         return $this->persistence;
     }
+
+
 
 
 

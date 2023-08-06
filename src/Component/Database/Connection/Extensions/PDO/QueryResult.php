@@ -2,7 +2,6 @@
 namespace Laventure\Component\Database\Connection\Extensions\PDO;
 
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
-use Laventure\Component\Database\Connection\Query\QueryResultLogger;
 use PDO;
 use PDOStatement;
 
@@ -12,6 +11,14 @@ use PDOStatement;
 */
 class QueryResult implements QueryResultInterface
 {
+
+
+    /**
+     * @var string
+    */
+    protected string $classname;
+
+
 
     /**
      * @param PDOStatement $statement
@@ -31,7 +38,7 @@ class QueryResult implements QueryResultInterface
     {
         $this->statement->setFetchMode(PDO::FETCH_CLASS, $classname);
 
-        $this->mapped = true;
+        $this->classname = $classname;
 
         return $this;
     }

@@ -41,20 +41,10 @@ class Query implements QueryInterface
 
 
 
-//    /**
-//     * @var QueryResultInterface
-//    */
-//    protected QueryResultInterface $hydrate;
-
-
-
-
-
     /**
      * @var QueryLogger
     */
     protected QueryLogger $logger;
-
 
 
 
@@ -133,6 +123,7 @@ class Query implements QueryInterface
 
         return $this;
     }
+
 
 
 
@@ -242,7 +233,7 @@ class Query implements QueryInterface
 
             if ($status = $this->statement->execute($this->parameters)) {
 
-                $this->logger->logExecutedQuery([
+                $this->logger->log([
                     'sql'            => $this->statement->queryString,
                     'bindings'       => $this->bindings,
                     'parameters'     => $this->parameters
@@ -269,7 +260,7 @@ class Query implements QueryInterface
 
             $this->pdo->exec($sql);
 
-            $this->logger->logExecutedQuery(compact('sql'));
+            $this->logger->log(compact('sql'));
 
             return true;
 
@@ -293,7 +284,7 @@ class Query implements QueryInterface
     {
         $this->execute();
 
-        return $this->logger->setQueryResult(new QueryResult($this->statement));
+        return new QueryResult($this->statement);
     }
 
 
@@ -318,11 +309,11 @@ class Query implements QueryInterface
     /**
      * @param Exception $e
      *
-     * @return mixed
+     * @return void
     */
-    public function abort(Exception $e): mixed
+    private function abort(Exception $e): void
     {
-        return (function () use ($e) {
+        (function () use ($e) {
             throw new QueryException($e->getMessage(), $e->getCode());
         })();
     }

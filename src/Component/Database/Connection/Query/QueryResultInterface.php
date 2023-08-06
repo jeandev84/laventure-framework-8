@@ -16,6 +16,8 @@ interface QueryResultInterface
 
 
     /**
+     * Save the class name to fetch
+     *
      * @param string $classname
      *
      * @return $this

@@ -1,10 +1,17 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 
-class Query
+
+
+
+/**
+ * @inheritdoc
+*/
+class Query implements SelectQueryInterface
 {
 
         /**
@@ -23,6 +30,14 @@ class Query
 
 
 
+        /**
+         * @var string
+        */
+        protected string $mapped;
+
+
+
+
 
         /**
          * @param QueryResultInterface $hydrate
@@ -31,8 +46,21 @@ class Query
         */
         public function __construct(QueryResultInterface $hydrate, ObjectPersistenceInterface $persistence)
         {
-              $this->hydrate     = $hydrate;
+              $this->mapped      = $persistence->getMapped();
+              $this->hydrate     = $this->mapped ? $hydrate->map($this->mapped) : $hydrate;
               $this->persistence = $persistence;
+        }
+
+
+
+
+
+        /**
+         * @inheritdoc
+        */
+        public function hasMapping(): bool
+        {
+            return ! empty($this->mapped);
         }
 
 
@@ -41,13 +69,15 @@ class Query
 
 
         /**
-         * @return array
+         * @inheritdoc
         */
         public function getResult(): array
         {
             $records = $this->hydrate->all();
 
-            $this->persistence->persistence($records);
+            if ($this->hasMapping()) {
+                $this->persistence->persistence($records);
+            }
 
             return $records;
         }
@@ -58,13 +88,15 @@ class Query
 
 
         /**
-         * @return object|mixed|null
+         * @inheritdoc
         */
         public function getOneOrNullResult(): mixed
         {
             $record = $this->hydrate->one();
 
-            $this->persistence->persistence([$record]);
+            if ($this->hasMapping()) {
+                $this->persistence->persistence([$record]);
+            }
 
             return $record;
         }
@@ -75,10 +107,35 @@ class Query
 
 
         /**
-         * @return array
+         * @inheritdoc
         */
         public function getArrayResult(): array
         {
             return $this->hydrate->assoc();
+        }
+
+
+
+
+
+        /**
+         * @inheritDoc
+        */
+        public function getArrayColumns(): array
+        {
+            return $this->hydrate->columns();
+        }
+
+
+
+
+
+
+        /**
+         * @inheritDoc
+        */
+        public function getMappedClass(): string
+        {
+            return $this->mapped;
         }
 }

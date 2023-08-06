@@ -3,7 +3,7 @@ namespace Laventure\Component\Database\Connection\Query;
 
 
 /**
- * @QueryInterface
+ * @SelectQueryInterface
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
@@ -88,6 +88,8 @@ interface QueryInterface
          * @return $this
         */
         public function setParameters(array $parameters): static;
+
+
 
 
 
