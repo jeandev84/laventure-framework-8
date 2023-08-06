@@ -92,13 +92,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
      * @param ConnectionInterface $connection
      *
      * @param string $table
-     *
-     * @param string $selected
     */
-    public function __construct(ConnectionInterface $connection, string $table, string $selected = '')
+    public function __construct(ConnectionInterface $connection, string $table)
     {
          parent::__construct($connection, $table);
-         $this->addSelect($selected ?: "*");
     }
 
 
@@ -352,11 +349,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     private function selectSQL(): string
     {
-        $command  =  $this->distinct ? 'SELECT DISTINCT' : 'SELECT';
-        $columns  =  join(', ', array_filter($this->selected));
-        $selected =  join(' ', [$command, $columns]);
+        $command   =  $this->distinct ? 'SELECT DISTINCT' : 'SELECT';
+        $columns   =  empty($this->selected) ? "*" : join(', ', array_filter($this->selected));
+        $selection =  join(' ', [$command, $columns]);
 
-        return sprintf('%s FROM %s', $selected, $this->getTable());
+        return sprintf('%s FROM %s', $selection, $this->getTable());
     }
 
 
