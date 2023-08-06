@@ -1,6 +1,7 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 
 class Query
@@ -13,35 +14,71 @@ class Query
 
 
 
-        /**
-         * @var string
-        */
-        protected string $classname;
-
-
-
 
         /**
-         * @param Select $select
+         * @var ObjectPersistenceInterface
         */
-        public function __construct(Select $select)
+        protected ObjectPersistenceInterface $persistence;
+
+
+
+
+
+        /**
+         * @param QueryResultInterface $hydrate
+         *
+         * @param ObjectPersistenceInterface $persistence
+        */
+        public function __construct(QueryResultInterface $hydrate, ObjectPersistenceInterface $persistence)
         {
-              $this->hydrate = $select->fetch();
+              $this->hydrate     = $hydrate;
+              $this->persistence = $persistence;
         }
 
 
 
 
 
-        /**
-         * @param string $classname
-         *
-         * @return $this
-        */
-        public function map(string $classname): static
-        {
-             $this->hydrate->map($classname);
 
-             return $this;
+        /**
+         * @return array
+        */
+        public function getResult(): array
+        {
+            $records = $this->hydrate->all();
+
+            $this->persistence->persistence($records);
+
+            return $records;
+        }
+
+
+
+
+
+
+        /**
+         * @return object|mixed|null
+        */
+        public function getOneOrNullResult(): mixed
+        {
+            $record = $this->hydrate->one();
+
+            $this->persistence->persistence([$record]);
+
+            return $record;
+        }
+
+
+
+
+
+
+        /**
+         * @return array
+        */
+        public function getArrayResult(): array
+        {
+            return $this->hydrate->assoc();
         }
 }

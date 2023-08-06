@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectBuilderInterface;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 use Laventure\Component\Database\Connection\ConnectionInterface;
@@ -88,6 +89,17 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
+
+
+    /**
+     * @var ObjectPersistenceInterface
+    */
+    protected ObjectPersistenceInterface $persistence;
+
+
+
+
+
     /**
      * @param ConnectionInterface $connection
      *
@@ -96,6 +108,24 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     public function __construct(ConnectionInterface $connection, string $table)
     {
          parent::__construct($connection, $table);
+         $this->persistence = new ObjectPersistence();
+    }
+
+
+
+
+
+    /**
+     * @param ObjectPersistenceInterface $persistence
+     *
+     * @return $this
+    */
+    public function persistence(ObjectPersistenceInterface $persistence): static
+    {
+        $persistence->open(true);
+        $this->persistence  = $persistence;
+
+        return $this;
     }
 
 
@@ -304,6 +334,21 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
+    /**
+     * @param string $classname
+     *
+     * @return $this
+    */
+    public function map(string $classname): static
+    {
+        $this->persistence->mapped($classname);
+
+        return $this;
+    }
+
+
+
+
 
 
     /**
@@ -315,6 +360,34 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
+
+
+
+
+    /**
+     * @return Query
+    */
+    public function getQuery(): Query
+    {
+        $mapped  = $this->persistence->getMapped();
+        $hydrate = $this->fetch();
+
+        if ($mapped) { $hydrate->map($mapped); }
+
+        return new Query($hydrate, $this->persistence);
+    }
+
+
+
+
+
+    /**
+     * @return ObjectPersistenceInterface
+    */
+    public function getPersistence(): ObjectPersistenceInterface
+    {
+        return $this->persistence;
+    }
 
 
 

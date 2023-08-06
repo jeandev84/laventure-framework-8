@@ -93,18 +93,4 @@ interface QueryResultInterface
      * @return int
     */
     public function numRows(): int;
-
-
-
-
-
-
-
-
-    /**
-     * Returns all object records
-     *
-     * @return object[]
-    */
-    public function getMapped(): array;
 }

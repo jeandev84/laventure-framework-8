@@ -13,30 +13,6 @@ use PDOStatement;
 class QueryResult implements QueryResultInterface
 {
 
-
-    /**
-     * @var QueryResultLogger
-    */
-    protected QueryResultLogger $logger;
-
-
-
-
-    /**
-     * @var bool
-    */
-    protected bool $mapped = false;
-
-
-
-    /**
-     * @var object[]
-    */
-    protected array $mapping = [];
-
-
-
-
     /**
      * @param PDOStatement $statement
     */
@@ -70,13 +46,7 @@ class QueryResult implements QueryResultInterface
     */
     public function all(): array
     {
-        $records = $this->statement->fetchAll();
-
-        if ($this->mapped) {
-            $this->mapping[] = $records;
-        }
-
-        return $records;
+        return $this->statement->fetchAll();
     }
 
 
@@ -88,13 +58,7 @@ class QueryResult implements QueryResultInterface
     */
     public function one(): mixed
     {
-        $record = $this->statement->fetch();
-
-        if ($this->mapped) {
-            $this->mapping[] = $record;
-        }
-
-        return $record;
+        return $this->statement->fetch();
     }
 
 
@@ -143,17 +107,5 @@ class QueryResult implements QueryResultInterface
     public function numRows(): int
     {
         return $this->statement->rowCount();
-    }
-
-
-
-
-
-    /**
-     * @inheritDoc
-    */
-    public function getMapped(): array
-    {
-         return $this->mapping;
     }
 }
