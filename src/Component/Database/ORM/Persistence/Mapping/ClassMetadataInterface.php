@@ -67,4 +67,30 @@ interface ClassMetadataInterface
      * @return bool
     */
     public function isIdentifier(string $field): bool;
+
+
+
+
+
+
+    /**
+     * Returns class field name
+     *
+     * @return array
+    */
+    public function getFieldNames(): array;
+
+
+
+
+
+    /**
+     * Determine if the given field name in class metadata
+     *
+     * @param string $field
+     *
+     * @return bool
+    */
+    public function hasField(string $field): bool;
+
 }

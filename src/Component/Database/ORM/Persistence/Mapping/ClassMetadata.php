@@ -29,17 +29,28 @@ class ClassMetadata implements ClassMetadataInterface
 
 
        /**
-         * @param string|object $classname
-         *
-         * @param string|null $table
+        * @var string
+       */
+       protected string $identifier = 'id';
+
+
+
+
+
+
+       /**
+        * @param string|object $classname
+        *
+        * @param string|null $table
        */
        public function __construct(string|object $classname, string $table = null)
        {
            try {
 
-               $reflection       = new ReflectionClass($classname);
-               $this->table      = $table ?: $this->tableName($reflection);
-               $this->reflection = $reflection;
+               $reflection        =  new ReflectionClass($classname);
+               $shortName         =  $reflection->getShortName();
+               $this->table       = $table ?: mb_strtolower("{$shortName}s");
+               $this->reflection  = $reflection;
 
            } catch (\Exception $e) {
                 trigger_error($e->getMessage());
@@ -87,17 +98,58 @@ class ClassMetadata implements ClassMetadataInterface
 
 
 
+      /**
+       * @inheritDoc
+      */
+      public function getIdentifier(): string
+      {
+           return $this->identifier;
+      }
+
+
+
 
 
       /**
-       * @param ReflectionClass $reflection
-       *
-       * @return string
+       * @inheritDoc
       */
-      private function tableName(ReflectionClass $reflection): string
+      public function isIdentifier(string $field): bool
       {
-           $shortName = $reflection->getShortName();
-           return mb_strtolower("{$shortName}s");
+          if (! $this->hasField($field)) {
+               return false;
+          }
+
+          return $this->getIdentifier() === $field;
       }
 
+
+
+
+
+
+      /**
+       * @inheritDoc
+      */
+      public function getFieldNames(): array
+      {
+          $columns = [];
+
+          foreach ($this->reflection->getProperties() as $property) {
+              $columns[] = $property->getName();
+          }
+
+          return $columns;
+      }
+
+
+
+
+
+      /**
+       * @inheritDoc
+      */
+      public function hasField(string $field): bool
+      {
+           return in_array($field, $this->getFieldNames());
+      }
 }
