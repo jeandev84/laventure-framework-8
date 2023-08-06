@@ -4,7 +4,8 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectBuilderInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistence;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 use Laventure\Component\Database\Connection\ConnectionInterface;
@@ -100,14 +101,16 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
-
     /**
      * @param ConnectionInterface $connection
+     *
+     * @param string|null $selects
     */
-    public function __construct(ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, string $selects = null)
     {
          parent::__construct($connection, '');
          $this->persistence = new ObjectPersistence();
+         $this->addSelect($selects ?: "*");
     }
 
 
@@ -154,7 +157,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     /**
      * @inheritDoc
     */
-    public function addSelect(string $select): static
+    public function addSelect(?string $select): static
     {
          $this->selected[] = $select;
 
@@ -192,13 +195,13 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
-     * @param string $orderBy
-     *
      * @return $this
     */
-    public function addOrderBy(string $orderBy): static
+    public function addOrderBy(?array $orderBy): static
     {
-         $this->orderBy[] = $orderBy;
+         foreach ($orderBy as $order) {
+             $this->orderBy[] = $order;
+         }
 
          return $this;
     }
@@ -311,7 +314,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     /**
      * @inheritDoc
     */
-    public function limit(int $limit): static
+    public function limit(?int $limit): static
     {
         $this->limit = $limit;
 
@@ -324,7 +327,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     /**
      * @inheritDoc
     */
-    public function offset(int $offset): static
+    public function offset(?int $offset): static
     {
         $this->offset = $offset;
 

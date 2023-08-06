@@ -76,9 +76,9 @@ interface EventManagerInterface
 
 
      /**
-      * @param object $object
+      * @param string $event
       *
       * @return mixed
      */
-     public function dispatch(object $object): mixed;
+     public function dispatch(string $event): mixed;
 }

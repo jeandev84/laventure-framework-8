@@ -71,7 +71,7 @@ class EntityRepository implements EntityRepositoryInterface
     */
     public function find($id): ?object
     {
-         return $this->em->getUnitOfWork()->find($id);
+         return $this->em->find($this->getClassName(), $id);
     }
 
 
@@ -83,8 +83,15 @@ class EntityRepository implements EntityRepositoryInterface
     */
     public function findOneBy(array $criteria, array $oderBy = null): ?object
     {
+        $persistence = $this->em->getUnitOfWork()->getPersistence($this->getClassName());
 
+        return $persistence->select()
+                           ->criteria($criteria)
+                           ->addOrderBy($oderBy)
+                           ->getQuery()
+                           ->getOneOrNullResult();
     }
+
 
 
 
@@ -95,7 +102,11 @@ class EntityRepository implements EntityRepositoryInterface
     */
     public function findAll(): array
     {
-
+        return $this->em->getUnitOfWork()
+                        ->getPersistence($this->getClassName())
+                        ->select()
+                        ->getQuery()
+                        ->getResult();
     }
 
 
@@ -107,6 +118,14 @@ class EntityRepository implements EntityRepositoryInterface
     */
     public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): mixed
     {
+          return $this->em->getUnitOfWork()
+                          ->getPersistence($this->getClassName())
+                          ->select()
+                          ->addOrderBy($orderBy)
+                          ->limit($limit)
+                          ->offset($offset)
+                          ->getQuery()
+                          ->getResult();
 
     }
 

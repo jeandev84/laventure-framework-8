@@ -8,4 +8,12 @@ namespace Laventure\Component\Database\ORM\Collection;
 class ObjectStorage extends \SplObjectStorage
 {
 
+    /**
+     * @return int
+    */
+    public function clear(): int
+    {
+        return $this->removeAll($this);
+    }
+
 }

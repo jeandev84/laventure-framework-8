@@ -14,19 +14,6 @@ namespace Laventure\Component\Database\ORM\Persistence\UnitOfWork;
 interface UnitOfWorkInterface
 {
 
-     /**
-      * Find object by id
-      *
-      * @param $id
-      *
-      * @return object|null
-     */
-     public function find($id): ?object;
-
-
-
-
-
 
      /**
       * Register state NEW or UPDATE

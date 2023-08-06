@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
 
 
@@ -20,10 +21,12 @@ class Persistence implements PersistenceInterface
 
 
 
+
     /**
-     * @var string
+     * @var ClassMetadata
     */
-    protected string $classname;
+    protected ClassMetadata $metadata;
+
 
 
 
@@ -36,8 +39,59 @@ class Persistence implements PersistenceInterface
     public function __construct(EntityManager $em, string $classname)
     {
          $this->em        = $em;
-         $this->classname = $classname;
+         $this->metadata  = $this->em->getClassMetadata($classname);
     }
+
+
+
+
+
+
+    /**
+     * @return QueryBuilder
+    */
+    public function createQueryBuilder(): QueryBuilder
+    {
+        return $this->em->createQueryBuilder();
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    public function getIdentifier(): string
+    {
+        return $this->metadata->getIdentifier();
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    public function getClassname(): string
+    {
+        return $this->metadata->getClassname();
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    public function getTableName(): string
+    {
+        return $this->metadata->getTableName();
+    }
+
+
 
 
 
@@ -48,31 +102,11 @@ class Persistence implements PersistenceInterface
     */
     public function select(string $selects = null, array $criteria = []): Select
     {
-         $qb = $this->em->createQueryBuilder()->select($selects);
-         return $qb->map($this->classname)
-                   ->criteria($criteria);
-    }
-
-
-
-
-    /**
-     * @inheritDoc
-    */
-    public function insert(string $table, array $attributes): int
-    {
-         return $this->em->createQueryBuilder()->insert($table, $attributes);
-    }
-
-
-
-
-    /**
-     * @inheritDoc
-    */
-    public function update(string $table, array $attributes, array $criteria): int
-    {
-         return $this->em->createQueryBuilder()->update($table, $attributes, $criteria);
+         return $this->createQueryBuilder()
+                     ->select($selects)
+                     ->from($this->getTableName())
+                     ->criteria($criteria)
+                     ->map($this->getClassname());
     }
 
 
@@ -81,10 +115,48 @@ class Persistence implements PersistenceInterface
 
 
     /**
+     * @inheritdoc
+    */
+    public function find(int $id): ?object
+    {
+        return $this->select("*", [$this->getIdentifier() => $id]);
+    }
+
+
+
+
+
+    /**
      * @inheritDoc
     */
-    public function delete(string $table, array $criteria): bool
+    public function insert(array $attributes): int
     {
-        return $this->em->createQueryBuilder()->delete($table, $criteria);
+         return $this->createQueryBuilder()->insert($this->getTableName(), $attributes);
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function update(array $attributes, array $criteria): int
+    {
+         return $this->createQueryBuilder()->update($this->getTableName(), $attributes, $criteria);
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function delete(array $criteria): bool
+    {
+        return $this->createQueryBuilder()->delete($this->getTableName(), $criteria);
     }
 }

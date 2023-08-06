@@ -7,8 +7,6 @@ namespace Laventure\Component\Database\ORM\Collection;
 */
 abstract class Collection extends \SplObjectStorage
 {
-
-
     /**
      * @param object $object
      *

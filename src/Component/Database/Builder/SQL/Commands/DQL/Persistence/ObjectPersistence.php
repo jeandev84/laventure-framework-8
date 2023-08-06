@@ -1,7 +1,6 @@
 <?php
-namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
+namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 
 
 /**

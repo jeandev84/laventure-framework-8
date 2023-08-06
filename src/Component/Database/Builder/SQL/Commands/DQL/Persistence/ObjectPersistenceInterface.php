@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping;
+namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence;
 
 
 /**

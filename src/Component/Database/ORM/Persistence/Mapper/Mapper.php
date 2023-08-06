@@ -13,5 +13,16 @@ abstract class Mapper implements DataMapperInterface
      *
      * @return mixed
     */
-    abstract protected function mapRows(object $object);
+    abstract protected function mapRows(object $object): mixed;
+
+
+
+
+
+    /**
+     * @param array $data
+     *
+     * @return object
+    */
+    abstract protected function fromState(array $data): object;
 }

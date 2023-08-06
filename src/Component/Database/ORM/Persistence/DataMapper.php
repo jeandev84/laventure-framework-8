@@ -21,12 +21,23 @@ class DataMapper extends Mapper
 
 
     /**
+     * @var UnitOfWork
+    */
+    protected UnitOfWork $unitOfWork;
+
+
+
+
+
+    /**
      * @param EntityManager $em
     */
     public function __construct(EntityManager $em)
     {
          $this->em = $em;
     }
+
+
 
 
 
@@ -69,7 +80,19 @@ class DataMapper extends Mapper
     /**
      * @inheritDoc
     */
-    protected function mapRows(object $object)
+    protected function mapRows(object $object): mixed
+    {
+
+    }
+
+
+
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function fromState(array $data): object
     {
 
     }

@@ -50,6 +50,13 @@ class Query implements QueryInterface
 
 
 
+    /**
+     * @var string
+    */
+    protected string $sql = '';
+
+
+
 
     /**
      * @var array
@@ -107,6 +114,8 @@ class Query implements QueryInterface
     {
         $this->statement = $this->pdo->prepare($sql);
 
+        $this->sql = $sql;
+
         return $this;
     }
 
@@ -120,6 +129,8 @@ class Query implements QueryInterface
     public function query(string $sql): static
     {
         $this->statement = $this->pdo->query($sql);
+
+        $this->sql = $sql;
 
         return $this;
     }
@@ -241,6 +252,7 @@ class Query implements QueryInterface
             }
 
         } catch (PDOException $e) {
+
             $this->abort($e);
         }
 

@@ -33,12 +33,24 @@ interface PersistenceInterface
 
 
 
+    /**
+     * Find one record
+     *
+     * @param int $id
+     *
+     * @return object|null
+    */
+    public function find(int $id): ?object;
+
+
+
+
 
 
     /**
      * Insert new record
     */
-    public function insert(string $table, array $attributes): int;
+    public function insert(array $attributes): int;
 
 
 
@@ -51,7 +63,7 @@ interface PersistenceInterface
     /**
      * Update records
     */
-    public function update(string $table, array $attributes, array $criteria): int;
+    public function update(array $attributes, array $criteria): int;
 
 
 
@@ -62,11 +74,9 @@ interface PersistenceInterface
     /**
      * Delete records
      *
-     * @param string $table
-     *
      * @param array $criteria
      *
      * @return bool
     */
-    public function delete(string $table, array $criteria): bool;
+    public function delete(array $criteria): bool;
 }

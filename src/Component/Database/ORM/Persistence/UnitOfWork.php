@@ -1,7 +1,8 @@
 <?php
 namespace Laventure\Component\Database\ORM\Persistence;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
+
+use Laventure\Component\Database\ORM\Collection\ObjectStorage;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -29,9 +30,26 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
     /**
-     * @var array
+     * @var EntityManager
     */
-    protected array $managed = [];
+    protected EntityManager $em;
+
+
+
+
+    /**
+     * @var ObjectStorage
+    */
+    protected ObjectStorage $storage;
+
+
+
+
+
+    /**
+     * @var DataMapper
+    */
+    protected DataMapper $dataMapper;
 
 
 
@@ -40,9 +58,15 @@ class UnitOfWork implements UnitOfWorkInterface
     /**
      * @var object[]
     */
-    protected array $persisted = [];
+    protected array $managed = [];
 
 
+
+
+    /**
+     * @var object[]
+    */
+    protected array $persists = [];
 
 
 
@@ -52,25 +76,18 @@ class UnitOfWork implements UnitOfWorkInterface
     protected array $removes = [];
 
 
-
-
-    /**
-     * @var EntityManager
-    */
-    protected EntityManager $em;
-
-
-
-
-
-
     /**
      * @param EntityManager $em
     */
     public function __construct(EntityManager $em)
     {
-        $this->em = $em;
+         $this->em         = $em;
+         $this->dataMapper = new DataMapper($this->em);
+         $this->storage    = new ObjectStorage();
     }
+
+
+
 
 
 
@@ -91,14 +108,14 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
-
     /**
      * @inheritDoc
     */
     public function persist(object $object): void
     {
-
+        $this->persists[] = $object;
     }
+
 
 
 
@@ -109,7 +126,7 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function remove(object $object): void
     {
-
+        $this->removes[] = $object;
     }
 
 
@@ -132,7 +149,7 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function attach(object $object): void
     {
-
+        $this->storage->attach($object);
     }
 
 
@@ -144,8 +161,9 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function detach(object $object): void
     {
-
+        $this->storage->detach($object);
     }
+
 
 
 
@@ -155,8 +173,9 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function merge(object $object): void
     {
-
+         $this->attach($object);
     }
+
 
 
 
@@ -172,12 +191,34 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
+    /**
+     * @return object[]
+    */
+    public function getPersists(): array
+    {
+        return $this->persists;
+    }
+
+
+
+
+
+
+    /**
+     * @return object[]
+    */
+    public function getRemoves(): array
+    {
+        return $this->removes;
+    }
+
+
 
     /**
      * @inheritDoc
     */
     public function clear(): void
     {
-
+        $this->storage->clear();
     }
 }
