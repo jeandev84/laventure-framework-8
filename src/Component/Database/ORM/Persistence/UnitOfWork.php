@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 
 use Laventure\Component\Database\ORM\Collection\ObjectStorage;
+use Laventure\Component\Database\ORM\Persistence\Manager\Exception\EntityManagerException;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -183,16 +184,18 @@ class UnitOfWork implements UnitOfWorkInterface
     /**
      * @inheritDoc
     */
-    public function commit(): bool
+    public function commit(): void
     {
+         $this->em->transaction(function () {
 
+         });
     }
 
 
 
 
     /**
-     * @return object[]
+     * @inheritdoc
     */
     public function getPersists(): array
     {
@@ -205,7 +208,7 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
     /**
-     * @return object[]
+     * @inheritdoc
     */
     public function getRemoves(): array
     {

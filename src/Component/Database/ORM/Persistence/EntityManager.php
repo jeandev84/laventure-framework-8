@@ -298,7 +298,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
          } catch (Exception $e) {
              $this->close();
              $this->rollback();
-             throw new EntityManagerException($e->getMessage(), $e->getCode());
+             trigger_error($e->getMessage());
          }
      }
 

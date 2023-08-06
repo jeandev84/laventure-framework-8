@@ -119,7 +119,9 @@ class Persistence implements PersistenceInterface
     */
     public function find(int $id): ?object
     {
-        return $this->select("*", [$this->getIdentifier() => $id]);
+        return $this->select("*", [$this->getIdentifier() => $id])
+                    ->getQuery()
+                    ->getOneOrNullResult();
     }
 
 

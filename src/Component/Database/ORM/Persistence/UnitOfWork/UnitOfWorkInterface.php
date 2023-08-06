@@ -100,12 +100,30 @@ interface UnitOfWorkInterface
      /**
       * Commit changes
       *
-      * @return bool
+      * @return void
      */
-     public function commit(): bool;
+     public function commit(): void;
 
 
 
+
+
+
+
+    /**
+     * @return object[]
+    */
+    public function getPersists(): array;
+
+
+
+
+
+
+    /**
+     * @return object[]
+     */
+    public function getRemoves(): array;
 
 
 
