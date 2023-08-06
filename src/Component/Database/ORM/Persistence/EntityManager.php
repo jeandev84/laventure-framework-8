@@ -2,16 +2,17 @@
 namespace Laventure\Component\Database\ORM\Persistence;
 
 use Closure;
+use Exception;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EntityManagerInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
+use Laventure\Component\Database\ORM\Persistence\Manager\Exception\EntityManagerException;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
-use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataInterface;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataFactory;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
 use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepository;
 use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryFactory;
-use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryInterface;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -33,8 +34,15 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @var Definition
     */
-    protected Definition $config;
+    protected Definition $definition;
 
+
+
+
+    /**
+     * @var EventManager
+    */
+    protected EventManager $eventManager;
 
 
 
@@ -49,9 +57,37 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
     /**
-     * @var ClassMetadata
+     * @var ClassMetadataFactory
     */
-    protected ClassMetadata $metadata;
+    protected ClassMetadataFactory $metadataFactory;
+
+
+
+
+
+    /**
+     * @var EntityRepositoryFactory
+    */
+    protected EntityRepositoryFactory $repositoryFactory;
+
+
+
+
+
+    /**
+     * @var string
+    */
+    protected string $mapped = '';
+
+
+
+
+
+    /**
+     * @var bool
+    */
+    protected bool $enabled = false;
+
 
 
 
@@ -66,11 +102,6 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
-    /**
-     * @var bool
-    */
-    protected bool $enabled = false;
-
 
 
 
@@ -79,12 +110,17 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
      * @param ConnectionInterface $connection
      *
      * @param Definition $definition
+     *
+     * @param EventManager $eventManager
     */
-    public function __construct(ConnectionInterface $connection, Definition $definition)
+    public function __construct(ConnectionInterface $connection, Definition $definition, EventManager $eventManager)
     {
-        $this->connection   = $connection;
-        $this->config   = $definition;
-        $this->unitOfWork   = new UnitOfWork($this);
+        $this->connection        = $connection;
+        $this->definition        = $definition;
+        $this->eventManager      = $eventManager;
+        $this->metadataFactory   = $definition->getMetadataFactory();
+        $this->repositoryFactory = $definition->getRepositoryFactory();
+        $this->unitOfWork        = new UnitOfWork($this);
     }
 
 
@@ -137,7 +173,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function getUnitOfWork(): UnitOfWorkInterface
+    public function getUnitOfWork(): UnitOfWork
     {
         return $this->unitOfWork;
     }
@@ -161,9 +197,9 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function find(string $classname, $id): object|null
+    public function find(string $classname, $id): ?object
     {
-        return $this->getRepository($classname)->find($id);
+
     }
 
 
@@ -174,15 +210,13 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function getRepository(string $classname): EntityRepositoryInterface
+    public function getRepository(string $classname): EntityRepository
     {
          if (isset($this->repositories[$classname])) {
              return $this->repositories[$classname];
          }
 
-         $factory = $this->config->getRepositoryFactory();
-
-         if (! $repository = $factory->createRepository($classname)) {
+         if (! $repository = $this->repositoryFactory->createRepository($classname)) {
                $repository = new EntityRepository($this, new ClassMetadata($classname));
          }
 
@@ -193,14 +227,6 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
-    /**
-     * @inheritDoc
-    */
-    public function getMetadata(): ClassMetadataInterface
-    {
-
-    }
-
 
 
 
@@ -209,8 +235,12 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function createQueryBuilder(): QueryBuilder
     {
-
+         return new QueryBuilder($this);
     }
+
+
+
+
 
 
 
@@ -221,6 +251,8 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
      {
          return $this->connection->beginTransaction();
      }
+
+
 
 
 
@@ -255,9 +287,18 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
      /**
       * @inheritDoc
      */
-     public function transaction(Closure $func): mixed
+     public function transaction(Closure $func): void
      {
+         $this->beginTransaction();
 
+         try {
+             $func($this);
+             $this->commit();
+         } catch (Exception $e) {
+             $this->close();
+             $this->rollback();
+             throw new EntityManagerException($e->getMessage(), $e->getCode());
+         }
      }
 
 
@@ -379,11 +420,28 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
     /**
+     * @param string $mapped
+     *
+     * @return static
+    */
+    public function mapped(string $mapped): static
+    {
+        $this->mapped = $mapped;
+
+        return $this;
+    }
+
+
+
+
+
+
+    /**
      * @inheritDoc
     */
     public function hasMapping(): bool
     {
-        return ! empty($this->metadata->getClassname());
+        return ! empty($this->mapped);
     }
 
 
@@ -395,19 +453,21 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function getMapped(): string
     {
-        return $this->metadata->getClassname();
+        return $this->mapped;
     }
 
 
 
 
 
+
+
     /**
-     * @return string
+     * @inheritDoc
     */
-    public function getTableName(): string
+    public function getClassMetadata(string $classname): ClassMetadata
     {
-        return $this->metadata->getTableName();
+        return $this->metadataFactory->createClassMetadata($classname);
     }
 
 

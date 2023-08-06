@@ -4,6 +4,7 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataFactory;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataInterface;
 use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryFactory;
 
@@ -11,26 +12,21 @@ class Definition
 {
 
 
-       /**
-        * @var EntityRepositoryFactory
-       */
-       protected EntityRepositoryFactory $repositoryFactory;
+         /**
+          * @var ClassMetadataFactory
+         */
+         protected ClassMetadataFactory $metadataFactory;
 
 
 
 
-       /**
-        * @var EventManager
-       */
-       protected EventManager $eventManager;
 
 
+        /**
+         * @var EntityRepositoryFactory
+        */
+        protected EntityRepositoryFactory $repositoryFactory;
 
-
-       /**
-        * @var ClassMetadata
-       */
-       protected ClassMetadata $metadata;
 
 
 
@@ -38,14 +34,17 @@ class Definition
 
 
        /**
-         * @param EntityRepositoryFactory $repositoryFactory
-         *
-         * @param EventManager $eventManager
+        * @param EntityRepositoryFactory $repositoryFactory
+        *
+        * @param ClassMetadataFactory $metadataFactory
        */
-       public function __construct(EntityRepositoryFactory $repositoryFactory, EventManager $eventManager)
+       public function __construct(
+           ClassMetadataFactory $metadataFactory,
+           EntityRepositoryFactory $repositoryFactory,
+       )
        {
+           $this->metadataFactory   = $metadataFactory;
            $this->repositoryFactory = $repositoryFactory;
-           $this->eventManager      = $eventManager;
        }
 
 
@@ -65,25 +64,12 @@ class Definition
 
 
 
-
-       /**
-        * @return EventManager
-       */
-       public function getEventManager(): EventManager
-       {
-           return $this->eventManager;
-       }
-
-
-
-
-
       /**
-       * @return ClassMetadata
+       * @return ClassMetadataFactory
       */
-      public function getClassMetadata(): ClassMetadata
+      public function getMetadataFactory(): ClassMetadataFactory
       {
-
+           return $this->metadataFactory;
       }
 
 }

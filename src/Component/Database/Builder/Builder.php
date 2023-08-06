@@ -32,12 +32,10 @@ class Builder
 
      /**
       * @param ConnectionInterface $connection
-      *
-      * @param string $table
      */
-     public function __construct(ConnectionInterface $connection, string $table)
+     public function __construct(ConnectionInterface $connection)
      {
-          $this->builder = new SqlQueryBuilder($connection, $table);
+          $this->builder = new SqlQueryBuilder($connection);
      }
 
 
@@ -78,19 +76,21 @@ class Builder
 
 
 
-
-
     /**
      * Insert records
      *
+     * @param string $table
+     *
      * @param array $attributes
      *
-     * @return bool
+     * @return int
     */
-    public function insert(array $attributes): bool
+    public function insert(string $table, array $attributes): int
     {
-         return $this->builder->insert($attributes)->execute();
+         return $this->builder->insert($table, $attributes)->execute();
     }
+
+
 
 
 
@@ -102,15 +102,17 @@ class Builder
     /**
      * Update record
      *
+     * @param string $table
+     *
      * @param array $attributes
      *
-     * @param array $wheres
+     * @param array $criteria
      *
-     * @return bool
+     * @return int
     */
-    public function update(array $attributes, array $wheres): bool
+    public function update(string $table, array $attributes, array $criteria): int
     {
-         return $this->builder->update($attributes)->criteria($wheres)->execute();
+         return $this->builder->update($table, $attributes, $criteria)->execute();
     }
 
 
@@ -120,13 +122,16 @@ class Builder
 
 
 
+
     /**
-     * @param array $wheres
+     * @param string $table
+     *
+     * @param array $criteria
      *
      * @return bool
     */
-    public function delete(array $wheres): bool
+    public function delete(string $table, array $criteria): bool
     {
-         return $this->builder->delete()->criteria($wheres)->execute();
+         return $this->builder->delete($table, $criteria)->execute();
     }
 }

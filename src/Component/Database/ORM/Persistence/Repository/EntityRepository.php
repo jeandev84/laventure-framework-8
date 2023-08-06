@@ -55,8 +55,10 @@ class EntityRepository implements EntityRepositoryInterface
     {
          return $this->em->createQueryBuilder()
                          ->select()
+                         ->map($this->getClassName())
                          ->from($this->getTableName(), $alias);
     }
+
 
 
 
@@ -111,6 +113,8 @@ class EntityRepository implements EntityRepositoryInterface
 
 
 
+
+
     /**
      * @inheritDoc
     */
@@ -123,11 +127,36 @@ class EntityRepository implements EntityRepositoryInterface
 
 
 
+
+    /**
+     * @return ClassMetadata
+    */
+    protected function getClassMetadata(): ClassMetadata
+    {
+        return $this->metadata;
+    }
+
+
+
+
+
     /**
      * @return string
     */
     protected function getTableName(): string
     {
         return $this->metadata->getTableName();
+    }
+
+
+
+
+
+    /**
+     * @return EntityManager
+    */
+    protected function getEntityManager(): EntityManager
+    {
+        return $this->em;
     }
 }

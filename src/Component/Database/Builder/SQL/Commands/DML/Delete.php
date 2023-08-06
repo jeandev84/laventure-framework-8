@@ -25,6 +25,7 @@ class Delete extends SQLBuilderHasConditions implements DeleteBuilderInterface
 
 
 
+
     /**
      * @inheritDoc
     */

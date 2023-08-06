@@ -34,7 +34,7 @@ class QueryBuilder extends Builder
       */
       public function __construct(EntityManager $em)
       {
-          parent::__construct($em->getConnection(),$em->getTableName());
+          parent::__construct($em->getConnection());
           $this->em = $em;
       }
 

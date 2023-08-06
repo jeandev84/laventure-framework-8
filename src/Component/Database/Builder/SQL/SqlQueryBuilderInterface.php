@@ -20,14 +20,17 @@ interface SqlQueryBuilderInterface
 {
 
 
-      /**
-       * Select records
-       *
-       * @param string $selects
-       *
-       * @return Select
+
+     /**
+      * Select records
+      *
+      * @param string|null $selects
+      * @return Select
      */
-     public function select(string $selects): Select;
+     public function select(string $selects = null): Select;
+
+
+
 
 
 
@@ -37,11 +40,14 @@ interface SqlQueryBuilderInterface
      /**
       * Insert records
       *
+      * @param string $table
+      *
       * @param array $attributes
       *
       * @return Insert
      */
-     public function insert(array $attributes): Insert;
+     public function insert(string $table, array $attributes): Insert;
+
 
 
 
@@ -52,11 +58,19 @@ interface SqlQueryBuilderInterface
      /**
       * Update record
       *
+      * @param string $table
+      *
       * @param array $attributes
+      *
+      * @param array $criteria
       *
       * @return Update
      */
-     public function update(array $attributes): Update;
+     public function update(string $table, array $attributes, array $criteria): Update;
+
+
+
+
 
 
 
@@ -65,7 +79,11 @@ interface SqlQueryBuilderInterface
 
 
      /**
+      * @param string $table
+      *
+      * @param array $criteria
+      *
       * @return Delete
      */
-     public function delete(): Delete;
+     public function delete(string $table, array $criteria): Delete;
 }

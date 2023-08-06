@@ -59,7 +59,6 @@ abstract class SQlBuilder
 
 
 
-
       /**
        * @param string $name
        *
@@ -107,10 +106,12 @@ abstract class SQlBuilder
 
 
 
+
+
       /**
        * @return string
       */
-      protected function getTable(): string
+      public function getTable(): string
       {
            return $this->table;
       }

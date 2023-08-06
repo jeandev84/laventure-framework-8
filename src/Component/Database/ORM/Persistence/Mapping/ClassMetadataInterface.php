@@ -113,6 +113,8 @@ interface ClassMetadataInterface
 
 
 
+
+
     /**
      * Determine if field has value object or other value
      *
@@ -136,5 +138,20 @@ interface ClassMetadataInterface
      * @return bool
     */
     public function isCollectionValueAssociation(string $field): bool;
+
+
+
+
+
+
+
+    /**
+     * Get columns value
+     *
+     * @param object $object
+     *
+     * @return mixed
+    */
+    public function getIdentifierValues(object $object): mixed;
 
 }

@@ -16,8 +16,6 @@ class ServiceRepository extends EntityRepository
        * @param EntityManager $em
        *
        * @param string $classname
-       *
-       * @throws \ReflectionException
      */
      public function __construct(EntityManager $em, string $classname)
      {

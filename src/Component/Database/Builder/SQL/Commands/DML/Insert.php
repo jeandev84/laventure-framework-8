@@ -56,6 +56,7 @@ class Insert extends SQlBuilder implements InsertBuilderInterface
 
 
 
+
     /**
      * @inheritDoc
     */

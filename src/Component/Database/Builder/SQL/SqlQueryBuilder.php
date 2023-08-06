@@ -32,23 +32,13 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
 
 
     /**
-     * @var string
-    */
-    protected string $table;
-
-
-
-
-    /**
      * @param ConnectionInterface $connection
-     *
-     * @param string $table
     */
-    public function __construct(ConnectionInterface $connection, string $table)
+    public function __construct(ConnectionInterface $connection)
     {
          $this->connection = $connection;
-         $this->table      = $table;
     }
+
 
 
 
@@ -73,9 +63,9 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     /**
      * @inheritDoc
     */
-    public function insert(array $attributes): Insert
+    public function insert(string $table, array $attributes): Insert
     {
-         $command = new Insert($this->connection, $this->table);
+         $command = new Insert($this->connection, $table);
          $command->insert($attributes);
          return $command;
     }
@@ -88,10 +78,11 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     /**
      * @inheritDoc
     */
-    public function update(array $attributes): Update
+    public function update(string $table, array $attributes, array $criteria): Update
     {
-         $command = new Update($this->connection, $this->table);
+         $command = new Update($this->connection, $table);
          $command->update($attributes);
+         $command->criteria($criteria);
          return $command;
     }
 
@@ -103,8 +94,10 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     /**
      * @inheritDoc
     */
-    public function delete(): Delete
+    public function delete(string $table, array $criteria): Delete
     {
-        return new Delete($this->connection, $this->table);
+        $command = new Delete($this->connection, $table);
+        $command->criteria($criteria);
+        return $command;
     }
 }

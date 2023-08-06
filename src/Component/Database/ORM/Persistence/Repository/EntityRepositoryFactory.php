@@ -10,7 +10,7 @@ namespace Laventure\Component\Database\ORM\Persistence\Repository;
  *
  * @package Laventure\Component\Database\ORM\Persistence\Repository
 */
-interface EntityRepositoryFactory
+abstract class EntityRepositoryFactory
 {
 
     /**
@@ -18,7 +18,7 @@ interface EntityRepositoryFactory
      *
      * @param string $classname
      *
-     * @return EntityRepositoryInterface|null
+     * @return EntityRepository|null
     */
-    public function createRepository(string $classname): ?EntityRepositoryInterface;
+    abstract public function createRepository(string $classname): ?EntityRepository;
 }

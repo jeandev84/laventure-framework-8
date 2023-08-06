@@ -27,6 +27,7 @@ interface UnitOfWorkInterface
 
 
 
+
      /**
       * Register state NEW or UPDATE
       *

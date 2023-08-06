@@ -1,6 +1,7 @@
 <?php
 namespace Laventure\Component\Database\ORM\Persistence;
 
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -18,12 +19,37 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
+
+    /**
+     * @var Persistence
+    */
+    protected Persistence $persistence;
+
+
+
+
     /**
      * @var array
+    */
+    protected array $managed = [];
+
+
+
+
+
+    /**
+     * @var object[]
     */
     protected array $persisted = [];
 
 
+
+
+
+    /**
+     * @var object[]
+    */
+    protected array $removes = [];
 
 
 
@@ -51,12 +77,16 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
     /**
-     * @inheritDoc
+     * @param string $classname
+     *
+     * @return Persistence
     */
-    public function find($id): void
+    public function getPersistence(string $classname): Persistence
     {
-
+         return new Persistence($this->em, $classname);
     }
+
+
 
 
 

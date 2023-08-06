@@ -3,10 +3,10 @@ namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 use Closure;
 use Laventure\Component\Database\Connection\ConnectionInterface;
-use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataInterface;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
-use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryInterface;
-use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
+use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepository;
+use Laventure\Component\Database\ORM\Persistence\UnitOfWork;
 
 
 /**
@@ -43,6 +43,8 @@ interface EntityManagerInterface extends ObjectManager
 
 
 
+
+
     /**
      * Returns connection real
      *
@@ -60,9 +62,9 @@ interface EntityManagerInterface extends ObjectManager
     /**
      * Returns unit of work
      *
-     * @return UnitOfWorkInterface
+     * @return UnitOfWork
     */
-    public function getUnitOfWork(): UnitOfWorkInterface;
+    public function getUnitOfWork(): UnitOfWork;
 
 
 
@@ -95,7 +97,20 @@ interface EntityManagerInterface extends ObjectManager
      *
      * @return object|null
     */
-    public function find(string $classname, $id): object|null;
+    public function find(string $classname, $id): ?object;
+
+
+
+
+
+
+
+    /**
+     * @param string $classname
+     *
+     * @return ClassMetadata
+    */
+    public function getClassMetadata(string $classname): ClassMetadata;
 
 
 
@@ -107,22 +122,11 @@ interface EntityManagerInterface extends ObjectManager
     /**
      * @param string $classname
      *
-     * @return EntityRepositoryInterface
+     * @return EntityRepository
     */
-    public function getRepository(string $classname): EntityRepositoryInterface;
+    public function getRepository(string $classname): EntityRepository;
 
 
-
-
-
-
-
-    /**
-     * Returns
-     *
-     * @return ClassMetadataInterface
-    */
-    public function getMetadata(): ClassMetadataInterface;
 
 
 
