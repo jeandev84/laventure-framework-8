@@ -14,22 +14,14 @@ namespace Laventure\Component\Database\ORM\Persistence\UnitOfWork;
 interface UnitOfWorkInterface
 {
 
-     const STATE_MANAGED   = 1;
-     const STATE_NEW       = 2;
-     const STATE_DETACHED  = 3;
-     const STATE_REMOVED   = 4;
-
-
-
-
      /**
       * Find object by id
       *
       * @param $id
       *
-      * @return void
+      * @return object|null
      */
-     public function find($id): void;
+     public function find($id): ?object;
 
 
 
@@ -42,8 +34,7 @@ interface UnitOfWorkInterface
       *
       * @return void
      */
-     public function persist(object $object);
-
+     public function persist(object $object): void;
 
 
 
@@ -126,15 +117,6 @@ interface UnitOfWorkInterface
      public function commit(): bool;
 
 
-
-
-
-
-
-     /**
-      * @return bool
-     */
-     public function rollback(): bool;
 
 
 

@@ -1,7 +1,133 @@
 <?php
 namespace Laventure\Component\Database\ORM\Persistence\Repository;
 
-class EntityRepository
+
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
+use Laventure\Component\Database\ORM\Persistence\EntityManager;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
+use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
+
+
+/**
+ * @inheritdoc
+*/
+class EntityRepository implements EntityRepositoryInterface
 {
 
+
+    /**
+     * @var EntityManager
+    */
+    protected EntityManager $em;
+
+
+
+    /**
+     * @var ClassMetadata
+    */
+    protected ClassMetadata $metadata;
+
+
+
+
+
+    /**
+     * @param EntityManager $em
+     *
+     * @param ClassMetadata $metadata
+    */
+    public function __construct(EntityManager $em, ClassMetadata $metadata)
+    {
+         $this->em  = $em;
+         $this->metadata = $metadata;
+    }
+
+
+
+
+
+    /**
+     * @param string $alias
+     *
+     * @return Select
+    */
+    public function createQueryBuilder(string $alias): Select
+    {
+         return $this->em->createQueryBuilder()
+                         ->select()
+                         ->from($this->getTableName(), $alias);
+    }
+
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function find($id): ?object
+    {
+         return $this->em->getUnitOfWork()->find($id);
+    }
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function findOneBy(array $criteria, array $oderBy = null): ?object
+    {
+
+    }
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function findAll(): array
+    {
+
+    }
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): mixed
+    {
+
+    }
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function getClassName(): string
+    {
+        return $this->metadata->getClassname();
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    protected function getTableName(): string
+    {
+        return $this->metadata->getTableName();
+    }
 }

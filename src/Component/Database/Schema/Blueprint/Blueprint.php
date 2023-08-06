@@ -379,7 +379,7 @@ abstract class Blueprint implements BlueprintInterface
     */
     public function hasTable(): bool
     {
-        return in_array($this->getTable(), $this->getTables());
+        return $this->connection->hasTable($this->getTable());
     }
 
 

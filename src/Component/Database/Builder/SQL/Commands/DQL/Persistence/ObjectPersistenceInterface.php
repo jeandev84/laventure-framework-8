@@ -14,33 +14,34 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping;
 interface ObjectPersistenceInterface
 {
 
-     /**
-      * @param string $classname
-      *
-      * @return static
-     */
-     public function mapped(string $classname): static;
+
+    /**
+     * Determine if mapped class
+     *
+     * @return bool
+    */
+    public function hasMapping(): bool;
+
+
+
+
+
+    /**
+     * Returns mapped class
+     *
+     * @return string
+    */
+    public function getMapped(): string;
 
 
 
 
 
 
-     /**
-      * @param object[] $objects
-      *
-      * @return mixed
-     */
-     public function persistence(array $objects): mixed;
-
-
-
-
-
-
-
-     /**
-      * @return string
-     */
-     public function getMapped(): string;
+    /**
+     * @param object[] $objects
+     *
+     * @return void
+    */
+    public function persistence(array $objects): void;
 }

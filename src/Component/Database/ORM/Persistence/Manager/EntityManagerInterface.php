@@ -1,8 +1,12 @@
 <?php
 namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
+use Closure;
 use Laventure\Component\Database\Connection\ConnectionInterface;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataInterface;
+use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
 use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryInterface;
+use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
 /**
@@ -13,11 +17,14 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
+     * Open entity manager
+     *
      * @param bool $enabled
      *
-     * @return mixed
+     * @return static
     */
-    public function open(bool $enabled): mixed;
+    public function open(bool $enabled): static;
+
 
 
 
@@ -25,10 +32,11 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
+     * Determine if the entity manager opened
+     *
      * @return bool
     */
     public function isOpen(): bool;
-
 
 
 
@@ -41,6 +49,37 @@ interface EntityManagerInterface extends ObjectManager
      * @return ConnectionInterface
     */
     public function getConnection(): ConnectionInterface;
+
+
+
+
+
+
+
+
+    /**
+     * Returns unit of work
+     *
+     * @return UnitOfWorkInterface
+    */
+    public function getUnitOfWork(): UnitOfWorkInterface;
+
+
+
+
+
+
+
+
+    /**
+     * Returns event manager
+     *
+     * @return EventManager
+    */
+    public function getEventManager(): EventManager;
+
+
+
 
 
 
@@ -79,11 +118,36 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
-     * @param string $classname
+     * Returns
      *
-     * @return mixed
+     * @return ClassMetadataInterface
     */
-    public function getClassMetadata(string $classname);
+    public function getMetadata(): ClassMetadataInterface;
+
+
+
+
+
+
+    /**
+     * Create query builder
+     *
+     * @return QueryBuilder
+    */
+    public function createQueryBuilder(): QueryBuilder;
+
+
+
+
+
+
+    /**
+     * Begin transaction
+     *
+     * @return bool
+    */
+    public function beginTransaction(): bool;
+
 
 
 
@@ -93,6 +157,54 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
+     * Commit all changes
+     *
+     * @return bool
+    */
+    public function commit(): bool;
+
+
+
+
+
+
+
+
+
+    /**
+     * Rollback commit process
+     *
+     * @return bool
+    */
+    public function rollback(): bool;
+
+
+
+
+
+
+
+
+    /**
+     * Call transaction
+     *
+     * @param Closure $func
+     *
+     * @return void
+    */
+    public function transaction(Closure $func): void;
+
+
+
+
+
+
+
+
+
+    /**
+     * Close entity manager
+     *
      * @return void
     */
     public function close(): void;

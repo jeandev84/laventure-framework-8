@@ -20,9 +20,9 @@ interface ObjectManager
      *
      * @param object $object
      *
-     * @return mixed
+     * @return void
     */
-    public function persist(object $object): mixed;
+    public function persist(object $object): void;
 
 
 
@@ -86,9 +86,9 @@ interface ObjectManager
      *
      * @param object $object
      *
-     * @return mixed
+     * @return void
     */
-    public function refresh(object $object): mixed;
+    public function refresh(object $object): void;
 
 
 
@@ -124,12 +124,13 @@ interface ObjectManager
 
 
 
+
     /**
      * Determine if object in storage
      *
      * @param object $object
      *
-     * @return mixed
+     * @return bool
     */
-    public function contains(object $object): mixed;
+    public function contains(object $object): bool;
 }

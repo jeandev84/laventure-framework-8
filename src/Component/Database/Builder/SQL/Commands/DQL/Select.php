@@ -103,12 +103,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
     /**
      * @param ConnectionInterface $connection
-     *
-     * @param string $table
     */
-    public function __construct(ConnectionInterface $connection, string $table)
+    public function __construct(ConnectionInterface $connection)
     {
-         parent::__construct($connection, $table);
+         parent::__construct($connection, '');
          $this->persistence = new ObjectPersistence();
     }
 
@@ -117,16 +115,19 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
+     * set object persistence manager
+     *
      * @param ObjectPersistenceInterface $persistence
      *
      * @return $this
     */
     public function persistence(ObjectPersistenceInterface $persistence): static
     {
-        $this->persistence  = $persistence;
+        $this->persistence = $persistence;
 
         return $this;
     }
+
 
 
 
@@ -169,7 +170,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function from(string $table, string $alias = ''): static
     {
-         $this->from[] = "$table $alias";
+         $this->from[$table] = $alias ? "$table $alias" : $table;
 
          return $this;
     }
@@ -356,7 +357,13 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function fetch(): QueryResultInterface
     {
-        return $this->statement()->fetch();
+        $fetch = $this->statement()->fetch();
+
+        if ($this->persistence->hasMapping()) {
+            $fetch->map($this->persistence->getMapped());
+        }
+
+        return $fetch;
     }
 
 
@@ -407,7 +414,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function getTable(): string
     {
-        return ($this->from ? join(', ', $this->from) : parent::getTable());
+        return join(', ', array_values($this->from));
     }
 
 

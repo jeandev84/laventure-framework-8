@@ -209,13 +209,24 @@ abstract class DriverConnection extends PdoConnection implements ConnectionInter
      *
      * @return mixed
     */
-    private function createDriverException(string $message): mixed
+    private function createDriverException(string $message): void
     {
-         return (function () use ($message) {
+         (function () use ($message) {
               throw new DriverConnectionException($message);
          })();
     }
 
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function hasTable(string $name): bool
+    {
+        return in_array($name, $this->getTables());
+    }
 
 
 

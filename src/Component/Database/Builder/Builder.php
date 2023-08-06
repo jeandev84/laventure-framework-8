@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\Builder;
 
 
 
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\Builder\SQL\Commands\Expr\Expr;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
@@ -25,7 +26,6 @@ class Builder
        * @var SqlQueryBuilder
       */
       protected SqlQueryBuilder $builder;
-
 
 
 

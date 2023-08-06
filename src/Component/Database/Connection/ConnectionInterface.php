@@ -317,6 +317,21 @@ interface ConnectionInterface
 
 
     /**
+     * Determine if table name exists in database
+     *
+     * @param string $name
+     *
+     * @return bool
+    */
+    public function hasTable(string $name): bool;
+
+
+
+
+
+
+
+    /**
      * Returns database tables
      *
      * @return array

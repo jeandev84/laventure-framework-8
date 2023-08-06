@@ -146,7 +146,7 @@ class Schema implements SchemaInterface
     */
     public function exists(string $table): bool
     {
-        return $this->blueprint($table)->hasTable();
+        return $this->connection->hasTable($table);
     }
 
 

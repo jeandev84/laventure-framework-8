@@ -59,8 +59,11 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     */
     public function select(string $selects = null): Select
     {
-         return new Select($this->connection, $this->table, $selects);
+         $select = new Select($this->connection);
+         $select->addSelect($selects);
+         return $select;
     }
+
 
 
 

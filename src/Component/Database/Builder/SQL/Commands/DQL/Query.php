@@ -46,23 +46,9 @@ class Query implements SelectQueryInterface
         */
         public function __construct(QueryResultInterface $hydrate, ObjectPersistenceInterface $persistence)
         {
-              $this->mapped      = $persistence->getMapped();
-              $this->hydrate     = $this->mapped ? $hydrate->map($this->mapped) : $hydrate;
+              $this->hydrate     = $hydrate;
               $this->persistence = $persistence;
         }
-
-
-
-
-
-        /**
-         * @inheritdoc
-        */
-        public function hasMapping(): bool
-        {
-            return ! empty($this->mapped);
-        }
-
 
 
 
@@ -75,9 +61,7 @@ class Query implements SelectQueryInterface
         {
             $records = $this->hydrate->all();
 
-            if ($this->hasMapping()) {
-                $this->persistence->persistence($records);
-            }
+            $this->persistence->persistence($records);
 
             return $records;
         }
@@ -94,9 +78,7 @@ class Query implements SelectQueryInterface
         {
             $record = $this->hydrate->one();
 
-            if ($this->hasMapping()) {
-                $this->persistence->persistence([$record]);
-            }
+            $this->persistence->persistence([$record]);
 
             return $record;
         }

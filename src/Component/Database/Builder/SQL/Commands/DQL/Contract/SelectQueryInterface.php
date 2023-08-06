@@ -15,17 +15,6 @@ interface SelectQueryInterface
 {
 
     /**
-     * Determine if has been mapping class
-     *
-     * @return bool
-    */
-    public function hasMapping(): bool;
-
-
-
-
-
-    /**
      * Return the name of mapped class
      *
      * @return string

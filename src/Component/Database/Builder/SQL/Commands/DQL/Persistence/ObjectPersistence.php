@@ -3,6 +3,10 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Mapping\ObjectPersistenceInterface;
 
+
+/**
+ * @inheritdoc
+*/
 class ObjectPersistence implements ObjectPersistenceInterface
 {
 
@@ -24,53 +28,49 @@ class ObjectPersistence implements ObjectPersistenceInterface
 
 
      /**
-      * @inheritDoc
+      * @param string $classname
+      *
+      * @return static
      */
-     public function persistence(array $objects): static
+     public function mapped(string $classname): static
      {
-           if ($this->classname) {
-               $this->persisted[] = $objects;
-           }
+         $this->classname = $classname;
 
-           return $this;
+         return $this;
      }
 
 
 
 
 
-    /**
-     * @inheritDoc
-    */
-    public function mapped(string $classname): static
-    {
-        $this->classname = $classname;
-
-        return $this;
-    }
+     /**
+      * @inheritDoc
+     */
+     public function persistence(array $objects): void
+     {
+           $this->persisted[] = $objects;
+     }
 
 
 
 
 
-    /**
-     * @inheritDoc
-    */
-    public function getMapped(): string
-    {
-        return $this->classname;
-    }
+     /**
+      * @inheritDoc
+     */
+     public function hasMapping(): bool
+     {
+         return ! empty($this->classname);
+     }
 
 
 
 
-
-    /**
-     * @inheritDoc
-    */
-    public function close(): void
-    {
-         $this->enabled = false;
-         $this->persisted = [];
-    }
+     /**
+      * @inheritDoc
+     */
+     public function getMapped(): string
+     {
+         return $this->classname;
+     }
 }

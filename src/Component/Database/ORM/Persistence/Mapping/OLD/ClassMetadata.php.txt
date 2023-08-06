@@ -1,0 +1,126 @@
+<?php
+namespace Laventure\Component\Database\ORM\Persistence\Mapping;
+
+
+use ReflectionClass;
+
+/**
+ * @inheritdoc
+*/
+class ClassMetadata implements ClassMetadataInterface
+{
+
+       /**
+        * @var ReflectionClass
+       */
+       protected ReflectionClass $reflection;
+
+
+
+
+
+       /**
+        * @var string
+       */
+       protected string $table;
+
+
+
+
+
+
+       /**
+        * @param string|object $classname
+        *
+        * @throws \ReflectionException
+       */
+       public function __construct(string|object $classname)
+       {
+            $this->reflection = new ReflectionClass($classname);
+       }
+
+
+
+
+
+
+       /**
+        * @inheritDoc
+       */
+       public function getClassname(): string
+       {
+           return $this->reflection->getName();
+       }
+
+
+
+
+
+
+       /**
+        * @inheritDoc
+       */
+       public function getTableName(): string
+       {
+           $shortName = $this->reflection->getShortName();
+
+           return mb_strtolower("{$shortName}s");
+       }
+
+
+
+
+
+       /**
+        * @return ReflectionClass
+       */
+       public function reflection(): ReflectionClass
+       {
+           return $this->reflection;
+       }
+
+
+
+
+       public function getColumns(): array
+       {
+           $columns = [];
+
+           foreach ($this->reflection->getProperties() as $property) {
+              $columns[] = $this->camelCaseToUnderscore($property->getName());
+           }
+
+           return $columns;
+       }
+
+
+
+
+
+
+       /**
+        * Example:
+        * Transform authorId to author_id
+        *
+        * @param string $source
+        * @return string
+       */
+       private function camelCaseToUnderscore(string $source): string
+       {
+           return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $source));
+       }
+
+
+
+
+
+
+       /**
+        * @param string $source
+        * @return string
+       */
+       private function underscoreToCamelCase(string $source): string
+       {
+             return lcfirst(str_replace('_', '', ucwords($source, '_')));
+       }
+}
