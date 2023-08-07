@@ -2,6 +2,8 @@
 namespace Laventure\Component\Event\Listener;
 
 
+use Laventure\Component\Event\Subscriber\EventSubscriberInterface;
+
 /**
  * @inheritdoc
 */
@@ -13,6 +15,15 @@ class ListenerProvider implements ListenerProviderInterface
      * @var array
     */
     protected array $listeners = [];
+
+
+
+
+    /**
+     * @var EventSubscriberInterface[]
+    */
+    protected array $subscribers = [];
+
 
 
 
@@ -30,6 +41,64 @@ class ListenerProvider implements ListenerProviderInterface
 
          return $this;
     }
+
+
+
+
+
+    /**
+     * @param array $listeners
+     *
+     * @return $this
+    */
+    public function addListeners(array $listeners): static
+    {
+         foreach ($listeners as $eventName => $callback) {
+              $this->addListener($eventName, $callback);
+         }
+
+         return $this;
+    }
+
+
+
+
+    /**
+     * @param EventSubscriberInterface $subscriber
+     *
+     * @return $this
+    */
+    public function addSubscriber(EventSubscriberInterface $subscriber): static
+    {
+         foreach ($subscriber->getSubscribedEvents() as $event => $callback) {
+               $this->addListener($event, $callback);
+         }
+
+         $this->subscribers[] = $subscriber;
+
+         return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param EventSubscriberInterface[] $subscribers
+     *
+     * @return $this
+    */
+    public function addSubscribers(array $subscribers): static
+    {
+         foreach ($subscribers as $subscriber) {
+             $this->addSubscriber($subscriber);
+         }
+
+         return $this;
+    }
+
+
 
 
 
