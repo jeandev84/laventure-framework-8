@@ -209,8 +209,9 @@ class UnitOfWork implements UnitOfWorkInterface
                        break;
                   endswitch;
               }
-
+              $this->clear();
          });
+
     }
 
 
