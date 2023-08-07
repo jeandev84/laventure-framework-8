@@ -93,6 +93,21 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
+    /**
+     * @var array
+    */
+    protected array $initialized = [];
+
+
+
+
+
+    /**
+     * @var array
+    */
+    protected array $managed = [];
+
+
 
 
     /**
@@ -372,27 +387,13 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
-
     /**
      * @inheritDoc
-    */
-    public function flush(): void
-    {
-        $this->eventManager->dispatchEvent(new PreFlushEvent($this));
-        $this->unitOfWork->commit();
-    }
-
-
-
-
-
-
-    /**
-     * @inheritDoc
-    */
+     */
     public function initialize(object $object): void
     {
-         $this->unitOfWork->attach($object);
+        $this->unitOfWork->attach($object);
+        $this->initialized[get_class($object)] = $object;
     }
 
 
@@ -401,7 +402,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
     /**
      * @inheritDoc
-    */
+     */
     public function contains(object $object): bool
     {
         return $this->unitOfWork->contains($object);
@@ -410,16 +411,19 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
+
     /**
      * @inheritDoc
-    */
+     */
     public function persistence(array $objects): void
     {
         foreach ($objects as $object) {
             if (! is_object($object)) {
                 continue;
             }
+
             $this->persist($object);
+            $this->managed[get_class($object)] = $object;
         }
     }
 
@@ -431,7 +435,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
      * @param string $mapped
      *
      * @return static
-    */
+     */
     public function mapped(string $mapped): static
     {
         $this->mapped = $mapped;
@@ -446,7 +450,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
     /**
      * @inheritDoc
-    */
+     */
     public function hasMapping(): bool
     {
         return ! empty($this->mapped);
@@ -458,7 +462,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
     /**
      * @inheritDoc
-    */
+     */
     public function getMapped(): string
     {
         return $this->mapped;
@@ -472,7 +476,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
     /**
      * @inheritDoc
-    */
+     */
     public function getClassMetadata($classname): ClassMetadata
     {
         return $this->metadataFactory->createClassMetadata($classname);
@@ -485,7 +489,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
     /**
      * @return array
-    */
+     */
     public function getQueries(): array
     {
         return $this->connection->getQueries();
@@ -499,11 +503,25 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @return array
     */
-    public function getExecutedQueries(): array
+    public function logSQL(): array
     {
-         return array_filter($this->getQueries(), function (QueryInterface $statement) {
-             return $statement->getLogger()->getQueriesInfo();
-         });
+        return array_filter($this->getQueries(), function (QueryInterface $statement) {
+            return $statement->getLogger()->getQueriesInfo();
+        });
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function flush(): void
+    {
+        $this->eventManager->dispatchEvent(new PreFlushEvent($this));
+        $this->unitOfWork->commit();
     }
 
 
