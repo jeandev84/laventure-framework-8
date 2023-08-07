@@ -175,7 +175,7 @@ interface ClassMetadataInterface
     /**
      * @return array
     */
-    public function methods(): array;
+    public function getMethods(): array;
 
 
 

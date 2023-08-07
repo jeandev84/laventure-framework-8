@@ -271,7 +271,7 @@ class ClassMetadata implements ClassMetadataInterface
       */
       public function hasAttribute(string $column): bool
       {
-          return array_key_exists($column, $this->map()->attributes());
+          return array_key_exists($column, $this->map()->getAttributes());
       }
 
 
@@ -284,7 +284,7 @@ class ClassMetadata implements ClassMetadataInterface
       */
       public function hasIdentifier(): bool
       {
-           return array_key_exists($this->identifier, $this->map()->identifiers());
+           return array_key_exists($this->identifier, $this->map()->getIdentifiers());
       }
 
 
@@ -315,7 +315,7 @@ class ClassMetadata implements ClassMetadataInterface
               return false;
           }
 
-          $collection = $this->map()->persistenceCollection();
+          $collection = $this->map()->getCollection();
 
           return $collection->hasCollection($field);
      }
@@ -368,7 +368,7 @@ class ClassMetadata implements ClassMetadataInterface
     */
     public function getIdentifierValues(): array
     {
-        return $this->map()->identifiers();
+        return $this->map()->getIdentifiers();
     }
 
 
@@ -378,7 +378,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @inheritdoc
     */
-    public function methods(): array
+    public function getMethods(): array
     {
         $methods = [];
 
@@ -399,7 +399,7 @@ class ClassMetadata implements ClassMetadataInterface
     */
     public function hasMethod(string $name): bool
     {
-        return in_array($name, $this->methods());
+        return in_array($name, $this->getMethods());
     }
 
 
@@ -410,7 +410,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return mixed
     */
-    public function identifierValue(): mixed
+    public function getIdentifierValue(): mixed
     {
         return $this->identifiers[$this->identifier] ?? null;
     }
@@ -422,7 +422,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return array
     */
-    public function attributes(): array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -452,7 +452,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return array
     */
-    public function belongs(): array
+    public function getBelongs(): array
     {
         return $this->belongs;
     }
@@ -465,7 +465,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return PersistenceCollection
     */
-    public function persistenceCollection(): PersistenceCollection
+    public function getCollection(): PersistenceCollection
     {
         return $this->collection;
     }
@@ -477,7 +477,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return array
     */
-    public function identifiers(): array
+    public function getIdentifiers(): array
     {
         return $this->identifiers;
     }
@@ -488,7 +488,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @return array
     */
-    public function properties(): array
+    public function getProperties(): array
     {
         return $this->properties;
     }
