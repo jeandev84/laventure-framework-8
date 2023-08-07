@@ -15,19 +15,6 @@ interface QueryInterface
 {
 
         /**
-         * Simple query
-         *
-         * @param string $sql
-         *
-         * @return $this
-        */
-        public function query(string $sql): static;
-
-
-
-
-
-        /**
          * Prepare sql statement
          *
          * @param string $sql

@@ -123,22 +123,6 @@ class Query implements QueryInterface
 
 
 
-    /**
-     * @inheritDoc
-    */
-    public function query(string $sql): static
-    {
-        $this->statement = $this->pdo->query($sql);
-
-        $this->sql = $sql;
-
-        return $this;
-    }
-
-
-
-
-
 
     /**
      * @inheritDoc

@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 use Closure;
 use Laventure\Component\Database\Connection\ConnectionInterface;
+use Laventure\Component\Database\ORM\Persistence\Manager\Event\EventManager;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
 use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepository;

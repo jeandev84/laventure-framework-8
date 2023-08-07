@@ -3,7 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 
 use Laventure\Component\Database\ORM\Collection\ObjectStorage;
-use Laventure\Component\Database\ORM\Persistence\Manager\Exception\EntityManagerException;
+use Laventure\Component\Database\ORM\Persistence\Manager\Event\EventManager;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -12,14 +12,6 @@ use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 */
 class UnitOfWork implements UnitOfWorkInterface
 {
-
-    const STATE_MANAGED   = 1;
-    const STATE_NEW       = 2;
-    const STATE_DETACHED  = 3;
-    const STATE_REMOVED   = 4;
-
-
-
 
 
     /**
@@ -55,11 +47,27 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
+    /**
+     * @var EventManager
+    */
+    protected EventManager $eventManager;
+
+
+
+
 
     /**
      * @var object[]
     */
     protected array $managed = [];
+
+
+
+
+    /**
+     * @var array
+    */
+    protected array $persisted = [];
 
 
 
@@ -82,13 +90,23 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
     /**
+     * @var array
+    */
+    protected array $removed = [];
+
+
+
+
+
+    /**
      * @param EntityManager $em
     */
     public function __construct(EntityManager $em)
     {
-         $this->em         = $em;
-         $this->dataMapper = new DataMapper($this->em);
-         $this->storage    = new ObjectStorage();
+         $this->em           = $em;
+         $this->eventManager = $em->getEventManager();
+         $this->dataMapper   = new DataMapper($this->em);
+         $this->storage      = new ObjectStorage();
     }
 
 
@@ -135,7 +153,7 @@ class UnitOfWork implements UnitOfWorkInterface
     {
         $this->removes[] = $object;
 
-        $this->attach($object);
+        $this->detach($object);
     }
 
 
@@ -225,7 +243,9 @@ class UnitOfWork implements UnitOfWorkInterface
     {
         foreach ($this->persists as $object) {
             if ($this->storage->contains($object)) {
-                $this->dataMapper->save($object);
+                if($this->dataMapper->save($object)) {
+                    $this->persisted[] = $object;
+                }
             }
         }
     }
@@ -241,8 +261,8 @@ class UnitOfWork implements UnitOfWorkInterface
     private function delete(): void
     {
         foreach($this->removes as $object) {
-            if ($this->storage->contains($object)) {
-                $this->dataMapper->delete($object);
+            if($this->dataMapper->delete($object)) {
+                $this->removed[] = $object;
             }
         }
     }

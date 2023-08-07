@@ -140,24 +140,6 @@ class PdoConnection implements PdoConnectionInterface
 
 
 
-
-    /**
-     * @param string $sql
-     *
-     * @return QueryInterface
-    */
-    public function query(string $sql): QueryInterface
-    {
-        return $this->createQuery()->query($sql);
-    }
-
-
-
-
-
-
-
-
     /**
      * @param string $sql
      *
