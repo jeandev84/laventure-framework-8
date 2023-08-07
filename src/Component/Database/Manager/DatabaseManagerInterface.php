@@ -2,6 +2,8 @@
 namespace Laventure\Component\Database\Manager;
 
 
+use Laventure\Component\Database\Connection\Configuration\Configuration;
+use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 
 /**
@@ -33,15 +35,12 @@ interface DatabaseManagerInterface
 
 
 
-
-
-      /**
-       * Returns all connections
-       *
-       * @return ConnectionInterface[]
-      */
-      public function getConnections(): array;
-
+     /**
+      * @param string $name
+      *
+      * @return array
+     */
+     public function credentials(string $name): array;
 
 
 
@@ -52,11 +51,22 @@ interface DatabaseManagerInterface
       /**
        * Returns all configuration
        *
-       * @return array
+       * @return Configuration
       */
-      public function getConfigurations(): array;
+      public function config(): Configuration;
 
 
+
+
+
+
+
+      /**
+       * Returns all connections
+       *
+       * @return ConnectionInterface[]
+      */
+      public function getConnections(): array;
 
 
 

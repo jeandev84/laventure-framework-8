@@ -75,6 +75,43 @@ class Configuration implements ConfigurationInterface
 
 
 
+
+         /**
+          * @param string $name
+          *
+          * @return mixed
+        */
+        public function required(string $name): mixed
+        {
+             if ($this->empty($name)) {
+                 trigger_error("Connection config param $name is required.");
+             }
+
+             return $this->get($name);
+        }
+
+
+
+
+
+
+
+        /**
+         * @param string $name
+         *
+         * @return bool
+        */
+        public function empty(string $name): bool
+        {
+             return empty($this->params[$name]);
+        }
+
+
+
+
+
+
+
         /**
          * @inheritDoc
         */
@@ -255,6 +292,35 @@ class Configuration implements ConfigurationInterface
             return $this->get('collation', '');
         }
 
+
+
+
+
+
+        /**
+         * @return array
+        */
+        public function keys(): array
+        {
+             return array_keys($this->params);
+        }
+
+
+
+
+
+
+
+
+        /**
+         * @return void
+        */
+        public function removeAll(): void
+        {
+             foreach ($this->keys() as $name) {
+                 $this->remove($name);
+             }
+        }
 
 
 

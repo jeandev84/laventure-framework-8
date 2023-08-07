@@ -5,6 +5,7 @@ use Closure;
 use Exception;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Connection\Configuration\Configuration;
+use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
 use Laventure\Component\Database\Manager\DatabaseManager;
 use Laventure\Component\Database\Migration\Migrator;
@@ -18,53 +19,46 @@ use Laventure\Component\Database\Schema\Schema;
 class Manager extends DatabaseManager
 {
 
-       /**
-        * @var static
+
+        /**
+         * @var Configuration
+        */
+        protected Configuration $config;
+
+
+
+
+
+        /**
+         * @var EntityManager|null
+        */
+        protected ?EntityManager $em = null;
+
+
+
+
+
+        /**
+         * @var static
+        */
+        protected static $instance;
+
+
+
+
+
+
+        /**
+         * @param array $config
        */
-       protected static $instance;
-
-
-
-
-       /**
-        * @var array
-       */
-       protected static $credentials;
-
-
-
-
-
-       /**
-        * @var EntityManager|null
-       */
-       protected ?EntityManager $em = null;
-
-
-
-
-
-
-
-       /**
-        * @param array $credentials
-        *
-        * @return void
-       */
-       public function addConnections(array $credentials): void
+       public function __construct(array $config)
        {
-            $config = new Configuration($credentials);
+            $this->config = new Configuration($config);
+            $connection   = $this->config->required('connection');
+            $credentials  = $this->config->required('configurations');
 
-            if (! $config->has('connection')) {
-                $this->abortIf("undefined param [connection]");
-            }
+            $this->open($connection, $credentials);
 
-            if (! $config->has('connections')) {
-                 $this->abortIf("undefined param [connections]");
-            }
-
-            $this->open($config['connection'], $config['connections']);
-            self::$credentials = $credentials;
             self::$instance = $this;
        }
 
@@ -72,25 +66,12 @@ class Manager extends DatabaseManager
 
 
 
-
        /**
-        * @return static
+        * @return static|null
        */
-       public static function capsule(): static
+       public static function capsule(): ?static
        {
-            if (self::$instance) {
-                 return self::$instance;
-            }
-
-            $instance = new static();
-
-            if (! self::$credentials) {
-                $instance->abortIf("no connections params added.");
-            }
-
-            $instance->open(self::$credentials['connection'], self::$credentials['connections']);
-
-            return self::$instance = $instance;
+           return self::$instance;
        }
 
 
@@ -203,8 +184,9 @@ class Manager extends DatabaseManager
        */
        public function migrator(string $name = null): Migrator
        {
-            return new Migrator($this->connection($name));
+            return new Migrator($this->connection($name), $this->migrationTable());
        }
+
 
 
 
@@ -219,6 +201,9 @@ class Manager extends DatabaseManager
        {
             return new Builder($this->connection($name));
        }
+
+
+
 
 
 
@@ -284,6 +269,7 @@ class Manager extends DatabaseManager
        
        /**
         * @param string|null $name
+        *
         * @return void
        */
        public function purge(string $name = null): void
@@ -292,11 +278,39 @@ class Manager extends DatabaseManager
        }
 
 
-       
-       
-       
-       
-       
+
+
+
+
+       /**
+        * @inheritDoc
+       */
+       public function config(): Configuration
+       {
+           return $this->config;
+       }
+
+
+
+
+
+
+
+
+       /**
+        * @inheritdoc
+       */
+       public function close(): void
+       {
+           parent::close();
+           $this->config->removeAll();
+       }
+
+
+
+
+
+
        /**
         * @param string|null $name
         * 
@@ -305,5 +319,19 @@ class Manager extends DatabaseManager
        public function getQueries(string $name = null): array
        {
            return $this->connection($name)->getQueries();
+       }
+
+
+
+
+
+
+
+       /**
+        * @return string
+       */
+       private function migrationTable(): string
+       {
+           return $this->config()->get('migration.table', 'migrations');
        }
 }

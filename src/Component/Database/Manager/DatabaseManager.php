@@ -40,7 +40,7 @@ class DatabaseManager implements DatabaseManagerInterface
         /**
          * @var array
         */
-        protected array $config = [];
+        protected array $credentials = [];
 
 
 
@@ -56,36 +56,14 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
 
-
         /**
          * @inheritdoc
         */
         public function open(string $name, array $config): void
         {
              $this->setConnections(ConnectionStack::defaults());
-             $this->setDefaultConnection($name);
-             $this->setConfigurations($config);
-        }
-
-
-
-
-
-
-
-
-        /**
-         * @param string $name
-         *
-         * @param array $config
-         *
-         * @return $this
-        */
-        public function setConfiguration(string $name, array $config): static
-        {
-              $this->config[$name] = $config;
-
-              return $this;
+             $this->setCurrentConnection($name);
+             $this->setCredentials($config);
         }
 
 
@@ -100,10 +78,10 @@ class DatabaseManager implements DatabaseManagerInterface
          *
          * @return $this
         */
-        public function setConfigurations(array $config): static
+        public function setCredentials(array $config): static
         {
              foreach ($config as $name => $params) {
-                 $this->setConfiguration($name, $params);
+                 $this->credentials[$name] = $params;
              }
 
              return $this;
@@ -118,21 +96,15 @@ class DatabaseManager implements DatabaseManagerInterface
         /**
          * @param string $name
          *
-         * @return ConfigurationInterface
+         * @return array
         */
-        public function configuration(string $name): ConfigurationInterface
+        public function credentials(string $name): array
         {
-             if (! isset($this->config[$name])) {
-                  $this->abortIf("unavailable configuration '$name'.");
+             if (empty($this->credentials[$name])) {
+                  $this->abortIf("empty credentials for connection '$name'");
              }
 
-             $config = new Configuration($this->config[$name]);
-
-             if ($config->isEmpty()) {
-                  $this->abortIf("empty params for configuration '$name'");
-             }
-
-             return $config;
+             return $this->credentials[$name];
         }
 
 
@@ -202,14 +174,14 @@ class DatabaseManager implements DatabaseManagerInterface
         */
         public function connection(string $name = ''): ConnectionInterface
         {
-             $name   = $this->getDefaultConnection($name);
-             $config = $this->configuration($name);
+             $name        = $name ?: $this->connection;
+             $credentials = $this->credentials($name);
 
              if (! $this->hasConnection($name)) {
                  $this->abortIf("unavailable connection named '$name'");
              }
 
-             return $this->connect($name, $config);
+             return $this->connect($name, $credentials);
         }
 
 
@@ -247,32 +219,14 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
 
-
-        /**
-         * @inheritdoc
-        */
-        public function getConfigurations(): array
-        {
-             return $this->config;
-        }
-
-
-
-
-
-
-
-
-
-
         /**
          * @inheritdoc
         */
         public function close(): void
         {
              $this->connection  = null;
+             $this->credentials = [];
              $this->connections = [];
-             $this->config      = [];
              $this->connected   = [];
         }
 
@@ -287,19 +241,19 @@ class DatabaseManager implements DatabaseManagerInterface
         /**
          * @param string $name
          *
-         * @param ConfigurationInterface $config
+         * @param array $credentials
          *
          * @return ConnectionInterface
         */
-        private function connect(string $name, ConfigurationInterface $config): ConnectionInterface
+        private function connect(string $name, array $credentials): ConnectionInterface
         {
-              $this->connections[$name]->connect($config);
+              $this->connections[$name]->connect(new Configuration($credentials));
 
               if (! $this->connections[$name]->connected()) {
                  $this->abortIf("no connection detected for '$name'.");
               }
 
-              $this->setDefaultConnection($name);
+              $this->setCurrentConnection($name);
 
               return $this->connected[$name] = $this->connections[$name];
         }
@@ -316,7 +270,7 @@ class DatabaseManager implements DatabaseManagerInterface
          *
          * @return void
         */
-        private function setDefaultConnection(string $connection): void
+        private function setCurrentConnection(string $connection): void
         {
              $this->connection = $connection;
         }
@@ -327,16 +281,14 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
 
+
+
         /**
-         * Returns current connection
-         *
-         * @param string $name
-         *
-         * @return string|null
+         * @inheritDoc
         */
-        private function getDefaultConnection(string $name = ''): ?string
+        public function config(): Configuration
         {
-              return $name ?: $this->connection;
+            return new Configuration($this->credentials);
         }
 
 
@@ -344,14 +296,23 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
         /**
+         * @return array
+        */
+        public function getCredentials(): array
+        {
+             return $this->credentials;
+        }
+
+
+        /**
          * @param string $message
          * @param int $code
          * @return void
-       */
-       protected function abortIf(string $message, int $code = 500): void
-       {
-           (function () use ($message, $code) {
-              throw new DatabaseManagerException($message, $code);
-           })();
-       }
+        */
+        public function abortIf(string $message, int $code = 500): void
+        {
+             (function () use ($message, $code) {
+                throw new DatabaseManagerException($message, $code);
+              })();
+        }
 }
