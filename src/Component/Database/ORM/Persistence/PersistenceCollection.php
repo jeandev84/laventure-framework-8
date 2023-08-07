@@ -39,6 +39,20 @@ class PersistenceCollection extends ObjectStorage
 
 
      /**
+      * @param string $column
+      *
+      * @return bool
+     */
+     public function hasCollection(string $column): bool
+     {
+         return array_key_exists($column, $this->collections);
+     }
+
+
+
+
+
+     /**
       * @return array
      */
      public function getCollections(): array

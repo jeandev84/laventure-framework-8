@@ -16,7 +16,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     /**
      * @inheritDoc
     */
-    public function createClassMetadata(string $classname): ClassMetadata
+    public function createClassMetadata(string|object $classname): ClassMetadata
     {
          return new ClassMetadata($classname);
     }

@@ -2,10 +2,8 @@
 namespace Laventure\Component\Database\ORM\Persistence\Mapping;
 
 
-use DateTimeInterface;
 use Laventure\Component\Database\ORM\Collection\Collection;
 use Laventure\Component\Database\ORM\Persistence\EntityPropertyResolver;
-use Laventure\Component\Database\ORM\Persistence\PersistenceCollection;
 use ReflectionClass;
 use ReflectionObject;
 
@@ -32,7 +30,7 @@ class ClassMetadata implements ClassMetadataInterface
         /**
         * @var string|object
         */
-        protected string|object $context;
+        protected string|object $classname;
 
 
 
@@ -42,13 +40,6 @@ class ClassMetadata implements ClassMetadataInterface
         */
         protected string $table;
 
-
-
-
-        /**
-         * @var PersistenceCollection
-        */
-        protected PersistenceCollection $collection;
 
 
 
@@ -64,71 +55,36 @@ class ClassMetadata implements ClassMetadataInterface
         /**
          * @var array
         */
-        protected array $identifiers = [];
-
-
-
-
-
-        /**
-         * @var array
-        */
-        protected array $properties = [];
-
-
-
-
-        /**
-         * @var array
-         */
-        protected array $attributes = [];
-
-
-
-
-        /**
-         * @var object[]
-         */
-        protected array $belongs  = [];
-
-
-
-
-        /**
-         * @var array
-        */
-        protected array $methods  = [];
+        protected array $associations = [];
 
 
 
 
        /**
-        * @param string|object $context
+        * @param string|object $classname
         *
         * @param string $table
        */
-       public function __construct(string|object $context, string $table = '')
+       public function __construct(string|object $classname, string $table = '')
        {
-           $this->context    = $context;
-           $this->table      = $table;
-           $this->collection = new PersistenceCollection();
-       }
+           $this->classname = $classname;
+           $this->table     = $table;
 
+           /*
+           try {
 
+               $reflection        =  new ReflectionClass($classname);
+               $shortName         =  $reflection->getShortName();
+               $this->table       = $table ?: mb_strtolower("{$shortName}s");
+               $this->reflection  = $reflection;
 
-
-
-       /**
-        * @return object
-       */
-       public function getObject(): object
-       {
-           if (! is_object($this->context)) {
-               trigger_error("Required object context for mapping.");
+           } catch (\Exception $e) {
+                trigger_error($e->getMessage());
            }
-
-           return $this->context;
+           */
        }
+
+
 
 
 
@@ -138,7 +94,11 @@ class ClassMetadata implements ClassMetadataInterface
        */
        public function getClassname(): string
        {
-           return $this->getReflection()->getName();
+           if (is_object($this->classname)) {
+               return $this->getReflection()->getName();
+           }
+
+           return $this->classname;
        }
 
 
@@ -165,7 +125,7 @@ class ClassMetadata implements ClassMetadataInterface
        */
        public function getReflection(): ReflectionObject|ReflectionClass
        {
-           return $this->createReflection($this->context);
+           return $this->createReflection($this->classname);
        }
 
 
@@ -258,11 +218,7 @@ class ClassMetadata implements ClassMetadataInterface
                return false;
            }
 
-           if (! is_object($this->context)) {
-               return false;
-           }
-
-           $identifiers = $this->getIdentifierValues($this->context);
+           dd($this->getReflection());
       }
 
 
@@ -289,46 +245,6 @@ class ClassMetadata implements ClassMetadataInterface
           if (! $this->hasField($field)) {
               return false;
           }
-
-          $collection = $this->map()->persistenceCollection();
-
-          return $collection->hasCollection($field);
-     }
-
-
-
-
-
-     /**
-      * @return $this
-     */
-     public function map(): static
-     {
-         $reflection = $this->getReflection();
-         $object     = $this->getObject();
-
-         foreach ($reflection->getProperties() as $property) {
-
-             $propertyName = $property->getName();
-             $column       = $this->camelCaseToUnderscore($propertyName);
-             $value        = $property->getValue($object);
-
-             if ($this->isIdentifier($column)) {
-                 $this->identifier = $column;
-                 $this->identifiers[$column] = $value;
-             } elseif ($value instanceof DateTimeInterface) {
-                 $this->attributes[$column] = $value->format('Y-m-d H:i:s');
-             } elseif ($value instanceof Collection) {
-                 $this->collection->addCollection($column, $value);
-             } elseif (is_object($value)) {
-                 $this->belongs[$column] = $value;
-             } else {
-                 $this->attributes[$column] = $value;
-             }
-             $this->properties[$propertyName] = $value;
-         }
-
-         return $this;
      }
 
 
@@ -369,7 +285,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @inheritdoc
     */
-    public function methods(): array
+    public function getMethods(): array
     {
         $methods = [];
 
@@ -390,79 +306,6 @@ class ClassMetadata implements ClassMetadataInterface
     */
     public function hasMethod(string $name): bool
     {
-        return in_array($name, $this->methods());
-    }
-
-
-
-
-
-
-    /**
-     * @return mixed
-    */
-    public function identifierValue(): mixed
-    {
-        return $this->identifiers[$this->identifier] ?? null;
-    }
-
-
-
-
-
-    /**
-     * @return array
-    */
-    public function attributes(): array
-    {
-        return $this->attributes;
-    }
-
-
-
-
-
-    /**
-     * @return array
-    */
-    public function belongs(): array
-    {
-        return $this->belongs;
-    }
-
-
-
-
-
-
-    /**
-     * @return PersistenceCollection
-    */
-    public function persistenceCollection(): PersistenceCollection
-    {
-        return $this->collection;
-    }
-
-
-
-
-
-    /**
-     * @return array
-    */
-    public function identifiers(): array
-    {
-        return $this->identifiers;
-    }
-
-
-
-
-    /**
-     * @return array
-    */
-    public function properties(): array
-    {
-        return $this->properties;
+        return in_array($name, $this->getMethods());
     }
 }
