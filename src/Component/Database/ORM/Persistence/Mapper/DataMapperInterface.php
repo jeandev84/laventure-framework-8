@@ -43,4 +43,16 @@ interface DataMapperInterface
      * @return int
     */
     public function delete(object $object): int;
+
+
+
+
+
+
+    /**
+     * @param object $object
+     *
+     * @return mixed
+    */
+    public function mapRows(object $object): mixed;
 }

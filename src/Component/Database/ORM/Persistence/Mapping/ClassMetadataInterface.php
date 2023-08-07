@@ -1,6 +1,7 @@
 <?php
 namespace Laventure\Component\Database\ORM\Persistence\Mapping;
 
+use Laventure\Component\Database\ORM\Persistence\PersistenceCollection;
 use ReflectionClass;
 
 /**

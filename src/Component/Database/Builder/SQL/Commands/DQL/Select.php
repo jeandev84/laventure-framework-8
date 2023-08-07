@@ -157,7 +157,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     /**
      * @inheritDoc
     */
-    public function addSelect(?string $select): static
+    public function addSelect(string $select): static
     {
          $this->selected[] = $select;
 
@@ -187,7 +187,9 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
-        return $this->addOrderBy(sprintf('%s %s', $column, strtoupper($direction)));
+        $this->orderBy[] = sprintf('%s %s', $column, strtoupper($direction));
+
+        return $this;
     }
 
 
@@ -197,10 +199,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     /**
      * @return $this
     */
-    public function addOrderBy(?array $orderBy): static
+    public function addOrderBy(array $orderBy): static
     {
-         foreach ($orderBy as $order) {
-             $this->orderBy[] = $order;
+         foreach ($orderBy as $column => $direction) {
+             $this->orderBy($column, $direction);
          }
 
          return $this;

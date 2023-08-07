@@ -81,13 +81,13 @@ class EntityRepository implements EntityRepositoryInterface
     /**
      * @inheritDoc
     */
-    public function findOneBy(array $criteria, array $oderBy = null): ?object
+    public function findOneBy(array $criteria, array $oderBy = null): mixed
     {
         $persistence = $this->em->getUnitOfWork()->getPersistence($this->getClassName());
 
         return $persistence->select()
                            ->criteria($criteria)
-                           ->addOrderBy($oderBy)
+                           ->addOrderBy($oderBy ?: [])
                            ->getQuery()
                            ->getOneOrNullResult();
     }

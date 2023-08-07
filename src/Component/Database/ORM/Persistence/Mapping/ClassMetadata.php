@@ -2,6 +2,9 @@
 namespace Laventure\Component\Database\ORM\Persistence\Mapping;
 
 
+use DateTimeInterface;
+use Laventure\Component\Database\ORM\Collection\Collection;
+use Laventure\Component\Database\ORM\Persistence\PersistenceCollection;
 use ReflectionClass;
 
 
@@ -11,34 +14,35 @@ use ReflectionClass;
 class ClassMetadata implements ClassMetadataInterface
 {
 
-       /**
+        /**
         * @var ReflectionClass
-       */
-       protected ReflectionClass $reflection;
+        */
+        protected ReflectionClass $reflection;
 
 
 
-       /**
+        /**
         * @var string
-       */
-       protected string $classname;
+        */
+        protected string $classname;
 
 
 
 
-       /**
-        * @var string
-       */
-       protected string $table;
+        /**
+         * @var string
+        */
+        protected string $table;
 
 
 
 
 
-       /**
-        * @var string
-       */
-       protected string $identifier = 'id';
+        /**
+         * @var string
+        */
+        protected string $identifier = 'id';
+
 
 
 
