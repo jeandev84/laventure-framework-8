@@ -138,7 +138,7 @@ class Manager extends DatabaseManager
        */
        public function getRepository(string $classname): EntityRepository
        {
-            return $this->em->getRepository($classname);
+            return $this->getEntityManager()->getRepository($classname);
        }
 
 
