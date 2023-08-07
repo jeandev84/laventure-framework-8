@@ -15,5 +15,4 @@ class ObjectStorage extends \SplObjectStorage
     {
         return $this->removeAll($this);
     }
-
 }

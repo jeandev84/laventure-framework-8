@@ -442,7 +442,6 @@ class ClassMetadata implements ClassMetadataInterface
 
 
 
-
     /**
      * @return array
     */

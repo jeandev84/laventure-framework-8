@@ -1,16 +1,16 @@
 <?php
-namespace Laventure\Component\Database\ORM\Persistence\Manager\Event;
+namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 /**
- * @Events
+ * @Event
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence\Manager\Event
+ * @package Laventure\Component\Database\ORM\Persistence\Manager
 */
-class Events
+class Event
 {
      const postLoad          = 'postLoad';
      const prePersist        = 'prePersist';

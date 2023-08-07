@@ -14,11 +14,11 @@ namespace Laventure\Component\Database\ORM\Persistence\UnitOfWork;
 interface UnitOfWorkInterface
 {
 
-      const STATE_MANAGED   = 1;
-      const STATE_NEW       = 2;
-      const STATE_DETACHED  = 3;
-      const STATE_REMOVED   = 4;
 
+     const STATE_MANAGED   = 1;
+     const STATE_NEW       = 2;
+     const STATE_DETACHED  = 3;
+     const STATE_REMOVED   = 4;
 
 
 
@@ -130,21 +130,48 @@ interface UnitOfWorkInterface
 
 
 
-
-    /**
-     * @return object[]
-    */
-    public function getPersists(): array;
-
-
-
-
-
-
-    /**
-     * @return object[]
+     /**
+      * @param object $object
+      *
+      * @return void
      */
-    public function getRemoves(): array;
+     public function addPersistState(object $object): void;
+
+
+
+
+
+
+
+
+     /**
+      * Add removed state
+      *
+      * @param object $object
+      *
+      * @return void
+     */
+     public function addRemovedState(object $object): void;
+
+
+
+
+
+
+
+
+     /**
+      * Add detached state
+      *
+      * @param object $object
+      * @return void
+     */
+     public function addDetachedState(object $object): void;
+
+
+
+
+
 
 
 

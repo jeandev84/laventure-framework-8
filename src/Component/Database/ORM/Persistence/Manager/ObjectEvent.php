@@ -3,7 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence\Manager\Event;
 
 
 /**
- * @EventManagerInterface
+ * @ObjectEvent
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
@@ -11,7 +11,20 @@ namespace Laventure\Component\Database\ORM\Persistence\Manager\Event;
  *
  * @package Laventure\Component\Database\ORM\Persistence\Manager\Event
 */
-interface EventManagerInterface
+abstract class ObjectEvent
 {
+      public function __construct(protected object $object)
+      {
 
+      }
+
+
+
+      /**
+       * @return object
+      */
+      public function getSubject(): object
+      {
+           return $this->object;
+      }
 }

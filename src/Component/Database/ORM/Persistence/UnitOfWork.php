@@ -3,7 +3,8 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 
 use Laventure\Component\Database\ORM\Collection\ObjectStorage;
-use Laventure\Component\Database\ORM\Persistence\Manager\Event\EventManager;
+use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
 
@@ -54,37 +55,10 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
-
-
-    /**
-     * @var object[]
-    */
-    protected array $managed = [];
-
-
-
-
     /**
      * @var array
     */
     protected array $persisted = [];
-
-
-
-
-    /**
-     * @var object[]
-    */
-    protected array $persists = [];
-
-
-
-
-    /**
-     * @var object[]
-    */
-    protected array $removes = [];
-
 
 
 
@@ -136,9 +110,7 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function persist(object $object): void
     {
-        $this->persists[] = $object;
-
-        $this->attach($object);
+        $this->addPersistState($object);
     }
 
 
@@ -151,10 +123,9 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function remove(object $object): void
     {
-        $this->removes[] = $object;
-
-        $this->detach($object);
+         $this->addRemovedState($object);
     }
+
 
 
 
@@ -226,69 +197,20 @@ class UnitOfWork implements UnitOfWorkInterface
     public function commit(): void
     {
          $this->em->transaction(function () {
-             $this->save();
-             $this->delete();
+              $state = $this->storage->getInfo();
+              foreach ($this->storage as $object) {
+                  switch ($state):
+                       case self::STATE_MANAGED:
+                       case self::STATE_NEW:
+                          $this->dataMapper->save($object);
+                       break;
+                       case self::STATE_REMOVED;
+                          $this->dataMapper->delete($object);
+                       break;
+                  endswitch;
+              }
+
          });
-    }
-
-
-
-
-
-
-    /**
-     * @return void
-    */
-    private function save(): void
-    {
-        foreach ($this->persists as $object) {
-            if ($this->storage->contains($object)) {
-                if($this->dataMapper->save($object)) {
-                    $this->persisted[] = $object;
-                }
-            }
-        }
-    }
-
-
-
-
-
-
-    /**
-     * @return void
-    */
-    private function delete(): void
-    {
-        foreach($this->removes as $object) {
-            if($this->dataMapper->delete($object)) {
-                $this->removed[] = $object;
-            }
-        }
-    }
-
-
-
-
-    /**
-     * @inheritdoc
-    */
-    public function getPersists(): array
-    {
-        return $this->persists;
-    }
-
-
-
-
-
-
-    /**
-     * @inheritdoc
-    */
-    public function getRemoves(): array
-    {
-        return $this->removes;
     }
 
 
@@ -302,5 +224,65 @@ class UnitOfWork implements UnitOfWorkInterface
     public function clear(): void
     {
         $this->storage->clear();
+    }
+
+
+
+
+
+    /**
+     * @param $object
+     *
+     * @return ClassMetadata
+    */
+    public function metadata($object): ClassMetadata
+    {
+        return $this->em->getClassMetadata($object);
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function addPersistState(object $object): void
+    {
+         $this->eventManager->subscribePersistEvents();
+
+         if ($this->metadata($object)->map()->isNew()) {
+             $this->storage->attach($object, self::STATE_NEW);
+         } else {
+             $this->storage->attach($object, self::STATE_MANAGED);
+         }
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function addRemovedState(object $object): void
+    {
+         $this->eventManager->subscribeRemoveEvents();
+
+         if (! $this->metadata($object)->isNew()) {
+             $this->storage->attach($object, self::STATE_REMOVED);
+         }
+    }
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function addDetachedState(object $object): void
+    {
+        // TODO: Implement addDetachedState() method.
     }
 }
