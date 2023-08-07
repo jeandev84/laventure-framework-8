@@ -343,19 +343,15 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
 
-
-
-
-
-       /**
-        * @param string $message
-        *
-        * @return void
+        /**
+         * @param string $message
+         * @param int $code
+         * @return void
        */
-       private function abortIf(string $message): void
+       protected function abortIf(string $message, int $code = 500): void
        {
-           (function () use ($message) {
-              throw new DatabaseManagerException($message);
+           (function () use ($message, $code) {
+              throw new DatabaseManagerException($message, $code);
            })();
        }
 }
