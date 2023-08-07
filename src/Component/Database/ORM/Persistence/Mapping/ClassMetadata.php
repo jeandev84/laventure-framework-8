@@ -254,16 +254,40 @@ class ClassMetadata implements ClassMetadataInterface
       */
       public function hasAssociation(string $field): bool
       {
-           if (! $this->hasField($field)) {
-               return false;
-           }
+           $isBelong      = $this->isSingleValueAssociation($field);
+           $isCollection  = $this->isCollectionValueAssociation($field);
 
-           if (! is_object($this->context)) {
-               return false;
-           }
-
-           $identifiers = $this->getIdentifierValues($this->context);
+           return ($isBelong || $isCollection);
       }
+
+
+
+
+
+      /**
+       * @param string $column
+       *
+       * @return bool
+      */
+      public function hasAttribute(string $column): bool
+      {
+          return array_key_exists($column, $this->map()->attributes());
+      }
+
+
+
+
+
+
+      /**
+       * @return bool
+      */
+      public function hasIdentifier(): bool
+      {
+           return array_key_exists($this->identifier, $this->map()->identifiers());
+      }
+
+
 
 
 
@@ -275,8 +299,9 @@ class ClassMetadata implements ClassMetadataInterface
      */
      public function isSingleValueAssociation(string $field): bool
      {
-
+          return $this->map()->hasBelong($field);
      }
+
 
 
 
@@ -294,6 +319,8 @@ class ClassMetadata implements ClassMetadataInterface
 
           return $collection->hasCollection($field);
      }
+
+
 
 
 
@@ -335,31 +362,13 @@ class ClassMetadata implements ClassMetadataInterface
 
 
 
+
     /**
      * @inheritDoc
     */
-    public function getIdentifierValues(object $object): array
+    public function getIdentifierValues(): array
     {
-        $fields = [];
-
-        $reflection = $this->createReflection($object);
-
-        foreach ($reflection->getProperties() as $property) {
-
-            $column = $property->getName();
-            $value  = $property->getValue($object);
-
-            if ($value instanceof Collection) {
-                $fields['association'][$column] = $value;
-            } elseif (is_object($value)) {
-                $fields['association'][$column] = $value;
-            }
-
-            $fields['attributes'][$column] = $value;
-        }
-
-
-        return $fields;
+        return $this->map()->identifiers();
     }
 
 
@@ -416,6 +425,24 @@ class ClassMetadata implements ClassMetadataInterface
     public function attributes(): array
     {
         return $this->attributes;
+    }
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @return bool
+    */
+    public function hasBelong(string $column): bool
+    {
+        if (! $this->hasField($column)) {
+            return false;
+        }
+
+        return isset($this->belongs[$column]);
     }
 
 

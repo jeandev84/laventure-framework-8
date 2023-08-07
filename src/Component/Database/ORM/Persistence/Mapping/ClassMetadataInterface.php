@@ -147,13 +147,24 @@ interface ClassMetadataInterface
 
 
     /**
+     * Returns mapped object
+     *
+     * @return object
+    */
+    public function getObject(): object;
+
+
+
+
+
+
+
+    /**
      * Get columns value
      *
-     * @param object $object
-     *
-     * @return mixed
+     * @return array
     */
-    public function getIdentifierValues(object $object): mixed;
+    public function getIdentifierValues(): array;
 
 
 
