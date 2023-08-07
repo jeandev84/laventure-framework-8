@@ -38,9 +38,9 @@ class ClassMetadata implements ClassMetadataInterface
 
 
         /**
-         * @var string
+         * @var string|null
         */
-        protected string $table;
+        protected ?string $table = '';
 
 
 
@@ -104,16 +104,28 @@ class ClassMetadata implements ClassMetadataInterface
 
        /**
         * @param string|object $context
-        *
-        * @param string $table
        */
-       public function __construct(string|object $context, string $table = '')
+       public function __construct(string|object $context)
        {
            $this->context    = $context;
-           $this->table      = $table;
            $this->collection = new PersistenceCollection();
        }
 
+
+
+
+
+       /**
+        * @param string $table
+        *
+        * @return $this
+       */
+       public function table(string $table): static
+       {
+           $this->table = $table;
+
+           return $this;
+       }
 
 
 
@@ -123,9 +135,9 @@ class ClassMetadata implements ClassMetadataInterface
        */
        public function getObject(): object
        {
-//           if (! is_object($this->context)) {
-//               trigger_error("Required object context for mapping.");
-//           }
+           if (! is_object($this->context)) {
+               trigger_error("Required object context for mapping.");
+           }
 
            return $this->context;
        }
@@ -151,9 +163,12 @@ class ClassMetadata implements ClassMetadataInterface
        */
        public function getTableName(): string
        {
+           if ($this->table) { return $this->table; }
+
            $reflection  = $this->getReflection();
            $shortName   =  $reflection->getShortName();
-           return $this->table ?: mb_strtolower("{$shortName}s");
+
+           return mb_strtolower("{$shortName}s");
        }
 
 

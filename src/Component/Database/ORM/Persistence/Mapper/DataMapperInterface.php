@@ -14,11 +14,11 @@ interface DataMapperInterface
 {
 
     /**
-     * @param $id
+     * @param int $id
      *
      * @return object|null
     */
-    public function find($id): ?object;
+    public function find(int $id): ?object;
 
 
 

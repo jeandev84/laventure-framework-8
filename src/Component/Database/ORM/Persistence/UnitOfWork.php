@@ -119,6 +119,8 @@ class UnitOfWork implements UnitOfWorkInterface
     public function persist(object $object): void
     {
         $this->persists[] = $object;
+
+        $this->attach($object);
     }
 
 
@@ -132,6 +134,21 @@ class UnitOfWork implements UnitOfWorkInterface
     public function remove(object $object): void
     {
         $this->removes[] = $object;
+
+        $this->attach($object);
+    }
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function find(int $id): ?object
+    {
+        return $this->dataMapper->find($id);
     }
 
 
@@ -191,11 +208,44 @@ class UnitOfWork implements UnitOfWorkInterface
     public function commit(): void
     {
          $this->em->transaction(function () {
-
+             $this->save();
+             $this->delete();
          });
     }
 
 
+
+
+
+
+    /**
+     * @return void
+    */
+    private function save(): void
+    {
+        foreach ($this->persists as $object) {
+            if ($this->storage->contains($object)) {
+                $this->dataMapper->save($object);
+            }
+        }
+    }
+
+
+
+
+
+
+    /**
+     * @return void
+    */
+    private function delete(): void
+    {
+        foreach($this->removes as $object) {
+            if ($this->storage->contains($object)) {
+                $this->dataMapper->delete($object);
+            }
+        }
+    }
 
 
 

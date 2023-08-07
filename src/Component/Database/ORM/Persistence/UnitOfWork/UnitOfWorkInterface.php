@@ -16,6 +16,20 @@ interface UnitOfWorkInterface
 
 
      /**
+      * Find storage object
+      *
+      * @param int $id
+      *
+      * @return object|null
+     */
+     public function find(int $id): ?object;
+
+
+
+
+
+
+     /**
       * Register state NEW or UPDATE
       *
       * @param object $object

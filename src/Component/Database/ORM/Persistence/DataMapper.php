@@ -44,7 +44,7 @@ class DataMapper extends Mapper
     /**
      * @inheritDoc
     */
-    public function find($id): ?object
+    public function find(int $id): ?object
     {
         return $this->data[$id] ?? null;
     }
