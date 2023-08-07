@@ -1,7 +1,7 @@
 <?php
 namespace Laventure\Component\Event\Dispatcher;
 
-use Laventure\Component\Event\Listeners\ListenerProviderInterface;
+use Laventure\Component\Event\Listener\ListenerProviderInterface;
 use Laventure\Component\Event\StoppableEventInterface;
 
 

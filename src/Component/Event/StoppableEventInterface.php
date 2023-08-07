@@ -16,7 +16,7 @@ namespace Laventure\Component\Event;
  *
  * A Dispatcher implementation MUST check to determine if an Event
  * is marked as stopped after each listener is called.  If it is then it should
- * return immediately without calling any further Listeners.
+ * return immediately without calling any further Listener.
 */
 interface StoppableEventInterface
 {

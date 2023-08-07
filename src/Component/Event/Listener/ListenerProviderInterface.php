@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Event\Listeners;
+namespace Laventure\Component\Event\Listener;
 
 
 /**
@@ -11,7 +11,7 @@ namespace Laventure\Component\Event\Listeners;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Event\Listeners
+ * @package Laventure\Component\Event\Listener
  *
  * Mapper from an event to the listeners that are applicable to that event.
 */
