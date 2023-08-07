@@ -67,9 +67,9 @@ class Manager extends DatabaseManager
 
 
        /**
-        * @return static|null
+        * @return static
        */
-       public static function capsule(): ?static
+       public static function capsule(): static
        {
            return self::$instance;
        }
