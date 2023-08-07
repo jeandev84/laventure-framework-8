@@ -65,6 +65,7 @@ class Manager extends DatabaseManager
 
             $this->open($config['connection'], $config['connections']);
             self::$credentials = $credentials;
+            self::$instance = $this;
        }
 
 
@@ -77,16 +78,19 @@ class Manager extends DatabaseManager
        */
        public static function capsule(): static
        {
-            if (! self::$instance) {
-                $instance = new static();
-                if (! self::$credentials) {
-                    $instance->abortIf("no connections params added.");
-                }
-                $instance->open(self::$credentials['connection'], self::$credentials['connections']);
-                self::$instance = $instance;
+            if (self::$instance) {
+                 return self::$instance;
             }
 
-            return self::$instance;
+            $instance = new static();
+
+            if (! self::$credentials) {
+                $instance->abortIf("no connections params added.");
+            }
+
+            $instance->open(self::$credentials['connection'], self::$credentials['connections']);
+
+            return self::$instance = $instance;
        }
 
 
