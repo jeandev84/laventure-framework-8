@@ -40,9 +40,9 @@ interface DataMapperInterface
     /**
      * @param object $object
      *
-     * @return int
+     * @return bool
     */
-    public function delete(object $object): int;
+    public function delete(object $object): bool;
 
 
 

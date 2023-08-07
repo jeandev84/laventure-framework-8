@@ -337,20 +337,22 @@ class ClassMetadata implements ClassMetadataInterface
          foreach ($reflection->getProperties() as $property) {
 
              $propertyName = $property->getName();
-             $column       = $this->camelCaseToUnderscore($propertyName);
+             $field        = $this->camelCaseToUnderscore($propertyName);
              $value        = $property->getValue($object);
 
-             if ($this->isIdentifier($column)) {
-                 $this->identifier = $column;
-                 $this->identifiers[$column] = $value;
+             if ($this->isIdentifier($field)) {
+                 $this->identifier = $field;
+                 $this->identifiers[$field] = $value;
              } elseif ($value instanceof DateTimeInterface) {
-                 $this->attributes[$column] = $value->format('Y-m-d H:i:s');
+                 $this->attributes[$field] = $value->format('Y-m-d H:i:s');
              } elseif ($value instanceof Collection) {
-                 $this->collection->addCollection($column, $value);
+                 $this->collection->addCollection($field, $value);
+             } elseif (is_array($value)) {
+                 $this->attributes[$field] = serialize($value);
              } elseif (is_object($value)) {
-                 $this->belongs[$column] = $value;
+                 $this->belongs[$field] = $value;
              } else {
-                 $this->attributes[$column] = $value;
+                 $this->attributes[$field] = $value;
              }
              $this->properties[$propertyName] = $value;
          }
@@ -414,6 +416,22 @@ class ClassMetadata implements ClassMetadataInterface
     {
         return $this->identifiers[$this->identifier] ?? null;
     }
+
+
+
+
+
+
+
+    /**
+     * @return bool
+    */
+    public function isNew(): bool
+    {
+         return is_null($this->getIdentifierValue());
+    }
+
+
 
 
 
