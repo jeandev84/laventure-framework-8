@@ -34,12 +34,12 @@ class Persistence implements PersistenceInterface
     /**
      * @param EntityManager $em
      *
-     * @param string $classname
+     * @param string|object $context
     */
-    public function __construct(EntityManager $em, string $classname)
+    public function __construct(EntityManager $em, string|object $context)
     {
          $this->em        = $em;
-         $this->metadata  = $this->em->getClassMetadata($classname);
+         $this->metadata  = $this->em->getClassMetadata($context);
     }
 
 
@@ -131,8 +131,10 @@ class Persistence implements PersistenceInterface
     /**
      * @inheritDoc
     */
-    public function insert(array $attributes): int
+    public function insert(): int
     {
+         $attributes = $this->metadata->map()->getAttributes();
+
          return $this->createQueryBuilder()->insert($this->getTableName(), $attributes);
     }
 
@@ -144,10 +146,14 @@ class Persistence implements PersistenceInterface
     /**
      * @inheritDoc
     */
-    public function update(array $attributes, array $criteria): int
+    public function update(): int
     {
+         $attributes = $this->metadata->map()->getAttributes();
+         $criteria   = $this->criteria();
+
          return $this->createQueryBuilder()->update($this->getTableName(), $attributes, $criteria);
     }
+
 
 
 
@@ -157,8 +163,36 @@ class Persistence implements PersistenceInterface
     /**
      * @inheritDoc
     */
-    public function delete(array $criteria): bool
+    public function delete(): bool
     {
-        return $this->createQueryBuilder()->delete($this->getTableName(), $criteria);
+        return $this->createQueryBuilder()->delete($this->getTableName(), $this->criteria());
+    }
+
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function metadata(): ClassMetadata
+    {
+        return $this->metadata;
+    }
+
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function criteria(): array
+    {
+        return [$this->getIdentifier() => $this->metadata->map()->getIdentifierValue()];
     }
 }

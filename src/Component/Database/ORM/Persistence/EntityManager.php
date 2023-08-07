@@ -133,10 +133,12 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function open(bool $enabled): static
     {
+        $this->connection->reconnect();
         $this->enabled = $enabled;
 
         return $this;
     }
+
 
 
 
@@ -150,7 +152,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     {
         $connected = $this->connection->connected();
 
-        return $this->enabled;
+        return ($this->enabled || $connected);
     }
 
 

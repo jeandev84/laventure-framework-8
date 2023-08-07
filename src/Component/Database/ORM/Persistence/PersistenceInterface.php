@@ -2,6 +2,7 @@
 namespace Laventure\Component\Database\ORM\Persistence;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
+use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 
 
 /**
@@ -47,10 +48,11 @@ interface PersistenceInterface
 
 
 
+
     /**
      * Insert new record
     */
-    public function insert(array $attributes): int;
+    public function insert(): int;
 
 
 
@@ -63,7 +65,7 @@ interface PersistenceInterface
     /**
      * Update records
     */
-    public function update(array $attributes, array $criteria): int;
+    public function update(): int;
 
 
 
@@ -74,9 +76,20 @@ interface PersistenceInterface
     /**
      * Delete records
      *
-     * @param array $criteria
-     *
      * @return bool
     */
-    public function delete(array $criteria): bool;
+    public function delete(): bool;
+
+
+
+
+
+
+
+
+
+    /**
+     * @return ClassMetadata
+    */
+    public function metadata(): ClassMetadata;
 }

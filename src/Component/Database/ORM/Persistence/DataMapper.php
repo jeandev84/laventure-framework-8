@@ -75,9 +75,7 @@ class DataMapper extends Mapper
     */
     public function insert(object $object): int
     {
-        $attributes =  $this->mapRows($object)->getAttributes();
-
-        return $this->persistence($object)->insert($attributes);
+        return $this->persistence($object)->insert();
     }
 
 
@@ -90,11 +88,9 @@ class DataMapper extends Mapper
     */
     public function update(object $object): int
     {
-        $rows            =  $this->mapRows($object);
-        $persistence     =  $this->persistence($object);
-        $criteria        =  [$this->metadata($object)->getIdentifier() => $rows->getIdentifierValue()];
-        $id              =  $persistence->update($rows->getAttributes(), $criteria);
+        $id = $this->persistence($object)->update();
         $this->data[$id] = $object;
+
         return $id;
     }
 
@@ -108,10 +104,7 @@ class DataMapper extends Mapper
     */
     public function delete(object $object): bool
     {
-        $rows     =  $this->mapRows($object);
-        $criteria =  [$this->metadata($object)->getIdentifier() => $rows->getIdentifierValue()];
-
-        return $this->persistence($object)->delete($criteria);
+        return $this->persistence($object)->delete();
     }
 
 
@@ -154,6 +147,6 @@ class DataMapper extends Mapper
     */
     private function persistence(object $object): Persistence
     {
-          return $this->em->getUnitOfWork()->getPersistence(get_class($object));
+         return $this->em->getUnitOfWork()->getPersistence(get_class($object));
     }
 }

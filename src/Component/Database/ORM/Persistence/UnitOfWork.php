@@ -99,13 +99,13 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
     /**
-     * @param string $classname
+     * @param string|object $context
      *
      * @return Persistence
     */
-    public function getPersistence(string $classname): Persistence
+    public function getPersistence(string|object $context): Persistence
     {
-         return new Persistence($this->em, $classname);
+         return new Persistence($this->em, $context);
     }
 
 
