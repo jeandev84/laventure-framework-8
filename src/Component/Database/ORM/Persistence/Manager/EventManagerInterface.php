@@ -2,8 +2,6 @@
 namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 
-use Laventure\Component\Database\ORM\Persistence\Manager\Event\ObjectEvent;
-
 /**
  * @EventManagerInterface
  *
@@ -18,10 +16,10 @@ interface EventManagerInterface
 
 
       /**
-       * @param ObjectEvent $event
+       * @param object $event
        *
-       * @return ObjectEvent
+       * @return object
       */
-      public function dispatchEvent(ObjectEvent $event): ObjectEvent;
+      public function dispatchEvent(object $event): object;
 
 }

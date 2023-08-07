@@ -2,7 +2,7 @@
 namespace Laventure\Component\Database\ORM\Persistence\Manager\Events;
 
 
-use Laventure\Component\Database\ORM\Persistence\Manager\Event\ObjectEvent;
+use Laventure\Component\Database\ORM\Persistence\Manager\ObjectEvent;
 
 /**
  * @PostLoadEvent
@@ -11,7 +11,7 @@ use Laventure\Component\Database\ORM\Persistence\Manager\Event\ObjectEvent;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence\Manager\Event
+ * @package Laventure\Component\Database\ORM\Persistence\Manager
 */
 class PostLoadEvent extends ObjectEvent
 {

@@ -390,7 +390,7 @@ class ClassMetadata implements ClassMetadataInterface
     {
         $methods = [];
 
-        foreach ($this->reflection->getMethods() as $method) {
+        foreach ($this->getReflection()->getMethods() as $method) {
            $methods[] = $method->getName();
         }
 
