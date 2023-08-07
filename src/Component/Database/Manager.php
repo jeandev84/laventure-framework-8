@@ -182,7 +182,7 @@ class Manager extends DatabaseManager
         *
         * @return Migrator
        */
-       public function migrator(string $name = null): Migrator
+       public function migration(string $name = null): Migrator
        {
             return new Migrator($this->connection($name), $this->migrationTable());
        }

@@ -89,7 +89,7 @@ class Migrator implements MigratorInterface
      *
      * @return $this
     */
-    public function addMigration(Migration $migration): static
+    public function add(Migration $migration): static
     {
          $this->migrations[$migration->getName()] = $migration;
 
@@ -106,10 +106,10 @@ class Migrator implements MigratorInterface
      *
      * @return $this
     */
-    public function addMigrations(array $migrations): static
+    public function collections(array $migrations): static
     {
         foreach ($migrations as $migration) {
-             $this->addMigration($migration);
+             $this->add($migration);
         }
 
         return $this;
