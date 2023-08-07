@@ -7,6 +7,7 @@ use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPers
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EntityManagerInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
+use Laventure\Component\Database\ORM\Persistence\Manager\Events\PreFlushEvent;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadataFactory;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
@@ -376,6 +377,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function flush(): void
     {
+        $this->eventManager->dispatchEvent(new PreFlushEvent($this));
         $this->unitOfWork->commit();
     }
 

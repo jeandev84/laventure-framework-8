@@ -2,7 +2,6 @@
 namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 
-use Laventure\Component\Database\ORM\Persistence\Manager\Event\ObjectEvent;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PostPersistEvent;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PostRemoveEvent;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PostUpdateEvent;
@@ -10,6 +9,7 @@ use Laventure\Component\Database\ORM\Persistence\Manager\Events\PrePersistEvent;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PreRemoveEvent;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PreUpdateEvent;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
+
 
 /**
  * @inheritdoc
@@ -63,17 +63,43 @@ class EventManager implements EventManagerInterface
 
 
     /**
+     * @param string $event
+     *
+     * @return bool
+    */
+    public function hasListener(string $event): bool
+    {
+         return isset($this->listeners[$event]);
+    }
+
+
+
+
+    /**
+     * @return array
+    */
+    public function getListeners(): array
+    {
+        return $this->listeners;
+    }
+
+
+
+
+
+
+    /**
      * @return void
     */
     public function subscribePersistEvents(): void
     {
-         $this->addListeners([
-             PrePersistEvent::class   => [$this, Event::prePersist],
-             PostPersistEvent::class  => [$this, Event::postPersist],
-             PreUpdateEvent::class    => [$this, Event::preUpdate],
-             PostUpdateEvent::class   => [$this, Event::postUpdate]
-         ]);
+         foreach ($this->persistEvents() as $event => $callback) {
+              if (! $this->hasListener($event)) {
+                  $this->addListener($event, $callback);
+              }
+         }
     }
+
 
 
 
@@ -83,39 +109,11 @@ class EventManager implements EventManagerInterface
     */
     public function subscribeRemoveEvents(): void
     {
-         $this->addListeners([
-             PreRemoveEvent::class    => [$this, Event::preRemove],
-             PostRemoveEvent::class   => [$this, Event::postRemove],
-         ]);
-    }
-
-
-
-
-
-
-
-    /**
-     * @param PrePersistEvent $event
-     *
-     * @return void
-    */
-    public function prePersist(PrePersistEvent $event): void
-    {
-         $this->call($event, Event::prePersist);
-    }
-
-
-
-
-    /**
-     * @param PostPersistEvent $event
-     *
-     * @return void
-    */
-    public function postPersist(PostPersistEvent $event): void
-    {
-        $this->call($event, Event::postPersist);
+        foreach ($this->removeEvents() as $event => $callback) {
+            if (! $this->hasListener($event)) {
+                $this->addListener($event, $callback);
+            }
+        }
     }
 
 
@@ -127,7 +125,7 @@ class EventManager implements EventManagerInterface
     /**
      * @inheritDoc
     */
-    public function dispatchEvent(ObjectEvent $event): ObjectEvent
+    public function dispatchEvent(object $event): object
     {
          $eventName = get_class($event);
 
@@ -167,15 +165,121 @@ class EventManager implements EventManagerInterface
     */
     private function call(ObjectEvent $event, string $method): void
     {
-        if (is_callable([$this, $method])) {
+        $object = $event->getSubject();
 
-            $object = $event->getSubject();
-
-            if($this->metadata($object)->hasMethod($method)) {
-                call_user_func([$object, $method], $event);
-            }
+        if($this->metadata($object)->hasMethod($method)) {
+            call_user_func([$object, $method], $event);
         }
-
     }
 
+
+
+
+
+    /**
+     * @param PrePersistEvent $event
+     *
+     * @return void
+    */
+    private function prePersist(PrePersistEvent $event): void
+    {
+        $this->call($event, Event::prePersist);
+    }
+
+
+
+
+    /**
+     * @param PostPersistEvent $event
+     *
+     * @return void
+    */
+    private function postPersist(PostPersistEvent $event): void
+    {
+        $this->call($event, Event::postPersist);
+    }
+
+
+
+
+    /**
+     * @param PreUpdateEvent $event
+     *
+     * @return void
+    */
+    private function preUpdate(PreUpdateEvent $event): void
+    {
+        $this->call($event, Event::preUpdate);
+    }
+
+
+
+
+
+    /**
+     * @param PostUpdateEvent $event
+     *
+     * @return void
+    */
+    private function postUpdate(PostUpdateEvent $event): void
+    {
+        $this->call($event, Event::postUpdate);
+    }
+
+
+
+
+    /**
+     * @param PreRemoveEvent $event
+     *
+     * @return void
+    */
+    private function preRemove(PreRemoveEvent $event): void
+    {
+        $this->call($event, Event::preRemove);
+    }
+
+
+
+
+    /**
+     * @param PostRemoveEvent $event
+     *
+     * @return void
+    */
+    private function postRemove(PostRemoveEvent $event): void
+    {
+        $this->call($event, Event::postRemove);
+    }
+
+
+
+
+    /**
+     * @return array[]
+    */
+    private function persistEvents(): array
+    {
+        return [
+            PrePersistEvent::class   => [$this, Event::prePersist],
+            PostPersistEvent::class  => [$this, Event::postPersist],
+            PreUpdateEvent::class    => [$this, Event::preUpdate],
+            PostUpdateEvent::class   => [$this, Event::postUpdate]
+        ];
+    }
+
+
+
+
+
+    /**
+     * @return array[]
+    */
+    private function removeEvents(): array
+    {
+        return [
+            PreRemoveEvent::class    => [$this, Event::preRemove],
+            PostRemoveEvent::class   => [$this, Event::postRemove],
+        ];
+    }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Database\ORM\Persistence\Manager\Event;
+namespace Laventure\Component\Database\ORM\Persistence\Manager;
 
 
 /**
@@ -9,7 +9,7 @@ namespace Laventure\Component\Database\ORM\Persistence\Manager\Event;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence\Manager\Event
+ * @package Laventure\Component\Database\ORM\Persistence\Manager
 */
 abstract class ObjectEvent
 {

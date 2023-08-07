@@ -4,6 +4,9 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 use Laventure\Component\Database\ORM\Collection\ObjectStorage;
 use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
+use Laventure\Component\Database\ORM\Persistence\Manager\Events\OnClearEvent;
+use Laventure\Component\Database\ORM\Persistence\Manager\Events\OnFlushEvent;
+use Laventure\Component\Database\ORM\Persistence\Manager\Events\PreFlushEvent;
 use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\UnitOfWork\UnitOfWorkInterface;
 
@@ -224,6 +227,8 @@ class UnitOfWork implements UnitOfWorkInterface
     */
     public function clear(): void
     {
+        $this->eventManager->dispatchEvent(new OnClearEvent($this->em));
+
         $this->storage->clear();
     }
 
@@ -285,5 +290,17 @@ class UnitOfWork implements UnitOfWorkInterface
     public function addDetachedState(object $object): void
     {
         // TODO: Implement addDetachedState() method.
+    }
+
+
+
+
+
+    /**
+     * @return EventManager
+    */
+    public function getEventManager(): EventManager
+    {
+        return $this->eventManager;
     }
 }
