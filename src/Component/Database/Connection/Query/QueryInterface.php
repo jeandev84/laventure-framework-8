@@ -85,9 +85,9 @@ interface QueryInterface
         /**
          * Execute query
          *
-         * @return mixed
+         * @return int|false
         */
-        public function execute(): mixed;
+        public function execute(): int|false;
 
 
 

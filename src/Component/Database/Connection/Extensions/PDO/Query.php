@@ -222,7 +222,7 @@ class Query implements QueryInterface
     /**
      * @inheritDoc
     */
-    public function execute(): bool
+    public function execute(): int|false
     {
         try {
 
@@ -233,6 +233,8 @@ class Query implements QueryInterface
                     'bindings'       => $this->bindings,
                     'parameters'     => $this->parameters
                 ]);
+
+                return (int)$this->pdo->lastInsertId();
             }
 
         } catch (PDOException $e) {

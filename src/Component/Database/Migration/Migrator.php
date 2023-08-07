@@ -23,7 +23,7 @@ class Migrator implements MigratorInterface
     /**
      * @var string
     */
-    protected string $table;
+    protected string $table = 'migrations';
 
 
 
@@ -70,15 +70,12 @@ class Migrator implements MigratorInterface
 
     /**
      * @param ConnectionInterface $connection
-     *
-     * @param string $table
     */
-    public function __construct(ConnectionInterface $connection, string $table = 'migrations')
+    public function __construct(ConnectionInterface $connection)
     {
          $this->connection   = $connection;
-         $this->table        = $table;
          $this->schema       = new Schema($connection);
-         $this->builder      = new Builder($connection, $table);
+         $this->builder      = new Builder($connection);
     }
 
 
@@ -169,7 +166,7 @@ class Migrator implements MigratorInterface
                  $version = $migration->getName();
                  $this->log("started migration $version ...");
                  $migration->up();
-                 $this->builder->insert([
+                 $this->builder->insert($this->getTable(), [
                      'version'     => $version,
                      'executed_at' => date('Y-m-d H:i:s')
                  ]);
@@ -271,11 +268,10 @@ class Migrator implements MigratorInterface
     */
     public function getAppliedMigrations(): array
     {
-         return $this->builder
-                     ->select('version')
-                     ->from($this->getTable())
-                     ->fetch()
-                     ->columns();
+         return $this->builder->select('version')
+                              ->from($this->getTable())
+                              ->fetch()
+                              ->columns();
     }
 
 

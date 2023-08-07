@@ -5,6 +5,7 @@ use Closure;
 use Exception;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
+use Laventure\Component\Database\Connection\Query\QueryInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EntityManagerInterface;
 use Laventure\Component\Database\ORM\Persistence\Manager\EventManager;
 use Laventure\Component\Database\ORM\Persistence\Manager\Events\PreFlushEvent;
@@ -384,6 +385,8 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
+
+
     /**
      * @inheritDoc
     */
@@ -474,6 +477,35 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     {
         return $this->metadataFactory->createClassMetadata($classname);
     }
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function getQueries(): array
+    {
+        return $this->connection->getQueries();
+    }
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function getExecutedQueries(): array
+    {
+         return array_filter($this->getQueries(), function (QueryInterface $query) {
+             return $query->getLogger()->getQueriesInfo();
+         });
+    }
+
 
 
 

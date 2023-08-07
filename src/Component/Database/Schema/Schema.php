@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\Schema;
 
 use Closure;
 use Laventure\Component\Database\Connection\ConnectionInterface;
+use Laventure\Component\Database\Connection\Query\QueryInterface;
 use Laventure\Component\Database\Schema\Blueprint\Blueprint;
 use Laventure\Component\Database\Schema\Blueprint\BlueprintFactory;
 
@@ -184,6 +185,33 @@ class Schema implements SchemaInterface
 
 
 
+
+    /**
+     * @inheritDoc
+    */
+    public function statement(string $sql, array $params = []): QueryInterface
+    {
+         return $this->connection->statement($sql, $params);
+    }
+
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function exec(string $sql): bool
+    {
+        return $this->connection->exec($sql);
+    }
+
+
+
+
+
     /**
      * @param string $table
      *
@@ -191,6 +219,8 @@ class Schema implements SchemaInterface
     */
     private function blueprint(string $table): Blueprint
     {
-         return BlueprintFactory::make($this->connection, $table);
+        return BlueprintFactory::make($this->connection, $table);
     }
+
+
 }

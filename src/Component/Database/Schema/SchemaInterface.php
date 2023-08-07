@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\Schema;
 
 
 use Closure;
+use Laventure\Component\Database\Connection\Query\QueryInterface;
 
 /**
  * @SchemaInterface
@@ -146,6 +147,34 @@ interface SchemaInterface
       * @return bool
      */
      public function hasColumn(string $table, string $column): bool;
+
+
+
+
+
+     /**
+      * @param string $sql
+      *
+      * @param array $params
+      *
+      * @return QueryInterface
+     */
+     public function statement(string $sql, array $params = []): QueryInterface;
+
+
+
+
+
+
+
+
+     /**
+      * @param string $sql
+      *
+      * @return bool
+     */
+     public function exec(string $sql): bool;
+
 
 
 
