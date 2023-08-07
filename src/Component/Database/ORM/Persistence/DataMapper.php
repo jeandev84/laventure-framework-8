@@ -147,6 +147,6 @@ class DataMapper extends Mapper
     */
     private function persistence(object $object): Persistence
     {
-         return $this->em->getUnitOfWork()->getPersistence(get_class($object));
+         return $this->em->getUnitOfWork()->getPersistence($object);
     }
 }

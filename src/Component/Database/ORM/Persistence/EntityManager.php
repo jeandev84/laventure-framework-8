@@ -145,6 +145,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
+
     /**
      * @inheritDoc
     */
@@ -468,7 +469,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function getClassMetadata(string|object $classname): ClassMetadata
+    public function getClassMetadata($classname): ClassMetadata
     {
         return $this->metadataFactory->createClassMetadata($classname);
     }

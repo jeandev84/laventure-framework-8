@@ -34,12 +34,12 @@ class Persistence implements PersistenceInterface
     /**
      * @param EntityManager $em
      *
-     * @param string|object $context
+     * @param $classname
     */
-    public function __construct(EntityManager $em, string|object $context)
+    public function __construct(EntityManager $em, $classname)
     {
          $this->em        = $em;
-         $this->metadata  = $this->em->getClassMetadata($context);
+         $this->metadata  = $this->em->getClassMetadata($classname);
     }
 
 

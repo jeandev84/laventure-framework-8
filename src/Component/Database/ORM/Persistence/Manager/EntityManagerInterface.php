@@ -106,11 +106,11 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
-     * @param string $classname
+     * @param $classname
      *
      * @return ClassMetadata
     */
-    public function getClassMetadata(string $classname): ClassMetadata;
+    public function getClassMetadata($classname): ClassMetadata;
 
 
 

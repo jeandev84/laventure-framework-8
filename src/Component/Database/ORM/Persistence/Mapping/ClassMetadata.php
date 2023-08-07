@@ -123,9 +123,9 @@ class ClassMetadata implements ClassMetadataInterface
        */
        public function getObject(): object
        {
-           if (! is_object($this->context)) {
-               trigger_error("Required object context for mapping.");
-           }
+//           if (! is_object($this->context)) {
+//               trigger_error("Required object context for mapping.");
+//           }
 
            return $this->context;
        }
@@ -347,8 +347,6 @@ class ClassMetadata implements ClassMetadataInterface
                  $this->attributes[$field] = $value->format('Y-m-d H:i:s');
              } elseif ($value instanceof Collection) {
                  $this->collection->addCollection($field, $value);
-             } elseif (is_array($value)) {
-                 $this->attributes[$field] = serialize($value);
              } elseif (is_object($value)) {
                  $this->belongs[$field] = $value;
              } else {
