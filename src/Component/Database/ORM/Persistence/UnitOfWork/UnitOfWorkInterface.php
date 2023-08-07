@@ -119,6 +119,17 @@ interface UnitOfWorkInterface
 
 
      /**
+      * @param object $object
+      *
+      * @return bool
+     */
+     public function contains(object $object): bool;
+
+
+
+
+
+     /**
       * Commit changes
       *
       * @return void

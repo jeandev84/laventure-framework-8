@@ -390,9 +390,9 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function initialize(object $object): mixed
+    public function initialize(object $object): void
     {
-
+         $this->unitOfWork->attach($object);
     }
 
 
@@ -404,7 +404,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function contains(object $object): bool
     {
-
+        return $this->unitOfWork->contains($object);
     }
 
 

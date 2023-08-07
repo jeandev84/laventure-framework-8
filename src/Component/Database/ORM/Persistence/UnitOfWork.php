@@ -169,6 +169,19 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
+    /**
+     * @inheritDoc
+    */
+    public function contains(object $object): bool
+    {
+        return $this->storage->contains($object);
+    }
+
+
+
+
+
+
 
     /**
      * @inheritDoc

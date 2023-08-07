@@ -116,9 +116,9 @@ interface ObjectManager
      *
      * @param object $object
      *
-     * @return mixed
+     * @return void
     */
-    public function initialize(object $object): mixed;
+    public function initialize(object $object): void;
 
 
 
