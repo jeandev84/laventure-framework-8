@@ -501,8 +501,8 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function getExecutedQueries(): array
     {
-         return array_filter($this->getQueries(), function (QueryInterface $query) {
-             return $query->getLogger()->getQueriesInfo();
+         return array_filter($this->getQueries(), function (QueryInterface $statement) {
+             return $statement->getLogger()->getQueriesInfo();
          });
     }
 
