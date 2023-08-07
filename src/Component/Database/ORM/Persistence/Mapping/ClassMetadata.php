@@ -2,9 +2,7 @@
 namespace Laventure\Component\Database\ORM\Persistence\Mapping;
 
 
-use DateTimeInterface;
-use Laventure\Component\Database\ORM\Collection\Collection;
-use Laventure\Component\Database\ORM\Persistence\PersistenceCollection;
+use Laventure\Component\Database\ORM\Persistence\EntityPropertyResolver;
 use ReflectionClass;
 
 
@@ -13,6 +11,12 @@ use ReflectionClass;
 */
 class ClassMetadata implements ClassMetadataInterface
 {
+
+
+        use EntityPropertyResolver;
+
+
+
 
         /**
         * @var ReflectionClass
@@ -42,8 +46,6 @@ class ClassMetadata implements ClassMetadataInterface
          * @var string
         */
         protected string $identifier = 'id';
-
-
 
 
 
@@ -213,8 +215,48 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @inheritDoc
     */
-    public function getIdentifierValues(object $object): mixed
+    public function getIdentifierValues(object $object): array
     {
+        $identifiers = [];
 
+        $reflection = new \ReflectionObject($object);
+
+        foreach ($reflection->getProperties() as $property) {
+            $identifiers[$property->getName()] = $property->getValue($object);
+        }
+
+
+        return $identifiers;
+    }
+
+
+
+
+
+    /**
+     * @inheritdoc
+    */
+    public function getMethods(): array
+    {
+        $methods = [];
+
+        foreach ($this->reflection->getMethods() as $method) {
+           $methods[] = $method->getName();
+        }
+
+        return $methods;
+    }
+
+
+
+
+
+
+    /**
+     * @inheritdoc
+    */
+    public function hasMethod(string $name): bool
+    {
+        return in_array($name, $this->getMethods());
     }
 }

@@ -70,6 +70,13 @@ class DataMapper implements DataMapperInterface
 
 
 
+    /**
+     * @var array
+    */
+    protected array $methods  = [];
+
+
+
 
 
     /**
@@ -214,6 +221,8 @@ class DataMapper implements DataMapperInterface
     {
         return $this->collection;
     }
+
+
 
 
 

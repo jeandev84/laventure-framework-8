@@ -155,4 +155,27 @@ interface ClassMetadataInterface
     */
     public function getIdentifierValues(object $object): mixed;
 
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function getMethods(): array;
+
+
+
+
+
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+    */
+    public function hasMethod(string $name): bool;
+
 }
