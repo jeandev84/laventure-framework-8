@@ -22,7 +22,7 @@ interface ActiveRecordInterface
        *
        * @return mixed
       */
-      public static function findOne(int $id): mixed;
+      public static function find(int $id): mixed;
 
 
 

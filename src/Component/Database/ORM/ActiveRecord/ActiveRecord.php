@@ -11,10 +11,8 @@ use Laventure\Component\Database\Manager;
 /**
  * @inheritdoc
 */
-class Model implements ActiveRecordInterface, \ArrayAccess
+abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 {
-
-
     /**
      * @var string
     */
@@ -24,7 +22,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var string
-    */
+     */
     protected string $alias = '';
 
 
@@ -32,7 +30,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var string
-    */
+     */
     protected static string $primaryKey = 'id';
 
 
@@ -41,7 +39,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var string|null
-    */
+     */
     protected ?string $connection = null;
 
 
@@ -49,10 +47,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
 
     /**
-     * Model attributes
+     * ActiveRecord attributes
      *
      * @var array
-    */
+     */
     protected array $attributes = [];
 
 
@@ -63,7 +61,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * Store attributes we can save
      *
      * @var array
-    */
+     */
     protected array $fillable = [];
 
 
@@ -76,7 +74,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * Guard columns
      *
      * @var string[]
-    */
+     */
     protected array $guarded = ['id'];
 
 
@@ -86,7 +84,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $selects = [];
 
 
@@ -94,7 +92,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var bool
-    */
+     */
     protected bool $distinct = false;
 
 
@@ -103,7 +101,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $joins = [];
 
 
@@ -112,7 +110,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $wheres = [];
 
 
@@ -121,7 +119,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $orderBy = [];
 
 
@@ -130,7 +128,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $groupBy = [];
 
 
@@ -138,7 +136,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $having = [];
 
 
@@ -147,7 +145,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-    */
+     */
     protected array $parameters = [];
 
 
@@ -156,7 +154,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var int
-    */
+     */
     protected int $limit = 0;
 
 
@@ -164,7 +162,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var int
-    */
+     */
     protected int $offset = 0;
 
 
@@ -174,7 +172,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array|string[]
-    */
+     */
     protected array $operators = [
         '='         => '',
         '>'         => '>',
@@ -191,7 +189,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var static
-    */
+     */
     protected static $model;
 
 
@@ -208,7 +206,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string|null $selects
      *
      * @return $this
-    */
+     */
     public static function select(string $selects = null, bool $distinct = false): static
     {
         static::$model = new static();
@@ -230,7 +228,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $selects
      *
      * @return $this
-    */
+     */
     public function addSelect(string $selects): static
     {
         static::$model->selects[] = $selects;
@@ -251,7 +249,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $type
      *
      * @return $this
-    */
+     */
     public function join(string $table, string $condition, string $type = 'JOIN'): static
     {
         self::$model->joins[$table] = compact($condition, $type);
@@ -272,10 +270,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function leftJoin(string $table, string $condition): static
     {
-         return $this->join($table, $condition, 'LEFT');
+        return $this->join($table, $condition, 'LEFT');
     }
 
 
@@ -292,10 +290,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function rightJoin(string $table, string $condition): static
     {
-         return $this->join($table, $condition, 'RIGHT');
+        return $this->join($table, $condition, 'RIGHT');
     }
 
 
@@ -310,7 +308,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function innerJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition, 'INNER');
@@ -333,7 +331,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      */
     public function fullJoin(string $table, string $condition): static
     {
-         return $this->join($table, $condition, 'FULL');
+        return $this->join($table, $condition, 'FULL');
     }
 
 
@@ -350,7 +348,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $direction
      *
      * @return $this
-    */
+     */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
         static::$model->orderBy[] = "$column $direction";
@@ -369,7 +367,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $column
      *
      * @return $this
-    */
+     */
     public function groupBy(string $column): static
     {
         static::$model->groupBy[] = $column;
@@ -391,7 +389,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function having(string $condition): static
     {
         static::$model->having[] = $condition;
@@ -411,7 +409,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param int $limit
      *
      * @return $this
-    */
+     */
     public function limit(int $limit): static
     {
         static::$model->limit = $limit;
@@ -430,7 +428,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param int $offset
      *
      * @return $this
-    */
+     */
     public function offset(int $offset): static
     {
         static::$model->offset = $offset;
@@ -453,15 +451,15 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param string $operator
      *
      * @return $this
-    */
+     */
     public function where(string $column, $value, string $operator = '='): static
     {
-          $binding = is_array($value) ? "(:$column)" : ":$column";
+        $binding = is_array($value) ? "(:$column)" : ":$column";
 
-          static::$model->wheres[$column]   = "$column $operator $binding";
-          static::$model->parameters[$column] = $value;
+        static::$model->wheres[$column]   = "$column $operator $binding";
+        static::$model->parameters[$column] = $value;
 
-          return static::$model;
+        return static::$model;
     }
 
 
@@ -478,10 +476,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param array $value
      *
      * @return $this
-    */
+     */
     public function whereIn(string $column, array $value): static
     {
-         return static::where($column, $value, "IN :($column)");
+        return static::where($column, $value, "IN :($column)");
     }
 
 
@@ -496,7 +494,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param $value
      *
      * @return $this
-    */
+     */
     public function whereLike(string $column, $value): static
     {
         return static::where($column, $value, "LIKE :($column)");
@@ -510,7 +508,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return array
-    */
+     */
     public function get(): array
     {
         return $this->getQuery()->getResult();
@@ -523,7 +521,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return mixed
-    */
+     */
     public function one(): mixed
     {
         return $this->getQuery()->getOneOrNullResult();
@@ -539,7 +537,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-    */
+     */
     public function delete(): bool
     {
 
@@ -552,7 +550,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-    */
+     */
     public function save(): int
     {
 
@@ -566,7 +564,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param array $attributes
      *
      * @return int
-    */
+     */
     private function update(array $attributes): int
     {
         return 1;
@@ -580,10 +578,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
      * @param array $attributes
      *
      * @return int
-    */
+     */
     private function insert(array $attributes): int
     {
-         return 2;
+        return 2;
     }
 
 
@@ -592,10 +590,10 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-    */
-    public static function findOne(int $id): mixed
+     */
+    public static function find(int $id): mixed
     {
-         return self::select()->where(self::$primaryKey, $id)->one();
+        return self::select()->where(self::$primaryKey, $id)->one();
     }
 
 
@@ -607,7 +605,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-    */
+     */
     public static function findAll(): array
     {
         return self::select()->get();
@@ -621,14 +619,14 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return Manager
-    */
+     */
     private function getManager(): Manager
     {
-         if(! $database = Manager::instance()) {
-              throw new \RuntimeException("No connection to database detected in : ". get_class($this));
-         }
+        if(! $database = Manager::instance()) {
+            throw new \RuntimeException("No connection to database detected in : ". get_class($this));
+        }
 
-         return $database;
+        return $database;
     }
 
 
@@ -640,12 +638,12 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return Builder
-    */
+     */
     private function createQueryBuilder(): Builder
     {
-          $database = static::getManager();
+        $database = static::getManager();
 
-          return new Builder($database->pdoConnection($this->connection));
+        return new Builder($database->pdoConnection($this->connection));
     }
 
 
@@ -656,26 +654,26 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return SelectQueryInterface
-    */
+     */
     private function getQuery(): SelectQueryInterface
     {
         if (! self::$model) {
-             throw new \RuntimeException("no selection detected inside: ". $this->getClassName());
+            throw new \RuntimeException("no selection detected inside: ". $this->getClassName());
         }
 
         $selects = join(', ', self::$model->selects);
 
         return $this->createQueryBuilder()
-                    ->select($selects ?: null)
-                    ->from($this->getTable(), $this->getTableAlias())
-                    ->map(get_called_class())
-                    ->addJoins(self::$model->joins)
-                    ->wheres(self::$model->wheres)
-                    ->setParameters(self::$model->parameters)
-                    ->addGroupBy(self::$model->groupBy)
-                    ->limit(self::$model->offset)
-                    ->offset(self::$model->offset)
-                    ->getQuery();
+            ->select($selects ?: null)
+            ->from($this->getTable(), $this->getTableAlias())
+            ->map(get_called_class())
+            ->addJoins(self::$model->joins)
+            ->wheres(self::$model->wheres)
+            ->setParameters(self::$model->parameters)
+            ->addGroupBy(self::$model->groupBy)
+            ->limit(self::$model->offset)
+            ->offset(self::$model->offset)
+            ->getQuery();
     }
 
 
@@ -686,7 +684,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return string
-    */
+     */
     private function getTableAlias(): string
     {
         if ($this->alias) {
@@ -704,7 +702,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return string
-    */
+     */
     private function getClassName(): string
     {
         return get_called_class();
@@ -716,14 +714,14 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return string
-    */
+     */
     protected function getTable(): string
     {
-         if (! $this->table) {
-             throw new \RuntimeException("Could not detected model ". get_class($this) . " table name.");
-         }
+        if (! $this->table) {
+            throw new \RuntimeException("Could not detected model ". get_class($this) . " table name.");
+        }
 
-         return $this->table;
+        return $this->table;
     }
 
 
@@ -839,7 +837,7 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public function offsetSet($offset, $value)
     {
         $this->setAttribute($offset, $value);
@@ -850,10 +848,9 @@ class Model implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public function offsetUnset($offset)
     {
         $this->removeAttribute($offset);
     }
-
 }
