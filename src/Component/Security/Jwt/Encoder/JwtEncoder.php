@@ -48,14 +48,16 @@ class JwtEncoder implements JwtEncoderInterface
     }
 
 
+
+
     /**
      * @inheritDoc
      *
      * @throws InvalidSignatureException|TokenExpiredException
-     */
+    */
     public function decode(string $string): array
     {
-        $payload = $this->getPayloadFromToken($string);
+        $payload = $this->getPayload($string);
 
         if ($payload['exp'] < time()) {
             throw new TokenExpiredException();
@@ -170,7 +172,7 @@ class JwtEncoder implements JwtEncoderInterface
      * @return array
      * @throws InvalidSignatureException
     */
-    protected function getPayloadFromToken(string $token): array
+    protected function getPayload(string $token): array
     {
         if(preg_match("/^(?<header>.+)\.(?<payload>.+)\.(?<signature>.+)$/", $token, $matches) !== 1) {
             throw new InvalidArgumentException("invalid token format");
