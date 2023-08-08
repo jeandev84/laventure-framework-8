@@ -5,7 +5,6 @@ use Closure;
 use Exception;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Connection\Configuration\Configuration;
-use Laventure\Component\Database\Connection\Configuration\ConfigurationInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
 use Laventure\Component\Database\Manager\DatabaseManager;
 use Laventure\Component\Database\Migration\Migrator;
