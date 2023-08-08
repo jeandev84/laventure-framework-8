@@ -2,12 +2,14 @@
 namespace Laventure\Component\Filesystem;
 
 
+use FilesystemIterator;
 use Laventure\Component\Filesystem\File\Base64File;
 use Laventure\Component\Filesystem\File\File;
 use Laventure\Component\Filesystem\File\FileInfo;
 use Laventure\Component\Filesystem\File\Iterator\FileIterator;
 use Laventure\Component\Filesystem\File\Iterator\GlobalIterator;
 use Laventure\Component\Filesystem\File\Locator\FileLocator;
+use Laventure\Component\Filesystem\File\Reader\DirectoryReader;
 use Laventure\Component\Filesystem\File\Stream;
 
 
@@ -226,6 +228,7 @@ class Filesystem
 
 
 
+
       /**
        * @param string $path
        *
@@ -279,9 +282,37 @@ class Filesystem
 
 
 
+     /**
+      * @param string $directory
+      *
+      * @return FilesystemIterator
+     */
+     public function iterate(string $directory): FilesystemIterator
+     {
+          return new FilesystemIterator($this->locate($directory));
+     }
 
 
-      /**
+
+
+
+     /**
+      * @param string $directory
+      *
+      * @return DirectoryReader
+     */
+     public function readDir(string $directory): DirectoryReader
+     {
+          return new DirectoryReader($this->locate($directory));
+     }
+
+
+
+
+
+
+
+    /**
        * @param string $path
        *
        * @return array|false
