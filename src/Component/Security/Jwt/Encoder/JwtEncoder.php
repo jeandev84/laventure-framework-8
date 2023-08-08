@@ -128,18 +128,20 @@ class JwtEncoder implements JwtEncoderInterface
     }
 
 
-
-
-
     /**
-     * @param string $signature
+     * @param string $header
+     *
+     * @param string $payload
      *
      * @return string
     */
-    protected function hashSignature(string $signature): string
+    protected function hashSignature(string $header, string $payload): string
     {
+        $signature = sprintf('%s.%s.%s', $header, $payload, $this->secretKey);
+
         return hash_hmac("sha256", $signature, true);
     }
+
 
 
 
@@ -156,9 +158,7 @@ class JwtEncoder implements JwtEncoderInterface
     */
     protected function encodeSignature(string $header, string $payload): string
     {
-        $signature = sprintf('%s.%s.%s', $header, $payload, $this->secretKey);
-
-        return $this->hashSignature($signature);
+        return $this->encoder->encode($this->hashSignature($header, $payload));
     }
 
 
@@ -183,7 +183,7 @@ class JwtEncoder implements JwtEncoderInterface
         }, ARRAY_FILTER_USE_KEY);
 
 
-        $signature = $this->encodeSignature($tokenParams['header'], $tokenParams['payload']);
+        $signature = $this->hashSignature($tokenParams['header'], $tokenParams['payload']);
         $signatureFromToken = $this->encoder->decode($signature);
 
         if (! hash_equals($signature, $signatureFromToken)) {
