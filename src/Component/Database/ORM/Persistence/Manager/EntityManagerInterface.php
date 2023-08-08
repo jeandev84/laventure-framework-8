@@ -95,9 +95,9 @@ interface EntityManagerInterface extends ObjectManager
      *
      * @param $id
      *
-     * @return object|null
+     * @return mixed
     */
-    public function find(string $classname, $id): ?object;
+    public function find(string $classname, $id): mixed;
 
 
 

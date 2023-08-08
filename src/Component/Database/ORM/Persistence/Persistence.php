@@ -78,9 +78,9 @@ class Persistence
     /**
      * @param int $id
      *
-     * @return object|null
+     * @return mixed
     */
-    public function find(int $id): ?object
+    public function find(int $id): mixed
     {
         return $this->select("*", [$this->identifier() => $id])
                     ->getQuery()

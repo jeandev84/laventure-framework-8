@@ -207,7 +207,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
     */
-    public function find(string $classname, $id): ?object
+    public function find(string $classname, $id): mixed
     {
         return $this->getUnitOfWork()->getPersistence($classname)->find($id);
     }
