@@ -4,13 +4,15 @@ namespace Laventure\Component\Security\Jwt\Encoder;
 
 use InvalidArgumentException;
 use Laventure\Component\Security\Encoder\Base64Encoder;
+use Laventure\Component\Security\Encoder\EncoderInterface;
 use Laventure\Component\Security\Jwt\Encoder\Exception\InvalidSignatureException;
 use Laventure\Component\Security\Jwt\Encoder\Exception\TokenExpiredException;
+
 
 /**
  * @inheritdoc
 */
-class JwtEncoder implements JwtEncoderInterface
+class JwtEncoder implements EncoderInterface
 {
 
 
@@ -219,5 +221,18 @@ class JwtEncoder implements JwtEncoderInterface
         }
 
         return $tokenParams;
+    }
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    protected function getSecretKey(): string
+    {
+         return $this->secretKey;
     }
 }
