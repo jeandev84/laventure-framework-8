@@ -3,7 +3,6 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 use Closure;
 use Exception;
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ClassMapping;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;

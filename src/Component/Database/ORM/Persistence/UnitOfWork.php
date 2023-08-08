@@ -205,8 +205,8 @@ class UnitOfWork implements UnitOfWorkInterface
     public function commit(): void
     {
          $this->em->transaction(function () {
-              $state = $this->storage->getInfo();
               foreach ($this->storage as $object) {
+                  $state = $this->storage->getInfo();
                   switch ($state):
                        case self::STATE_MANAGED:
                        case self::STATE_NEW:
@@ -281,10 +281,7 @@ class UnitOfWork implements UnitOfWorkInterface
     public function addRemovedState(object $object): void
     {
          $this->eventManager->subscribeRemoveEvents();
-
-         if (! $this->metadata($object)->isNew()) {
-             $this->storage->attach($object, self::STATE_REMOVED);
-         }
+         $this->storage->attach($object, self::STATE_REMOVED);
     }
 
 
