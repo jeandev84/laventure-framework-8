@@ -263,7 +263,7 @@ class UnitOfWork implements UnitOfWorkInterface
     {
          $this->eventManager->subscribePersistEvents();
 
-         if ($this->metadata($object)->map()->isNew()) {
+         if ($this->metadata($object)->map()->identifierIsNull()) {
              $this->storage->attach($object, self::STATE_NEW);
          } else {
              $this->storage->attach($object, self::STATE_MANAGED);

@@ -68,7 +68,7 @@ class DataMapper extends Mapper
          $event  = $this->dispatchEvent(new PrePersistEvent($object));
          $object = $event->getSubject();
 
-         if($this->mapRows($object)->isNew()) {
+         if($this->mapRows($object)->identifierIsNull()) {
               return $this->insert($object);
          }
 
