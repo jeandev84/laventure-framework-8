@@ -212,13 +212,13 @@ class PdoConnection implements PdoConnectionInterface
      *
      * @return bool
     */
-    public function transaction(Closure $closure): bool
+    public function transaction(Closure $func): bool
     {
+        $this->beginTransaction();
+
         try {
 
-            $this->beginTransaction();;
-
-            $closure($this);
+            $func($this);
 
             return $this->commit();
 
@@ -227,6 +227,8 @@ class PdoConnection implements PdoConnectionInterface
             if ($this->hasActiveTransaction()) {
                 $this->rollBack();
             }
+
+            $this->close();
 
             throw new PDOException($e->getMessage(), $e->getCode());
         }

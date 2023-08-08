@@ -128,38 +128,6 @@ class Manager extends DatabaseManager
 
 
 
-       /**
-        * @param string $sql
-        *
-        * @param array $params
-        *
-        * @return QueryInterface
-       */
-       public function statement(string $sql, array $params = []): QueryInterface
-       {
-             return $this->connection()->statement($sql, $params);
-       }
-
-
-
-
-
-
-
-      /**
-       * @param string $sql
-       *
-       * @return bool
-       */
-       public function exec(string $sql): bool
-       {
-            return $this->connection()->exec($sql);
-       }
-
-
-
-
-
 
        /**
         * @param string|null $name
@@ -206,88 +174,13 @@ class Manager extends DatabaseManager
 
 
 
-
-       /**
-        * @param Closure $func
-        *
-        * @return void
-       */
-       public function transaction(Closure $func): void
-       {
-            $this->connection()->beginTransaction();
-
-            try {
-                $func($this);
-                $this->connection()->commit();
-            } catch (Exception $e) {
-                $this->connection()->rollback();
-                $this->close();
-                $this->abortIf($e->getMessage());
-            }
-       }
-
-
-       
-       
-       
-       
-       /**
-        * @param string|null $name
-        * 
-        * @return void
-       */
-       public function disconnect(string $name = null): void
-       {
-            $this->connection($name)->disconnect();
-       }
-
-
-       
-       
-       
-       
-       
-       
-       /**
-        * @param string|null $name
-        * 
-        * @return void
-       */
-       public function reconnect(string $name = null): void
-       {
-            $this->connection($name)->reconnect();
-       }
-
-
-       
-       
-       
-       
-       
-       
-       
-       /**
-        * @param string|null $name
-        *
-        * @return void
-       */
-       public function purge(string $name = null): void
-       {
-           $this->connection($name)->purge();
-       }
-
-
-
-
-
-
-       /**
-        * @inheritDoc
-       */
-       public function config(): Configuration
-       {
-           return $this->config;
-       }
+        /**
+         * @inheritDoc
+        */
+        public function config(): Configuration
+        {
+            return $this->config;
+        }
 
 
 
@@ -296,30 +189,14 @@ class Manager extends DatabaseManager
 
 
 
-       /**
-        * @inheritdoc
-       */
-       public function close(): void
-       {
-           parent::close();
-           $this->config->removeAll();
-       }
-
-
-
-
-
-
-       /**
-        * @param string|null $name
-        * 
-        * @return array
-       */
-       public function getQueries(string $name = null): array
-       {
-           return $this->connection($name)->getQueries();
-       }
-
+        /**
+         * @inheritdoc
+        */
+        public function close(): void
+        {
+            parent::close();
+            $this->config->removeAll();
+        }
 
 
 

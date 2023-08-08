@@ -178,7 +178,7 @@ class MysqliConnection implements ConnectionInterface
     /**
      * @inheritDoc
     */
-    public function transaction(Closure $closure): mixed
+    public function transaction(Closure $func): mixed
     {
         // TODO: Implement transaction() method.
     }

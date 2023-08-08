@@ -189,11 +189,11 @@ interface ConnectionInterface
     /**
      * Transaction
      *
-     * @param Closure $closure
+     * @param Closure $func
      *
      * @return mixed
     */
-    public function transaction(Closure $closure): mixed;
+    public function transaction(Closure $func): mixed;
 
 
 
