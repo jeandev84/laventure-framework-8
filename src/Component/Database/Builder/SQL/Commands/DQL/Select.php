@@ -20,7 +20,8 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 {
 
 
-    use HasConditions;
+    use HasConditions, ClassMapping;
+
 
 
     /**
@@ -88,17 +89,6 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     protected array $having = [];
 
-
-
-
-
-
-    /**
-     * Class Mapping
-     *
-     * @var string
-    */
-    protected string $mappedClass;
 
 
 
@@ -345,22 +335,6 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     public function offset(?int $offset): static
     {
         $this->offset = $offset;
-
-        return $this;
-    }
-
-
-
-
-
-    /**
-     * @param string $classname
-     *
-     * @return $this
-    */
-    public function map(string $classname): static
-    {
-        $this->mappedClass = $classname;
 
         return $this;
     }

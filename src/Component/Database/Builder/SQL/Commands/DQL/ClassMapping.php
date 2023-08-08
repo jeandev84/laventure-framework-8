@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence;
+namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 
 
@@ -8,25 +8,33 @@ trait ClassMapping
 
 
     /**
+     * Class Mapping
+     *
      * @var string
     */
-    protected string $mapped = '';
+    protected string $mappedClass;
+
+
 
 
 
 
 
     /**
-     * @param string $mapped
+     * Class mapping
      *
-     * @return static
+     * @param string $classname
+     *
+     * @return $this
     */
-    public function mapped(string $mapped): static
+    public function map(string $classname): static
     {
-        $this->mapped = $mapped;
+        $this->mappedClass = $classname;
 
         return $this;
     }
+
+
 
 
 
@@ -37,8 +45,9 @@ trait ClassMapping
     */
     public function hasMapping(): bool
     {
-        return ! empty($this->mapped);
+        return ! empty($this->mappedClass);
     }
+
 
 
 
@@ -50,6 +59,6 @@ trait ClassMapping
     */
     public function getMapped(): string
     {
-        return $this->mapped;
+        return $this->mappedClass;
     }
 }
