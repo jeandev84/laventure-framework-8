@@ -168,11 +168,11 @@ class DatabaseManager implements DatabaseManagerInterface
 
 
         /**
-         * @param string $name
+         * @param string|null $name
          *
          * @return ConnectionInterface
         */
-        public function connection(string $name = ''): ConnectionInterface
+        public function connection(string $name = null): ConnectionInterface
         {
              $name        = $name ?: $this->connection;
              $credentials = $this->credentials($name);

@@ -58,19 +58,11 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
-    /**
-     * @var array
-    */
-    protected array $persisted = [];
-
-
-
 
     /**
      * @var array
     */
-    protected array $removed = [];
-
+    protected array $detached = [];
 
 
 
@@ -297,12 +289,18 @@ class UnitOfWork implements UnitOfWorkInterface
 
 
 
+
+
+
+
+
     /**
      * @inheritDoc
     */
     public function addDetachedState(object $object): void
     {
-        // TODO: Implement addDetachedState() method.
+         $this->storage->detach($object);
+         $this->detached[self::STATE_DETACHED][] = $object;
     }
 
 

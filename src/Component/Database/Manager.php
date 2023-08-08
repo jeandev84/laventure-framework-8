@@ -5,6 +5,8 @@ use Closure;
 use Exception;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Connection\Configuration\Configuration;
+use Laventure\Component\Database\Connection\ConnectionInterface;
+use Laventure\Component\Database\Connection\Extensions\PDO\PdoConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
 use Laventure\Component\Database\Manager\DatabaseManager;
 use Laventure\Component\Database\Migration\Migrator;
@@ -68,7 +70,7 @@ class Manager extends DatabaseManager
        /**
         * @return static
        */
-       public static function capture(): static
+       public static function instance(): static
        {
            return self::$instance;
        }
@@ -127,6 +129,24 @@ class Manager extends DatabaseManager
 
 
 
+       /**
+        * @param string|null $name
+       */
+       public function pdoConnection(string $name = null): ConnectionInterface
+       {
+           $connection = $this->connection($name);
+
+           if (! $connection instanceof PdoConnectionInterface) {
+                throw new \RuntimeException("no pdo connection detected.");
+           }
+
+           return $connection;
+       }
+
+
+
+
+
 
 
        /**
@@ -164,10 +184,11 @@ class Manager extends DatabaseManager
         *
         * @return Builder
        */
-       public function QB(string $name = null): Builder
+       public function createQB(string $name = null): Builder
        {
             return new Builder($this->connection($name));
        }
+
 
 
 

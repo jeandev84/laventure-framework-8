@@ -7,7 +7,13 @@ use Laventure\Component\Database\ORM\Collection\ObjectStorage;
 
 
 /**
+ * @PersistenceCollection
  *
+ * @author Jean-Claude <jeanyao@ymail.com>
+ *
+ * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
+ *
+ * @package Laventure\Component\Database\ORM\Persistence
 */
 class PersistenceCollection extends ObjectStorage
 {

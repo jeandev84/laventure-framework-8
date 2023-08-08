@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\Persistence;
 
 use Closure;
 use Exception;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ClassMapping;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryInterface;
@@ -22,7 +23,6 @@ use Laventure\Component\Database\ORM\Persistence\Repository\EntityRepositoryFact
 */
 class EntityManager implements EntityManagerInterface, ObjectPersistenceInterface
 {
-
 
     /**
      * @var ConnectionInterface
@@ -71,14 +71,6 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     protected EntityRepositoryFactory $repositoryFactory;
 
-
-
-
-
-    /**
-     * @var string
-    */
-    protected string $mapped = '';
 
 
 
@@ -415,7 +407,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @inheritDoc
      */
-    public function persistence(array $objects): void
+    public function persistence(array $objects): static
     {
         foreach ($objects as $object) {
             if (! is_object($object)) {
@@ -425,47 +417,8 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
             $this->persist($object);
             $this->managed[get_class($object)] = $object;
         }
-    }
-
-
-
-
-
-    /**
-     * @param string $mapped
-     *
-     * @return static
-     */
-    public function mapped(string $mapped): static
-    {
-        $this->mapped = $mapped;
 
         return $this;
-    }
-
-
-
-
-
-
-    /**
-     * @inheritDoc
-     */
-    public function hasMapping(): bool
-    {
-        return ! empty($this->mapped);
-    }
-
-
-
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getMapped(): string
-    {
-        return $this->mapped;
     }
 
 

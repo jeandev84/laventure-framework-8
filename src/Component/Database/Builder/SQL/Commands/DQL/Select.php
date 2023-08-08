@@ -4,7 +4,7 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectBuilderInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistence;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\NullObjectPersistence;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
@@ -94,9 +94,22 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
+     * Class Mapping
+     *
+     * @var string
+    */
+    protected string $mappedClass;
+
+
+
+
+
+
+    /**
      * @var ObjectPersistenceInterface
     */
     protected ObjectPersistenceInterface $persistence;
+
 
 
 
@@ -109,7 +122,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     public function __construct(ConnectionInterface $connection, string $selects = null)
     {
          parent::__construct($connection, '');
-         $this->persistence = new ObjectPersistence();
+         $this->persistence = new NullObjectPersistence();
          $this->addSelect($selects ?: "*");
     }
 
@@ -347,7 +360,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function map(string $classname): static
     {
-        $this->persistence->mapped($classname);
+        $this->mappedClass = $classname;
 
         return $this;
     }
@@ -362,13 +375,13 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function fetch(): QueryResultInterface
     {
-        $fetch = $this->statement()->fetch();
+         $fetch = $this->statement()->fetch();
 
-        if ($this->persistence->hasMapping()) {
-            $fetch->map($this->persistence->getMapped());
-        }
+         if ($this->mappedClass) {
+              $fetch->map($this->mappedClass);
+         }
 
-        return $fetch;
+         return $fetch;
     }
 
 

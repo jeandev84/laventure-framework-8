@@ -7,10 +7,17 @@ use Laventure\Component\Database\ORM\Persistence\Mapping\ClassMetadata;
 use Laventure\Component\Database\ORM\Persistence\Query\QueryBuilder;
 
 
+
 /**
- * @implements
+ * @Persistence
+ *
+ * @author Jean-Claude <jeanyao@ymail.com>
+ *
+ * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
+ *
+ * @package Laventure\Component\Database\ORM\Persistence
 */
-class Persistence implements PersistenceInterface
+class Persistence
 {
 
 
@@ -46,59 +53,12 @@ class Persistence implements PersistenceInterface
 
 
 
-
     /**
-     * @return QueryBuilder
-    */
-    public function createQueryBuilder(): QueryBuilder
-    {
-        return $this->em->createQueryBuilder();
-    }
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function getIdentifier(): string
-    {
-        return $this->metadata->getIdentifier();
-    }
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function getClassname(): string
-    {
-        return $this->metadata->getClassname();
-    }
-
-
-
-
-
-    /**
-     * @return string
-    */
-    public function getTableName(): string
-    {
-        return $this->metadata->getTableName();
-    }
-
-
-
-
-
-
-
-    /**
-     * @inheritDoc
+     * @param string|null $selects
+     *
+     * @param array $criteria
+     *
+     * @return Select
     */
     public function select(string $selects = null, array $criteria = []): Select
     {
@@ -114,12 +74,15 @@ class Persistence implements PersistenceInterface
 
 
 
+
     /**
-     * @inheritdoc
+     * @param int $id
+     *
+     * @return object|null
     */
     public function find(int $id): ?object
     {
-        return $this->select("*", [$this->getIdentifier() => $id])
+        return $this->select("*", [$this->identifier() => $id])
                     ->getQuery()
                     ->getOneOrNullResult();
     }
@@ -129,7 +92,7 @@ class Persistence implements PersistenceInterface
 
 
     /**
-     * @inheritDoc
+     * @return int
     */
     public function insert(): int
     {
@@ -142,9 +105,8 @@ class Persistence implements PersistenceInterface
 
 
 
-
     /**
-     * @inheritDoc
+     * @return int
     */
     public function update(): int
     {
@@ -158,10 +120,8 @@ class Persistence implements PersistenceInterface
 
 
 
-
-
     /**
-     * @inheritDoc
+     * @return bool
     */
     public function delete(): bool
     {
@@ -172,10 +132,8 @@ class Persistence implements PersistenceInterface
 
 
 
-
-
     /**
-     * @inheritDoc
+     * @return ClassMetadata
     */
     public function metadata(): ClassMetadata
     {
@@ -187,12 +145,65 @@ class Persistence implements PersistenceInterface
 
 
 
-
     /**
      * @return array
     */
-    public function criteria(): array
+    private function criteria(): array
     {
-        return [$this->getIdentifier() => $this->metadata->map()->getIdentifierValue()];
+        return [$this->identifier() => $this->metadata->map()->getIdentifierValue()];
     }
+
+
+
+
+
+
+
+
+    /**
+     * @return QueryBuilder
+    */
+    private function createQueryBuilder(): QueryBuilder
+    {
+        return $this->em->createQueryBuilder();
+    }
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    private function identifier(): string
+    {
+        return $this->metadata->getIdentifier();
+    }
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    private function getClassname(): string
+    {
+        return $this->metadata->getClassname();
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    private function getTableName(): string
+    {
+        return $this->metadata->getTableName();
+    }
+
 }

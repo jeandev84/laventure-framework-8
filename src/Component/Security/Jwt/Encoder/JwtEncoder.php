@@ -214,7 +214,7 @@ class JwtEncoder implements EncoderInterface
     protected function matchSignature(array $tokenParams): array
     {
         $signature = $this->hashSignature($tokenParams['header'], $tokenParams['payload']);
-        $signatureFromToken = $this->encoder->decode($signature);
+        $signatureFromToken = $this->encoder->decode($tokenParams['signature']);
 
         if (! hash_equals($signature, $signatureFromToken)) {
             throw new InvalidSignatureException("signature doesn't match");
