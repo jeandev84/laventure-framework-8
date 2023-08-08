@@ -11,7 +11,7 @@ class Asset implements AssetInterface
     /**
      * @var string
     */
-    protected string $url;
+    protected string $baseUrl;
 
 
 
@@ -34,28 +34,15 @@ class Asset implements AssetInterface
 
 
     /**
-     * @param string $url
+     * @param string $path
     */
-    public function __construct(string $url = '/')
+    public function __construct(string $path = '/')
     {
-         $this->url($url);
+        $this->baseUrl = rtrim($path, '/');
     }
 
 
 
-
-
-    /**
-     * @param string $url
-     *
-     * @return $this
-    */
-    public function url(string $url): static
-    {
-        $this->url = rtrim($url, '/');
-
-        return $this;
-    }
 
 
 
@@ -66,7 +53,7 @@ class Asset implements AssetInterface
     */
     public function resource(string $path): string
     {
-        return  $this->url . '/' . trim($path, '/');
+        return  $this->baseUrl . '/' . trim($path, '/');
     }
 
 
