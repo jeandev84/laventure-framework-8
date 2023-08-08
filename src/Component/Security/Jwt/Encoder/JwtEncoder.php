@@ -2,7 +2,10 @@
 namespace Laventure\Component\Security\Jwt\Encoder;
 
 
+use InvalidArgumentException;
 use Laventure\Component\Security\Encoder\Base64Encoder;
+use Laventure\Component\Security\Jwt\Encoder\Exception\InvalidSignatureException;
+use Laventure\Component\Security\Jwt\Encoder\Exception\TokenExpiredException;
 
 /**
  * @inheritdoc
@@ -45,16 +48,20 @@ class JwtEncoder implements JwtEncoderInterface
     }
 
 
-
-
-
-
     /**
      * @inheritDoc
-    */
+     *
+     * @throws InvalidSignatureException|TokenExpiredException
+     */
     public function decode(string $string): array
     {
+        $payload = $this->getPayloadFromToken($string);
 
+        if ($payload['exp'] < time()) {
+            throw new TokenExpiredException();
+        }
+
+        return $payload;
     }
 
 
@@ -155,13 +162,32 @@ class JwtEncoder implements JwtEncoderInterface
 
 
 
+
+
     /**
      * @param string $token
      *
      * @return array
+     * @throws InvalidSignatureException
     */
     protected function getPayloadFromToken(string $token): array
     {
+        if(preg_match("/^(?<header>.+)\.(?<payload>.+)\.(?<signature>.+)$/", $token, $matches) !== 1) {
+            throw new InvalidArgumentException("invalid token format");
+        }
 
+        $tokenParams = array_filter($matches, function ($key) {
+            return is_string($key);
+        }, ARRAY_FILTER_USE_KEY);
+
+
+        $signature = $this->encodeSignature($tokenParams['header'], $tokenParams['payload']);
+        $signatureFromToken = $this->encoder->decode($signature);
+
+        if (! hash_equals($signature, $signatureFromToken)) {
+            throw new InvalidSignatureException("signature doesn't match");
+        }
+
+        return $this->decodeFromJson($tokenParams['payload']);
     }
 }
