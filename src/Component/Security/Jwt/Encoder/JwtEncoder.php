@@ -57,7 +57,7 @@ class JwtEncoder implements JwtEncoderInterface
     */
     public function decode(string $string): array
     {
-        $payload = $this->getPayload($string);
+        $payload = $this->getPayloadParams($string);
 
         if ($payload['exp'] < time()) {
             throw new TokenExpiredException();
@@ -124,8 +124,16 @@ class JwtEncoder implements JwtEncoderInterface
     */
     protected function encodePayload(array $payload): string
     {
+        if (empty($payload['exp'])) {
+            throw new \RuntimeException("parameter 'exp' is required.");
+        }
+
         return $this->encodeFromArray($payload);
     }
+
+
+
+
 
 
     /**
@@ -172,7 +180,7 @@ class JwtEncoder implements JwtEncoderInterface
      * @return array
      * @throws InvalidSignatureException
     */
-    protected function getPayload(string $token): array
+    protected function getPayloadParams(string $token): array
     {
         if(preg_match("/^(?<header>.+)\.(?<payload>.+)\.(?<signature>.+)$/", $token, $matches) !== 1) {
             throw new InvalidArgumentException("invalid token format");
