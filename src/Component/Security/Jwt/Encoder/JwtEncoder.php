@@ -186,11 +186,31 @@ class JwtEncoder implements JwtEncoderInterface
             throw new InvalidArgumentException("invalid token format");
         }
 
+
         $tokenParams = array_filter($matches, function ($key) {
             return is_string($key);
         }, ARRAY_FILTER_USE_KEY);
 
 
+        $tokenParams = $this->matchSignature($tokenParams);
+
+        return $this->decodeFromJson($tokenParams['payload']);
+    }
+
+
+
+
+
+
+    /**
+     * @param array $tokenParams
+     *
+     * @return array
+     *
+     * @throws InvalidSignatureException
+    */
+    protected function matchSignature(array $tokenParams): array
+    {
         $signature = $this->hashSignature($tokenParams['header'], $tokenParams['payload']);
         $signatureFromToken = $this->encoder->decode($signature);
 
@@ -198,6 +218,6 @@ class JwtEncoder implements JwtEncoderInterface
             throw new InvalidSignatureException("signature doesn't match");
         }
 
-        return $this->decodeFromJson($tokenParams['payload']);
+        return $tokenParams;
     }
 }
