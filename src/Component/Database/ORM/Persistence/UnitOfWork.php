@@ -314,4 +314,16 @@ class UnitOfWork implements UnitOfWorkInterface
     {
         return $this->eventManager;
     }
+
+
+
+
+
+    /**
+     * @return ObjectStorage
+    */
+    public function getStorage(): ObjectStorage
+    {
+        return $this->storage;
+    }
 }
