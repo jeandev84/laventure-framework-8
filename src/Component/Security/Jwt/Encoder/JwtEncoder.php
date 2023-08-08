@@ -78,7 +78,7 @@ class JwtEncoder implements EncoderInterface
      *
      * @return string
     */
-    public function encodeFromArray(array $data): string
+    protected function encodeFromArray(array $data): string
     {
         return $this->encoder->encode(json_encode($data));
     }
@@ -94,7 +94,7 @@ class JwtEncoder implements EncoderInterface
      *
      * @return array
     */
-    public function decodeFromJson(string $json): array
+    protected function decodeFromJson(string $json): array
     {
         return json_decode($this->encoder->decode($json), true);
     }
