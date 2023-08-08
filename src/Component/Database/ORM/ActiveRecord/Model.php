@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
 use Laventure\Component\Database\Builder\Builder;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
 use Laventure\Component\Database\Manager;
 
 
@@ -10,8 +11,9 @@ use Laventure\Component\Database\Manager;
 /**
  * @inheritdoc
 */
-abstract class Model implements ActiveRecordInterface
+class Model implements ActiveRecordInterface, \ArrayAccess
 {
+
 
     /**
      * @var string
@@ -31,7 +33,7 @@ abstract class Model implements ActiveRecordInterface
     /**
      * @var string
     */
-    protected string $primary = 'id';
+    protected static string $primaryKey = 'id';
 
 
 
@@ -47,6 +49,8 @@ abstract class Model implements ActiveRecordInterface
 
 
     /**
+     * Model attributes
+     *
      * @var array
     */
     protected array $attributes = [];
@@ -56,9 +60,42 @@ abstract class Model implements ActiveRecordInterface
 
 
     /**
+     * Store attributes we can save
+     *
+     * @var array
+    */
+    protected array $fillable = [];
+
+
+
+
+
+
+
+    /**
+     * Guard columns
+     *
+     * @var string[]
+    */
+    protected array $guarded = ['id'];
+
+
+
+
+
+
+    /**
      * @var array
     */
     protected array $selects = [];
+
+
+
+
+    /**
+     * @var bool
+    */
+    protected bool $distinct = false;
 
 
 
@@ -109,6 +146,15 @@ abstract class Model implements ActiveRecordInterface
 
 
     /**
+     * @var array
+    */
+    protected array $parameters = [];
+
+
+
+
+
+    /**
      * @var int
     */
     protected int $limit = 0;
@@ -146,9 +192,13 @@ abstract class Model implements ActiveRecordInterface
     /**
      * @var static
     */
-    protected static $instance;
+    protected static $model;
 
 
+
+
+
+    private function __construct() {}
 
 
 
@@ -159,14 +209,135 @@ abstract class Model implements ActiveRecordInterface
      *
      * @return $this
     */
-    public static function select(string $selects = null): static
+    public static function select(string $selects = null, bool $distinct = false): static
     {
-         static::$instance = new static();
+        static::$model = new static();
 
-         static::$instance->selects[] = $selects;
+        static::$model->selects[] = $selects;
+        static::$model->distinct  = $distinct;
 
-         return static::$instance;
+        return static::$model;
     }
+
+
+
+
+
+
+
+
+    /**
+     * @param string $selects
+     *
+     * @return $this
+    */
+    public function addSelect(string $selects): static
+    {
+        static::$model->selects[] = $selects;
+
+        return static::$model;
+    }
+
+
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @param string $condition
+     *
+     * @param string $type
+     *
+     * @return $this
+    */
+    public function join(string $table, string $condition, string $type = 'JOIN'): static
+    {
+        self::$model->joins[$table] = compact($condition, $type);
+
+        return static::$model;
+    }
+
+
+
+
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @param string $condition
+     *
+     * @return $this
+    */
+    public function leftJoin(string $table, string $condition): static
+    {
+         return $this->join($table, $condition, 'LEFT');
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @param string $condition
+     *
+     * @return $this
+    */
+    public function rightJoin(string $table, string $condition): static
+    {
+         return $this->join($table, $condition, 'RIGHT');
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @param string $condition
+     *
+     * @return $this
+    */
+    public function innerJoin(string $table, string $condition): static
+    {
+        return $this->join($table, $condition, 'INNER');
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @param string $condition
+     *
+     * @return $this
+     */
+    public function fullJoin(string $table, string $condition): static
+    {
+         return $this->join($table, $condition, 'FULL');
+    }
+
+
+
 
 
 
@@ -182,10 +353,54 @@ abstract class Model implements ActiveRecordInterface
     */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
-        static::$instance->orderBy[] = "$column $direction";
+        static::$model->orderBy[] = "$column $direction";
 
-        return static::$instance;
+        return static::$model;
     }
+
+
+
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @return $this
+    */
+    public function groupBy(string $column): static
+    {
+        static::$model->groupBy[] = $column;
+
+        return static::$model;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * @param string $condition
+     *
+     * @return $this
+    */
+    public function having(string $condition): static
+    {
+        static::$model->having[] = $condition;
+
+        return static::$model;
+    }
+
+
+
 
 
 
@@ -199,9 +414,28 @@ abstract class Model implements ActiveRecordInterface
     */
     public function limit(int $limit): static
     {
-        static::$instance->limit = $limit;
+        static::$model->limit = $limit;
 
-        return static::$instance;
+        return static::$model;
+    }
+
+
+
+
+
+
+
+
+    /**
+     * @param int $offset
+     *
+     * @return $this
+    */
+    public function offset(int $offset): static
+    {
+        static::$model->offset = $offset;
+
+        return static::$model;
     }
 
 
@@ -220,12 +454,19 @@ abstract class Model implements ActiveRecordInterface
      *
      * @return $this
     */
-    public static function where(string $column, $value, string $operator = '='): static
+    public function where(string $column, $value, string $operator = '='): static
     {
-          static::$instance->wheres[$column] = compact('column', 'operator', 'value');
+          $binding = is_array($value) ? "(:$column)" : ":$column";
 
-          return static::$instance;
+          static::$model->wheres[$column]   = "$column $operator $binding";
+          static::$model->parameters[$column] = $value;
+
+          return static::$model;
     }
+
+
+
+
 
 
 
@@ -249,33 +490,30 @@ abstract class Model implements ActiveRecordInterface
 
 
 
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @return $this
+    */
+    public function whereLike(string $column, $value): static
+    {
+        return static::where($column, $value, "LIKE :($column)");
+    }
+
+
+
+
+
+
 
     /**
      * @return array
     */
     public function get(): array
     {
-        if (! self::$instance) { return []; }
-
-        $selects = join(', ', self::$instance->selects);
-        $alias   =  mb_substr($this->getTable(), 0, 1, "UTF-8");
-
-        $qb = $this->createQueryBuilder()
-                   ->select($selects ?: null)
-                   ->from($this->getTable(), $this->alias)
-                   ->map(get_class($this));
-
-
-        if ($wheres = self::$instance->wheres) {
-            foreach ($wheres as  $items) {
-                 [$column, $operator, $value] = array_values($items);
-                 $qb->where("$column $operator");
-                 $qb->setParameter($column, $value);
-             }
-        }
-
-
-        dd(self::$instance);
+        return $this->getQuery()->getResult();
     }
 
 
@@ -284,12 +522,17 @@ abstract class Model implements ActiveRecordInterface
 
 
     /**
-     * @return object|null
+     * @return mixed
     */
-    public function one(): ?object
+    public function one(): mixed
     {
-
+        return $this->getQuery()->getOneOrNullResult();
     }
+
+
+
+
+
 
 
 
@@ -319,14 +562,45 @@ abstract class Model implements ActiveRecordInterface
 
 
 
+    /**
+     * @param array $attributes
+     *
+     * @return int
+    */
+    private function update(array $attributes): int
+    {
+        return 1;
+    }
+
+
+
+
+
+    /**
+     * @param array $attributes
+     *
+     * @return int
+    */
+    private function insert(array $attributes): int
+    {
+         return 2;
+    }
+
+
+
+
 
     /**
      * @inheritDoc
     */
-    public static function find(int $id): ?object
+    public static function findOne(int $id): mixed
     {
-
+         return self::select()->where(self::$primaryKey, $id)->one();
     }
+
+
+
+
 
 
 
@@ -336,8 +610,10 @@ abstract class Model implements ActiveRecordInterface
     */
     public static function findAll(): array
     {
-
+        return self::select()->get();
     }
+
+
 
 
 
@@ -377,16 +653,207 @@ abstract class Model implements ActiveRecordInterface
 
 
 
+
+    /**
+     * @return SelectQueryInterface
+    */
+    private function getQuery(): SelectQueryInterface
+    {
+        if (! self::$model) {
+             throw new \RuntimeException("no selection detected inside: ". $this->getClassName());
+        }
+
+        $selects = join(', ', self::$model->selects);
+
+        return $this->createQueryBuilder()
+                    ->select($selects ?: null)
+                    ->from($this->getTable(), $this->getTableAlias())
+                    ->map(get_called_class())
+                    ->addJoins(self::$model->joins)
+                    ->wheres(self::$model->wheres)
+                    ->setParameters(self::$model->parameters)
+                    ->addGroupBy(self::$model->groupBy)
+                    ->limit(self::$model->offset)
+                    ->offset(self::$model->offset)
+                    ->getQuery();
+    }
+
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    private function getTableAlias(): string
+    {
+        if ($this->alias) {
+            return $this->alias;
+        }
+
+        return mb_substr($this->getTable(), 0, 1, "UTF-8");
+    }
+
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    private function getClassName(): string
+    {
+        return get_called_class();
+    }
+
+
+
+
+
     /**
      * @return string
     */
     protected function getTable(): string
     {
+         if (! $this->table) {
+             throw new \RuntimeException("Could not detected model ". get_class($this) . " table name.");
+         }
+
          return $this->table;
     }
 
 
 
 
-    private function __construct() {}
+
+    /**
+     * @param $name
+     * @param $value
+     * @return void
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+    }
+
+
+
+
+    /**
+     * Set attributes
+     *
+     * @param array $attributes
+     * @return void
+     */
+    public function setAttributes(array $attributes)
+    {
+        foreach ($attributes as $column => $value) {
+            $this->setAttribute($column, $value);
+        }
+    }
+
+
+
+
+    /**
+     * @param string $column
+     * @return bool
+     */
+    public function hasAttribute(string $column): bool
+    {
+        return isset($this->attributes[$column]);
+    }
+
+
+
+    /**
+     * Remove attribute
+     *
+     * @param string $column
+     * @return void
+     */
+    public function removeAttribute(string $column)
+    {
+        unset($this->attributes[$column]);
+    }
+
+
+
+
+    /**
+     * Get attribute
+     *
+     * @param string $column
+     * @return mixed|null
+     */
+    public function getAttribute(string $column)
+    {
+        return $this->attributes[$column] ?? null;
+    }
+
+
+    /**
+     * @param $field
+     * @param $value
+     */
+    public function __set($field, $value)
+    {
+        $this->setAttribute($field, $value);
+    }
+
+
+
+    /**
+     * @param $field
+     * @return mixed
+     */
+    public function __get($field)
+    {
+        return $this->getAttribute($field);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetExists($offset)
+    {
+        return $this->hasAttribute($offset);
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetGet($offset)
+    {
+        return $this->getAttribute($offset);
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->setAttribute($offset, $value);
+    }
+
+
+
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetUnset($offset)
+    {
+        $this->removeAttribute($offset);
+    }
+
 }

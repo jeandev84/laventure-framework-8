@@ -63,17 +63,16 @@ interface SelectBuilderInterface
     public function orderBy(string $column, string $direction = 'asc'): static;
 
 
-
-
-
     /**
      * @param string $table
      *
      * @param string $condition
      *
-     * @param string|null $type
+     * @param string $type
+     *
+     * @return static
     */
-    public function join(string $table, string $condition, string $type = null): static;
+    public function join(string $table, string $condition, string $type = "JOIN"): static;
 
 
 

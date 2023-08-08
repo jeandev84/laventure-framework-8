@@ -117,14 +117,14 @@ trait HasConditions
      /**
       * Add where
       *
-      * @param array $conditions
+      * @param array $wheres
       *
       * @return $this
      */
-     public function addConditions(array $conditions): static
+     public function wheres(array $wheres): static
      {
-          foreach ($conditions as $condition) {
-              $this->where($condition);
+          foreach ($wheres as $where) {
+              $this->where($where);
           }
 
           return $this;

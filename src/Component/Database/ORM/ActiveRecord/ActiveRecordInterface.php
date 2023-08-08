@@ -20,9 +20,13 @@ interface ActiveRecordInterface
        *
        * @param int $id
        *
-       * @return object|null
+       * @return mixed
       */
-      public static function find(int $id): ?object;
+      public static function findOne(int $id): mixed;
+
+
+
+
 
 
 

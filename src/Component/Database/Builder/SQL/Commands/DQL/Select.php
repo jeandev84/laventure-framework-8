@@ -92,6 +92,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
+    /**
+     * @var array|string[]
+    */
+    protected array $joinTypes = ['LEFT', 'RIGHT', 'FULL', 'INNER'];
+
 
 
 
@@ -220,11 +225,34 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     */
     public function join(string $table, string $condition, string $type = null): static
     {
-         $type = $type ? strtoupper($type). " JOIN" : "JOIN";
+          if ($type && ! in_array($type, $this->joinTypes)) {
+              throw new \RuntimeException("Join table required types: ". join(", ", $this->joinTypes));
+          }
+
+          $type = $type ? "$type JOIN" : "JOIN";
 
          $this->joins[] = sprintf('%s %s ON %s', $type, $table, $condition);
 
          return $this;
+    }
+
+
+
+
+
+    /**
+     * @param array $joins
+     *
+     * @return $this
+    */
+    public function addJoins(array $joins): static
+    {
+        foreach ($joins as $table => $joined) {
+            [$condition, $type] = array_values($joined);
+            $this->join($table, $condition, $type);
+        }
+
+        return $this;
     }
 
 
@@ -295,6 +323,26 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
         return $this;
     }
+
+
+
+
+
+    /**
+     * @param array $columns
+     *
+     * @return $this
+    */
+    public function addGroupBy(array $columns): static
+    {
+        foreach ($columns as $column) {
+            $this->groupBy($column);
+        }
+
+        return $this;
+    }
+
+
 
 
 
