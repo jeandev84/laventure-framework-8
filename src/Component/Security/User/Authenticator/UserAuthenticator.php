@@ -2,7 +2,7 @@
 namespace Laventure\Component\Security\User\Authenticator;
 
 
-use Laventure\Component\Security\Authentication\AuthenticatorInterface;;
+use Laventure\Component\Security\Authentication\Authenticator;
 use Laventure\Component\Security\User\Encoder\Password\UserPasswordEncoderInterface;
 use Laventure\Component\Security\User\Provider\UserProviderInterface;
 use Laventure\Component\Security\User\Token\UserTokenInterface;
@@ -19,7 +19,7 @@ use Laventure\Component\Security\User\UserInterface;
  *
  * @package Laventure\Component\Security\User\Authenticator
  */
-class UserAuthenticator implements AuthenticatorInterface
+class UserAuthenticator extends Authenticator
 {
 
     /**
@@ -90,15 +90,6 @@ class UserAuthenticator implements AuthenticatorInterface
 
 
 
-
-
-    /**
-     * @inheritDoc
-    */
-    public function isGranted(array $roles): bool
-    {
-        return ! empty(array_intersect($roles, $this->getUser()->getRoles()));
-    }
 
 
 

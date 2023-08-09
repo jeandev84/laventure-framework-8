@@ -18,9 +18,9 @@ class Auth
 
 
     /**
-     * @param AuthenticatorInterface $authenticator
+     * @param Authenticator $authenticator
     */
-    public function __construct(protected AuthenticatorInterface $authenticator)
+    public function __construct(protected Authenticator $authenticator)
     {
     }
 
