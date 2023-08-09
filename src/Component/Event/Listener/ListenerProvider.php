@@ -74,7 +74,7 @@ class ListenerProvider implements ListenerProviderInterface
                $this->addListener($event, $callback);
          }
 
-         $this->subscribers[] = $subscriber;
+         $this->subscribers[get_class($subscriber)] = $subscriber;
 
          return $this;
     }
