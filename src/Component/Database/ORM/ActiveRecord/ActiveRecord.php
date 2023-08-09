@@ -4,6 +4,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Query;
 use Laventure\Component\Database\Manager;
 
 
@@ -585,18 +586,14 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      */
     public function save(): int
     {
-        $columns = $this->getColumnsFromTable();
+        $attributes = $this->mapAttributes();
 
-        dd($columns);
-
-        /*
         if ($id = $this->getId()) {
-            $this->update([]);
-            return $id;
+            $this->update($attributes);
         } else {
-            return $this->insert([]);
+            $id = static::create($attributes);
         }
-        */
+        return $id;
     }
 
 
@@ -704,9 +701,9 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
 
     /**
-     * @return SelectQueryInterface
+     * @return Query
      */
-    private function getQuery(): SelectQueryInterface
+    private function getQuery(): Query
     {
         if (! self::$model) {
             throw new \RuntimeException("no selection detected inside: ". $this->getClassName());
@@ -749,16 +746,16 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
 
 
+
+
+    /**
+     * @return array
+    */
     private function getColumnsFromTable(): array
     {
-        $columns = $this->getManager()
-                        ->schema($this->connection)
-                        ->getColumns($this->getTable());
-
-
-        dd($columns);
-
-
+        return $this->getManager()
+                    ->schema($this->connection)
+                    ->getColumns($this->getTable());
     }
 
 
@@ -791,6 +788,38 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
 
 
+
+
+
+    /**
+     * @return array
+    */
+    private function mapAttributes(): array
+    {
+        $attributes = [];
+
+        $columns = $this->getColumnsFromTable();
+
+        foreach ($columns as $column) {
+            if (! empty($this->fillable)) {
+                if (\in_array($column, $this->fillable)) {
+                    $attributes[$column] = $this->{$column};
+                }
+            } else {
+                $attributes[$column] = $this->{$column};
+            }
+        }
+
+        if (! empty($this->guarded)) {
+            foreach ($this->guarded as $guarded) {
+                if (isset($attributes[$guarded])) {
+                    unset($attributes[$guarded]);
+                }
+            }
+        }
+
+        return $attributes;
+    }
 
 
     /**
