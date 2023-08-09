@@ -341,11 +341,7 @@ class MysqlBlueprint extends Blueprint
     {
         $statement = $this->statement("SHOW FULL COLUMNS FROM {$this->getTable()}");
 
-        $columns = $statement->fetch()->assoc();
-
-        return array_filter($columns, function ($column) {
-            return $column['Field'] ?? '';
-        });
+        return $statement->fetch()->columns();
     }
 
 

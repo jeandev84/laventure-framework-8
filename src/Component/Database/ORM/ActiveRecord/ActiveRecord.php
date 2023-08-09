@@ -585,7 +585,9 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      */
     public function save(): int
     {
-        $columns = $this->getManager();
+        $columns = $this->getColumnsFromTable();
+
+        dd($columns);
 
         /*
         if ($id = $this->getId()) {
@@ -608,17 +610,24 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      */
     public function update(array $attributes): int
     {
+        $criteria = [self::$primaryKey => $this->getId()];
+
         return $this->createQueryBuilder()
-            ->update($this->getTable(), $attributes, [self::$primaryKey => $this->getId()]);
+                    ->update($this->getTable(), $attributes, $criteria);
     }
 
 
 
 
 
+    /**
+     * @param array $attributes
+     *
+     * @return int
+    */
     public static function create(array $attributes): int
     {
-        $model = new static();
+        $model = self::instance();
 
         return $model->createQueryBuilder()->insert($model->getTable(), $attributes);
     }
@@ -738,6 +747,19 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
     }
 
 
+
+
+    private function getColumnsFromTable(): array
+    {
+        $columns = $this->getManager()
+                        ->schema($this->connection)
+                        ->getColumns($this->getTable());
+
+
+        dd($columns);
+
+
+    }
 
 
 

@@ -1,7 +1,6 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Contract\UpdateBuilderInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\IsSettable;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
@@ -10,14 +9,17 @@ use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 /**
  * @inheritdoc
 */
-class Update extends SQLBuilderHasConditions implements UpdateBuilderInterface
+class Update extends SQLBuilderHasConditions
 {
 
     use HasConditions, IsSettable;
 
 
+
     /**
-     * @inheritdoc
+     * @param array $attributes
+     *
+     * @return $this
     */
     public function update(array $attributes): static
     {
@@ -50,7 +52,7 @@ class Update extends SQLBuilderHasConditions implements UpdateBuilderInterface
     /**
      * @inheritDoc
     */
-    public function execute(): bool
+    public function execute(): false|int
     {
         return $this->statement()->execute();
     }

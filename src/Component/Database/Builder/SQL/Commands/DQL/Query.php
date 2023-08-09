@@ -1,23 +1,20 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
+
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 
 
 
 
-/**
- * @inheritdoc
-*/
-class Query implements SelectQueryInterface
+class Query
 {
 
         /**
          * @var QueryResultInterface
         */
-        protected QueryResultInterface $hydrate;
+        protected QueryResultInterface $fetch;
 
 
 
@@ -30,13 +27,6 @@ class Query implements SelectQueryInterface
 
 
 
-        /**
-         * @var string
-        */
-        protected string $mapped;
-
-
-
 
 
         /**
@@ -46,7 +36,7 @@ class Query implements SelectQueryInterface
         */
         public function __construct(QueryResultInterface $hydrate, ObjectPersistenceInterface $persistence)
         {
-              $this->hydrate     = $hydrate;
+              $this->fetch     = $hydrate;
               $this->persistence = $persistence;
         }
 
@@ -54,12 +44,13 @@ class Query implements SelectQueryInterface
 
 
 
+
         /**
-         * @inheritdoc
+         * @return array
         */
         public function getResult(): array
         {
-            $records = $this->hydrate->all();
+            $records = $this->fetch->all();
 
             $this->persistence->persistence($records);
 
@@ -72,11 +63,11 @@ class Query implements SelectQueryInterface
 
 
         /**
-         * @inheritdoc
+         * @return mixed
         */
         public function getOneOrNullResult(): mixed
         {
-            $record = $this->hydrate->one();
+            $record = $this->fetch->one();
 
             $this->persistence->persistence([$record]);
 
@@ -87,37 +78,24 @@ class Query implements SelectQueryInterface
 
 
 
-
         /**
-         * @inheritdoc
+         * @return array
         */
         public function getArrayResult(): array
         {
-            return $this->hydrate->assoc();
+            return $this->fetch->assoc();
         }
 
 
 
 
 
+
         /**
-         * @inheritDoc
+         * @return array
         */
         public function getArrayColumns(): array
         {
-            return $this->hydrate->columns();
-        }
-
-
-
-
-
-
-        /**
-         * @inheritDoc
-        */
-        public function getMappedClass(): string
-        {
-            return $this->mapped;
+            return $this->fetch->columns();
         }
 }

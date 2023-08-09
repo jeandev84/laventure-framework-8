@@ -1,14 +1,13 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Contract\InsertBuilderInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\SQlBuilder;
 
 
 /**
  * @inheritdoc
 */
-class Insert extends SQlBuilder implements InsertBuilderInterface
+class Insert extends SQlBuilder
 {
 
 
@@ -35,8 +34,11 @@ class Insert extends SQlBuilder implements InsertBuilderInterface
 
 
 
+
     /**
-     * @inheritDoc
+     * @param array $attributes
+     *
+     * @return $this
     */
     public function insert(array $attributes): static
     {
@@ -52,13 +54,8 @@ class Insert extends SQlBuilder implements InsertBuilderInterface
     }
 
 
-
-
-
-
-
     /**
-     * @inheritDoc
+     * @return array
     */
     public function getColumns(): array
     {
@@ -66,10 +63,8 @@ class Insert extends SQlBuilder implements InsertBuilderInterface
     }
 
 
-
-
     /**
-     * @inheritDoc
+     * @return array
     */
     public function getValues(): array
     {
@@ -93,11 +88,10 @@ class Insert extends SQlBuilder implements InsertBuilderInterface
 
 
 
-
     /**
-     * @inheritDoc
+     * @return false|int
     */
-    public function execute(): bool
+    public function execute(): false|int
     {
         return $this->statement()->execute();
     }

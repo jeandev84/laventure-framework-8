@@ -2,8 +2,6 @@
 namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectBuilderInterface;
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\SelectQueryInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\NullObjectPersistence;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
@@ -16,7 +14,7 @@ use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 /**
  * @inheritdoc
 */
-class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
+class Select extends SQLBuilderHasConditions
 {
 
 
@@ -140,16 +138,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param bool $distinct
+     *
+     * @return $this
+     */
     public function distinct(bool $distinct): static
     {
         $this->distinct = $distinct;
@@ -158,13 +151,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param string $select
+     * @return $this
+     */
     public function addSelect(string $select): static
     {
          $this->selected[] = $select;
@@ -173,12 +163,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param string $table
+     * @param string $alias
+     * @return $this
+     */
     public function from(string $table, string $alias = ''): static
     {
          $this->from[$table] = $alias ? "$table $alias" : $table;
@@ -187,12 +176,11 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param string $column
+     * @param string $direction
+     * @return $this
+     */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
         $this->orderBy[] = sprintf('%s %s', $column, strtoupper($direction));
@@ -217,12 +205,12 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param string $table
+     * @param string $condition
+     * @param string|null $type
+     * @return $this
+     */
     public function join(string $table, string $condition, string $type = null): static
     {
           if ($type && ! in_array($type, $this->joinTypes)) {
@@ -256,25 +244,22 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
     /**
-     * @inheritdoc
-    */
+     * @param string $table
+     * @param string $condition
+     * @return $this
+     */
     public function innerJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition, "INNER");
     }
 
 
-
-
-
-
     /**
-     * @inheritdoc
-    */
+     * @param string $table
+     * @param string $condition
+     * @return $this
+     */
     public function leftJoin(string $table, string $condition): static
     {
         return $this->join($table, $condition, "LEFT");
@@ -286,7 +271,9 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
-     * @inheritdoc
+     * @param string $table
+     * @param string $condition
+     * @return $this
     */
     public function rightJoin(string $table, string $condition): static
     {
@@ -297,10 +284,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
-
-
     /**
-     * @inheritdoc
+     * @param string $table
+     * @param string $condition
+     * @return $this
     */
     public function fullJoin(string $table, string $condition): static
     {
@@ -311,11 +298,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
 
-
-
-
     /**
-     * @inheritDoc
+     * @param string $column
+     *
+     * @return $this
     */
     public function groupBy(string $column): static
     {
@@ -343,15 +329,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param string $condition
+     * @return $this
+     */
     public function having(string $condition): static
     {
         $this->having[] = $condition;
@@ -360,13 +341,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @param int|null $limit
+     * @return $this
+     */
     public function limit(?int $limit): static
     {
         $this->limit = $limit;
@@ -375,10 +353,9 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
     /**
-     * @inheritDoc
+     * @param int|null $offset
+     * @return $this
     */
     public function offset(?int $offset): static
     {
@@ -388,13 +365,9 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
     /**
-     * @inheritDoc
-    */
+     * @return QueryResultInterface
+     */
     public function fetch(): QueryResultInterface
     {
          $fetch = $this->statement()->fetch();
@@ -407,14 +380,10 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
     }
 
 
-
-
-
-
     /**
-     * @inheritdoc
+     * @return Query
     */
-    public function getQuery(): SelectQueryInterface
+    public function getQuery(): Query
     {
         return new Query($this->fetch(), $this->persistence);
     }
@@ -424,7 +393,7 @@ class Select extends SQLBuilderHasConditions implements SelectBuilderInterface
 
 
     /**
-     * @inheritdoc
+     * @return ObjectPersistenceInterface
     */
     public function getPersistence(): ObjectPersistenceInterface
     {

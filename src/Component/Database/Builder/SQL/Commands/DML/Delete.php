@@ -1,14 +1,13 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Contract\DeleteBuilderInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 
 
 /**
  * @inheritdoc
 */
-class Delete extends SQLBuilderHasConditions implements DeleteBuilderInterface
+class Delete extends SQLBuilderHasConditions
 {
 
     /**
@@ -24,10 +23,8 @@ class Delete extends SQLBuilderHasConditions implements DeleteBuilderInterface
 
 
 
-
-
     /**
-     * @inheritDoc
+     * @return bool
     */
     public function execute(): bool
     {
