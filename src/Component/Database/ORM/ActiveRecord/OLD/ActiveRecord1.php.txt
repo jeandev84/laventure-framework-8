@@ -10,12 +10,12 @@ use Laventure\Component\Database\Manager;
 
 /**
  * @inheritdoc
- */
+*/
 abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 {
     /**
      * @var string
-     */
+    */
     protected string $table = '';
 
 
@@ -39,7 +39,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var string|null
-     */
+    */
     protected ?string $connection = null;
 
 
@@ -90,7 +90,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var array
-     */
+    */
     protected array $selects = [];
 
 
@@ -98,7 +98,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @var bool
-     */
+    */
     protected bool $distinct = false;
 
 
@@ -210,14 +210,14 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return static
-     */
+    */
     private static function instance(): static
     {
-        if (! self::$model) {
-            self::$model = new static();
-        }
+         if (! self::$model) {
+             self::$model = new static();
+         }
 
-        return self::$model;
+         return self::$model;
     }
 
 
@@ -227,10 +227,11 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param string|null $selects
      *
      * @return $this
-     */
-    public static function select(string $selects = null): static
+    */
+    public static function select(string $selects = null, bool $distinct = false): static
     {
         static::instance()->selects[] = $selects;
+        static::instance()->distinct  = $distinct;
 
         return static::instance();
     }
@@ -238,13 +239,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
 
 
-
-    /**
-     * @param bool $distinct
-     *
-     * @return $this
-    */
-    public function distinct(bool $distinct): static
+    public function distinct(bool $distinct)
     {
         static::instance()->distinct = $distinct;
 
@@ -281,12 +276,12 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param string $type
      *
      * @return $this
-   */
-    public function join(string $table, string $condition, string $type = 'JOIN'): static
+     */
+    public static function join(string $table, string $condition, string $type = 'JOIN'): static
     {
-        self::instance()->joins[$table] = compact($condition, $type);
+        self::select()->joins[$table] = compact($condition, $type);
 
-        return self::instance();
+        return static::$model;
     }
 
 
@@ -381,11 +376,11 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      *
      * @return $this
      */
-    public static function orderBy(string $column, string $direction = 'asc'): static
+    public function orderBy(string $column, string $direction = 'asc'): static
     {
-        static::instance()->orderBy[] = "$column $direction";
+        static::$model->orderBy[] = "$column $direction";
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -399,12 +394,12 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param string $column
      *
      * @return $this
-    */
+     */
     public function groupBy(string $column): static
     {
-        static::instance()->groupBy[] = $column;
+        static::$model->groupBy[] = $column;
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -424,9 +419,9 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      */
     public function having(string $condition): static
     {
-        static::instance()->having[] = $condition;
+        static::$model->having[] = $condition;
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -441,12 +436,12 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param int $limit
      *
      * @return $this
-    */
+     */
     public function limit(int $limit): static
     {
-        static::instance()->limit = $limit;
+        static::$model->limit = $limit;
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -463,9 +458,9 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      */
     public function offset(int $offset): static
     {
-        static::instance()->offset = $offset;
+        static::$model->offset = $offset;
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -488,10 +483,10 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
     {
         $binding = is_array($value) ? "(:$column)" : ":$column";
 
-        static::instance()->wheres[$column]   = "$column $operator $binding";
-        static::instance()->parameters[$column] = $value;
+        static::$model->wheres[$column]   = "$column $operator $binding";
+        static::$model->parameters[$column] = $value;
 
-        return static::instance();
+        return static::$model;
     }
 
 
@@ -526,7 +521,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param $value
      *
      * @return $this
-     */
+    */
     public static function whereLike(string $column, $value): static
     {
         return static::where($column, $value, "LIKE :($column)");
@@ -582,19 +577,19 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public function save(): int
     {
-        $columns = $this->getManager();
+         $columns = $this->getManager();
 
-        /*
-        if ($id = $this->getId()) {
-            $this->update([]);
-            return $id;
-        } else {
-            return $this->insert([]);
-        }
-        */
+          /*
+          if ($id = $this->getId()) {
+              $this->update([]);
+              return $id;
+          } else {
+              return $this->insert([]);
+          }
+          */
     }
 
 
@@ -605,11 +600,11 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
      * @param array $attributes
      *
      * @return int
-     */
+    */
     public function update(array $attributes): int
     {
         return $this->createQueryBuilder()
-            ->update($this->getTable(), $attributes, [self::$primaryKey => $this->getId()]);
+                    ->update($this->getTable(), $attributes, [self::$primaryKey => $this->getId()]);
     }
 
 
@@ -647,7 +642,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public static function findAll(): array
     {
         return self::select()->get();
@@ -661,7 +656,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return Manager
-     */
+    */
     private static function getManager(): Manager
     {
         if(! $database = Manager::instance()) {
@@ -680,7 +675,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return Builder
-     */
+    */
     private function createQueryBuilder(): Builder
     {
         $database = static::getManager();
@@ -706,16 +701,16 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
         $selects = join(', ', self::$model->selects);
 
         return $this->createQueryBuilder()
-            ->select($selects ?: null)
-            ->from($this->getTable(), $this->getTableAlias())
-            ->map(get_called_class())
-            ->addJoins(self::$model->joins)
-            ->wheres(self::$model->wheres)
-            ->setParameters(self::$model->parameters)
-            ->addGroupBy(self::$model->groupBy)
-            ->limit(self::$model->offset)
-            ->offset(self::$model->offset)
-            ->getQuery();
+                   ->select($selects ?: null)
+                   ->from($this->getTable(), $this->getTableAlias())
+                   ->map(get_called_class())
+                   ->addJoins(self::$model->joins)
+                   ->wheres(self::$model->wheres)
+                   ->setParameters(self::$model->parameters)
+                   ->addGroupBy(self::$model->groupBy)
+                   ->limit(self::$model->offset)
+                   ->offset(self::$model->offset)
+                   ->getQuery();
     }
 
 
@@ -773,10 +768,10 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return int|null
-     */
+    */
     private function getId(): ?int
     {
-        return $this->getAttribute(self::$primaryKey);
+         return $this->getAttribute(self::$primaryKey);
     }
 
 
@@ -860,7 +855,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @return array
-     */
+    */
     public function getAttributes(): array
     {
         return $this->attributes;
@@ -910,7 +905,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public function offsetSet($offset, $value)
     {
         $this->setAttribute($offset, $value);
@@ -921,7 +916,7 @@ abstract class ActiveRecord implements ActiveRecordInterface, \ArrayAccess
 
     /**
      * @inheritDoc
-     */
+    */
     public function offsetUnset($offset)
     {
         $this->removeAttribute($offset);
