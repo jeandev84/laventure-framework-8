@@ -372,7 +372,7 @@ class Filesystem
        *
        * @return false|int
       */
-      public function uploadFromBase64(Base64File $file, string $target): bool|int
+      public function uploadFromBase64(string $target, Base64File $file): bool|int
       {
            return $this->write($target, $file->data());
       }
