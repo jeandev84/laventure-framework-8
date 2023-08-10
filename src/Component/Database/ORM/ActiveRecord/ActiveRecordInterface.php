@@ -3,15 +3,15 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
 /**
- * @Persistence
+ * @ActiveRecordInterface
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence
- */
-interface ActiveRecordInterface
+ * @package Laventure\Component\Database\ORM\ActiveRecord
+*/
+interface ActiveRecordInterface extends \ArrayAccess
 {
 
 
@@ -31,17 +31,13 @@ interface ActiveRecordInterface
 
 
 
-
-
-
-
-
       /**
        * Returns all records
        *
        * @return array
       */
-      public static function findAll(): array;
+      public static function all(): array;
+
 
 
 

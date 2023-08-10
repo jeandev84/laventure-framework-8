@@ -15,7 +15,7 @@ use Laventure\Component\Database\ORM\Persistence\Manager\EntityManagerInterface;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence\Query
+ * @package Laventure\Component\Database\ORM\Persistence\QueryBuilder
 */
 class QueryBuilder extends Builder
 {
