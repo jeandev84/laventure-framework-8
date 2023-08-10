@@ -35,15 +35,6 @@ abstract class SQlBuilder
 
 
        /**
-        * @var array
-       */
-       protected array $parameters = [];
-
-
-
-
-
-       /**
         * @param ConnectionInterface $connection
         *
         * @param string $table
@@ -60,55 +51,6 @@ abstract class SQlBuilder
 
 
       /**
-       * @param string $name
-       *
-       * @param $value
-       *
-       * @return $this
-      */
-      protected function setParameter(string $name, $value): static
-      {
-           $this->parameters[$name] = $value;
-
-           return $this;
-      }
-
-
-
-
-
-      /**
-       * @param array $parameters
-       *
-       * @return SQlBuilder
-      */
-      protected function setParameters(array $parameters): static
-      {
-           $this->parameters = array_merge($this->parameters, $parameters);
-
-           return $this;
-      }
-
-
-
-
-
-      /**
-       * Returns parameters
-       *
-       * @return array
-      */
-      protected function getParameters(): array
-      {
-           return $this->parameters;
-      }
-
-
-
-
-
-
-      /**
        * @return string
       */
       public function getTable(): string
@@ -117,28 +59,6 @@ abstract class SQlBuilder
       }
 
 
-
-
-
-      /**
-       * @param array $attributes
-       *
-       * @return array
-      */
-      protected function resolveBindingParameters(array $attributes): array
-      {
-           $resolved = [];
-
-           foreach ($attributes as $column => $value) {
-              if ($this->hasPdoConnection()) {
-                 $resolved[] = "$column = :$column";
-              } else {
-                 $resolved[] = "$column = '$value'";
-              }
-           }
-
-           return $resolved;
-      }
 
 
 
@@ -174,7 +94,7 @@ abstract class SQlBuilder
        */
        protected function statement(): QueryInterface
        {
-           return $this->connection->statement($this->getSQL(), $this->getParameters());
+           return $this->connection->statement($this->getSQL());
        }
 
        

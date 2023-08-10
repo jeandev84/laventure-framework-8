@@ -1,13 +1,14 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
+use Laventure\Component\Database\Builder\SQL\Commands\ExecutableSQlCommand;
 use Laventure\Component\Database\Builder\SQL\Commands\SQlBuilder;
 
 
 /**
  * @inheritdoc
 */
-class Insert extends SQlBuilder
+class Insert extends SQlBuilder implements ExecutableSQlCommand
 {
 
 
@@ -15,7 +16,6 @@ class Insert extends SQlBuilder
      * @var int
     */
     protected int $index = 0;
-
 
 
 
@@ -31,6 +31,13 @@ class Insert extends SQlBuilder
     */
     protected array $values = [];
 
+
+
+
+    /**
+     * @var array
+    */
+    protected array $attributes = [];
 
 
 
@@ -93,18 +100,6 @@ class Insert extends SQlBuilder
 
 
 
-    /**
-     * @return int|bool
-    */
-    public function execute(): int|bool
-    {
-        return $this->statement()->execute();
-    }
-
-
-
-
-
 
     /**
      * @param array $attributes
@@ -113,7 +108,7 @@ class Insert extends SQlBuilder
     */
     public function add(array $attributes): void
     {
-        $attributes      = $this->resolveBindingParameters($attributes);
+        $attributes      = $this->resolveAttributes($attributes);
         $this->columns   = array_keys($attributes);
         $this->values[]  = '('. join(', ', array_values($attributes)) . ')';
 
@@ -125,22 +120,38 @@ class Insert extends SQlBuilder
 
 
     /**
-     * @inheritdoc
+     * @param array $attributes
+     *
+     * @return array
     */
-    protected function resolveBindingParameters(array $attributes): array
+    private function resolveAttributes(array $attributes): array
     {
         $resolved = [];
 
         foreach ($attributes as $column => $value) {
             if ($this->hasPdoConnection()) {
                 $resolved[$column] = ":{$column}_{$this->index}";
-                $this->setParameter("{$column}_{$this->index}", $value);
+                $this->attributes["{$column}_{$this->index}"] = $value;
             } else {
                 $resolved[$column] = "'$value'";
             }
         }
 
         return $resolved;
+    }
+
+
+
+
+
+    /**
+     * @return int|bool
+    */
+    public function execute(): int|bool
+    {
+        return $this->statement()
+                    ->setParameters($this->attributes)
+                    ->execute();
     }
 
 }

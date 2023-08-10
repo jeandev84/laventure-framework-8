@@ -23,7 +23,41 @@ interface HasConditionInterface
       *
       * @return static
      */
-     public function where(string $column, $value, string $operator = "="): static;
+     public static function where(string $column, $value, string $operator = "="): static;
+
+
+
+
+
+
+
+
+     /**
+      * @param string $column
+      *
+      * @param $value
+      *
+      * @return $this
+     */
+     public function andWhere(string $column, $value): static;
+
+
+
+
+
+
+     /**
+      * @param string $column
+      *
+      * @param $value
+      *
+      * @return $this
+     */
+     public function orWhere(string $column, $value): static;
+
+
+
+
 
 
 

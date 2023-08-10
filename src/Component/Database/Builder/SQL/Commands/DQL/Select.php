@@ -4,7 +4,6 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\NullObjectPersistence;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
-use Laventure\Component\Database\Builder\SQL\Commands\HasConditions;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
@@ -18,7 +17,7 @@ class Select extends SQLBuilderHasConditions
 {
 
 
-    use HasConditions, ClassMapping;
+    use ClassMapping;
 
 
 
@@ -86,6 +85,7 @@ class Select extends SQLBuilderHasConditions
      * @var string[]
     */
     protected array $having = [];
+
 
 
 
@@ -373,7 +373,9 @@ class Select extends SQLBuilderHasConditions
     */
     public function fetch(): QueryResultInterface
     {
-         $fetch = $this->statement()->fetch();
+         $fetch = $this->statement()
+                       ->setParameters($this->parameters)
+                       ->fetch();
 
          if ($this->mappedClass) {
               $fetch->map($this->mappedClass);

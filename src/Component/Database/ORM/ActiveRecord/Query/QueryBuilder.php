@@ -1,12 +1,11 @@
 <?php
 namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
 
-use Laventure\Component\Database\Builder\Builder;
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Delete;
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Insert;
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Update;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\DeleteBuilder;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\InsertBuilder;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\UpdateBuilder;
 
 
 /**
@@ -17,7 +16,7 @@ use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\UpdateBuilder;
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
  * @package Laventure\Component\Database\ORM\ActiveRecord\Query
-*/
+ */
 class QueryBuilder
 {
 
@@ -30,7 +29,7 @@ class QueryBuilder
      * @param string $model
      *
      * @param string $alias
-    */
+     */
     public function __construct(
         protected SqlQueryBuilder $builder,
         protected string $table,
@@ -47,13 +46,13 @@ class QueryBuilder
     /**
      * @param array|string|null $selects
      *
-     * @return SelectBuilder
-    */
-    public function select(array|string $selects = null): SelectBuilder
+     * @return Select
+     */
+    public function select(array|string $selects = null): Select
     {
-         $qb = new SelectBuilder($this->builder->select($selects), $this->model);
-         $qb->from($this->table, $this->alias);
-         return $qb;
+        return $this->builder->select($selects)
+                             ->map($this->model)
+                             ->from($this->table, $this->alias);
     }
 
 
@@ -64,11 +63,11 @@ class QueryBuilder
     /**
      * @param array $attributes
      *
-     * @return InsertBuilder
-    */
-    public function create(array $attributes): InsertBuilder
+     * @return Insert
+     */
+    public function create(array $attributes): Insert
     {
-         return new InsertBuilder($this->builder->insert($this->table, $attributes));
+        return $this->builder->insert($this->table, $attributes);
     }
 
 
@@ -80,11 +79,11 @@ class QueryBuilder
      *
      * @param array $wheres
      *
-     * @return UpdateBuilder
+     * @return Update
     */
-    public function update(array $attributes, array $wheres): UpdateBuilder
+    public function update(array $attributes, array $wheres): Update
     {
-         return new UpdateBuilder($this->builder->update($this->table, $attributes, $wheres));
+        return $this->builder->update($this->table, $attributes, $wheres);
     }
 
 
@@ -95,10 +94,10 @@ class QueryBuilder
     /**
      * @param array $wheres
      *
-     * @return DeleteBuilder
+     * @return Delete
     */
-    public function delete(array $wheres): DeleteBuilder
+    public function delete(array $wheres): Delete
     {
-        return new DeleteBuilder($this->builder->delete($this->table, $wheres));
+        return $this->builder->delete($this->table, $wheres);
     }
 }

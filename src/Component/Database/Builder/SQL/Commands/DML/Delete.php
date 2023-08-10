@@ -1,14 +1,16 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
+use Laventure\Component\Database\Builder\SQL\Commands\ExecutableSQlCommand;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 
 
 /**
  * @inheritdoc
 */
-class Delete extends SQLBuilderHasConditions
+class Delete extends SQLBuilderHasConditions implements ExecutableSQlCommand
 {
+
 
 
     /**
@@ -29,6 +31,8 @@ class Delete extends SQLBuilderHasConditions
     */
     public function execute(): bool
     {
-        return $this->statement()->execute();
+        return $this->statement()
+                    ->setParameters($this->parameters)
+                    ->execute();
     }
 }

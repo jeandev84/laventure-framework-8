@@ -14,7 +14,7 @@ use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditions;
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
  * @package Laventure\Component\Database\ORM\Query\ActiveRecord
-*/
+ */
 class SelectBuilder implements HasConditionInterface
 {
 
@@ -32,7 +32,7 @@ class SelectBuilder implements HasConditionInterface
 
     /**
      * @var string
-    */
+     */
     protected string $classname;
 
 
@@ -42,11 +42,11 @@ class SelectBuilder implements HasConditionInterface
      * @param Select $builder
      *
      * @param string $classname
-    */
+     */
     public function __construct(Select $builder, string $classname)
     {
-         $this->builder   = $builder;
-         $this->builder->map($classname);
+        $this->builder   = $builder;
+        $this->builder->map($classname);
     }
 
 
@@ -59,10 +59,10 @@ class SelectBuilder implements HasConditionInterface
      * @param string $alias
      *
      * @return $this
-    */
+     */
     public function from(string $table, string $alias = ''): static
     {
-        $this->builder->from($table, $alias);
+        #$this->builder->from($table, $alias);
 
         return $this;
     }
@@ -76,14 +76,14 @@ class SelectBuilder implements HasConditionInterface
      * @param array|string|null $selects
      *
      * @return $this
-    */
+     */
     public function addSelect(array|string $selects = null): static
     {
-         $selects = is_array($selects) ? join(', ', $selects) : $selects;
+        $selects = is_array($selects) ? join(', ', $selects) : $selects;
 
-         $this->builder->addSelect($selects);
+        #$this->builder->addSelect($selects);
 
-         return $this;
+        return $this;
     }
 
 
@@ -96,12 +96,12 @@ class SelectBuilder implements HasConditionInterface
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function join(string $table, string $condition): static
     {
-          $this->builder->join($table, $condition);
+        #$this->builder->join($table, $condition);
 
-          return $this;
+        return $this;
     }
 
 
@@ -114,12 +114,12 @@ class SelectBuilder implements HasConditionInterface
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function leftJoin(string $table, string $condition): static
     {
-         $this->builder->leftJoin($table, $condition);
+        #$this->builder->leftJoin($table, $condition);
 
-         return $this;
+        return $this;
     }
 
 
@@ -132,10 +132,10 @@ class SelectBuilder implements HasConditionInterface
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function rightJoin(string $table, string $condition): static
     {
-        $this->builder->rightJoin($table, $condition);
+        #$this->builder->rightJoin($table, $condition);
 
         return $this;
     }
@@ -153,9 +153,9 @@ class SelectBuilder implements HasConditionInterface
      */
     public function innerJoin(string $table, string $condition): static
     {
-         $this->builder->innerJoin($table, $condition);
+        #$this->builder->innerJoin($table, $condition);
 
-         return $this;
+        return $this;
     }
 
 
@@ -169,10 +169,10 @@ class SelectBuilder implements HasConditionInterface
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function fullJoin(string $table, string $condition): static
     {
-        $this->builder->fullJoin($table, $condition);
+        #$this->builder->fullJoin($table, $condition);
 
         return $this;
     }
@@ -189,10 +189,10 @@ class SelectBuilder implements HasConditionInterface
      * @param string $direction
      *
      * @return $this
-    */
+     */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
-        $this->builder->orderBy($column, $direction);
+        #$this->builder->orderBy($column, $direction);
 
         return $this;
     }
@@ -208,7 +208,7 @@ class SelectBuilder implements HasConditionInterface
      */
     public function groupBy(string $column): static
     {
-        $this->builder->groupBy($column);
+        #$this->builder->groupBy($column);
 
         return $this;
     }
@@ -223,12 +223,12 @@ class SelectBuilder implements HasConditionInterface
      * @param string $condition
      *
      * @return $this
-    */
+     */
     public function having(string $condition): static
     {
-         $this->builder->having($condition);
+        #$this->builder->having($condition);
 
-         return $this;
+        return $this;
     }
 
 
@@ -239,12 +239,12 @@ class SelectBuilder implements HasConditionInterface
      * @param int $limit
      *
      * @return $this
-    */
+     */
     public function limit(int $limit): static
     {
-         $this->builder->limit($limit);
+        #$this->builder->limit($limit);
 
-         return $this;
+        return $this;
     }
 
 
@@ -256,10 +256,10 @@ class SelectBuilder implements HasConditionInterface
      * @param int $limit
      *
      * @return $this
-    */
+     */
     public function offset(int $limit): static
     {
-        $this->builder->limit($limit);
+        #$this->builder->limit($limit);
 
         return $this;
     }
@@ -271,12 +271,12 @@ class SelectBuilder implements HasConditionInterface
 
     /**
      * @return object[]
-    */
+     */
     public function get(): array
     {
-         return $this->selected()
-                     ->fetch()
-                     ->all();
+        return $this->selected()
+                    ->fetch()
+                    ->all();
     }
 
 
@@ -288,7 +288,7 @@ class SelectBuilder implements HasConditionInterface
 
     /**
      * @return mixed
-    */
+     */
     public function one(): mixed
     {
         return $this->selected()
@@ -304,11 +304,11 @@ class SelectBuilder implements HasConditionInterface
 
     /**
      * @return Select
-    */
+     */
     private function selected(): Select
     {
         $qb = $this->builder->wheres($this->wheres)
-                              ->setParameters($this->parameters);
+            ->setParameters($this->parameters);
 
         dd($qb->getSQL());
     }

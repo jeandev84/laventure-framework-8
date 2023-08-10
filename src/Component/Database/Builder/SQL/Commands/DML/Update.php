@@ -1,13 +1,14 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
+use Laventure\Component\Database\Builder\SQL\Commands\ExecutableSQlCommand;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 
 
 /**
  * @inheritdoc
 */
-class Update extends SQLBuilderHasConditions
+class Update extends SQLBuilderHasConditions implements ExecutableSQlCommand
 {
 
 
@@ -23,17 +24,39 @@ class Update extends SQLBuilderHasConditions
     /**
      * @param array $attributes
      *
-     * @param array $wheres
-     *
      * @return $this
     */
-    public function update(array $attributes, array $wheres): static
+    public function update(array $attributes): static
     {
-         $this->data = $this->resolveBindingParameters($attributes);
+         $this->data = $this->resolveAttributes($attributes);
          $this->setParameters($attributes);
-         $this->criteria($wheres);
 
          return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param array $attributes
+     *
+     * @return array
+    */
+    private function resolveAttributes(array $attributes): array
+    {
+        $resolved = [];
+
+        foreach ($attributes as $column => $value) {
+            if ($this->hasPdoConnection()) {
+                $resolved[] = "$column = :$column";
+            } else {
+                $resolved[] = "$column = '$value'";
+            }
+        }
+
+        return $resolved;
     }
 
 
@@ -47,7 +70,7 @@ class Update extends SQLBuilderHasConditions
     */
     public function getSQL(): string
     {
-        $sql[] = sprintf("UPDATE %s %s", $this->getTable(), $this->setted());
+        $sql[] = sprintf("UPDATE %s %s", $this->getTable(), $this->set());
         $sql[] = $this->whereSQL();
 
         return join(' ', array_filter($sql)).';';
@@ -62,7 +85,7 @@ class Update extends SQLBuilderHasConditions
     /**
      * @return string
     */
-    private function setted(): string
+    private function set(): string
     {
         return sprintf('SET %s', join(', ', $this->data));
     }
@@ -76,6 +99,8 @@ class Update extends SQLBuilderHasConditions
     */
     public function execute(): false|int
     {
-        return $this->statement()->execute();
+        return $this->statement()
+                    ->setParameters($this->parameters)
+                    ->execute();
     }
 }

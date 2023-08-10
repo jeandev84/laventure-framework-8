@@ -89,7 +89,8 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     public function update(string $table, array $attributes, array $criteria): Update
     {
          $command = new Update($this->connection, $table);
-         $command->update($attributes, $criteria);
+         $command->update($attributes);
+         $command->criteria($criteria);
          return $command;
     }
 
