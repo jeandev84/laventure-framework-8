@@ -274,10 +274,9 @@ class SelectBuilder implements HasConditionInterface
     */
     public function get(): array
     {
-        $this->builder->wheres($this->wheres)
-                      ->setParameters($this->parameters);
-
-         return $this->builder->fetch()->all();
+         return $this->selected()
+                     ->fetch()
+                     ->all();
     }
 
 
@@ -292,10 +291,20 @@ class SelectBuilder implements HasConditionInterface
     */
     public function one(): mixed
     {
-        $this->builder->wheres($this->wheres)
-                      ->setParameters($this->parameters)
-                      ->limit(1);
+        return $this->selected()
+                    ->limit(1)
+                    ->fetch()
+                    ->one();
+    }
 
-        return $this->builder->fetch()->one();
+
+
+    /**
+     * @return Select
+    */
+    private function selected(): Select
+    {
+        return  $this->builder->wheres($this->wheres)
+                              ->setParameters($this->parameters);
     }
 }
