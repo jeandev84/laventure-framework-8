@@ -274,6 +274,9 @@ class SelectBuilder implements HasConditionInterface
     */
     public function get(): array
     {
+        $this->builder->wheres($this->wheres)
+                      ->setParameters($this->parameters);
+
          return $this->builder->fetch()->all();
     }
 
