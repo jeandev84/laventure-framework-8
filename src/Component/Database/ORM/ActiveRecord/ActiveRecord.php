@@ -5,7 +5,9 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
 use Laventure\Component\Database\Manager;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\DeleteBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\UpdateBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
 
@@ -57,7 +59,12 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @var array
     */
-    protected array $wheres = [];
+    protected array $wheres = [
+        'wheres'    => [],
+        'whereLike' => [],
+        'whereIn'   => []
+    ];
+
 
 
 
@@ -81,6 +88,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+    /**
+     * Singleton pattern applied
+     *
+     * @return static
+    */
+    private static function instance(): static
+    {
+        if (! self::$instance) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
+    }
+
+
+
 
 
 
@@ -91,7 +114,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function select(array|string $selects = null): SelectBuilder
     {
-         return self::getQB()->select($selects);
+         return self::query()->select($selects);
     }
 
 
@@ -128,6 +151,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         $instance = self::instance();
         $instance->wheres['whereIn'][$column] = [$column, $data];
+        return $instance;
+    }
+
+
+
+
+
+    /**
+     * @param string $column
+     * @param string $expression
+     * @return static
+    */
+    public static function whereLike(string $column, string $expression): static
+    {
+        $instance = self::instance();
+        $instance->wheres['whereLike'][$column] = [$column, $expression];
         return $instance;
     }
 
@@ -190,7 +229,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function create(array $attributes): int|bool
     {
-        return self::getQB()->create($attributes)->execute();
+        return self::query()->create($attributes)->execute();
     }
 
 
@@ -205,10 +244,17 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function update(array $attributes): bool|int
     {
-         return self::getQB()->update($attributes, [
+         $qb = self::query()->update($attributes, [
              self::getPrimaryKey() => $this->getId()
-         ])->execute();
+         ]);
+
+         $qb = $qb->wheres($this->getWheres())
+                  ->wheresIn($this->getWheresIn())
+                  ->wheresLike($this->getWheresLike());
+
+         return $qb->execute();
     }
+
 
 
 
@@ -220,10 +266,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function get(): array
     {
-       $qb = self::select();
-       $qb = $this->resolveConditions($qb);
-       return $qb->get();
+       return $this->selectQuery()->get();
     }
+
+
 
 
 
@@ -235,35 +281,29 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function one(): mixed
     {
-        $qb = self::select();
-        $qb = $this->resolveConditions($qb);
-        return $qb->one();
+        return $this->selectQuery()->one();
     }
+
+
 
 
 
 
 
     /**
-     * @param SelectBuilder $qb
-     *
      * @return SelectBuilder
     */
-    private function resolveConditions(SelectBuilder $qb): SelectBuilder
+    private function selectQuery(): SelectBuilder
     {
-        $instance = self::instance();
-        foreach ($instance->wheres['wheres'] as $wheres) {
-            [$column, $value, $operator] = $wheres;
-            $qb->where($column, $value, $operator);
-        }
-
-        foreach ($instance->wheres['whereIn'] as $whereIn) {
-            [$column, $data] = $whereIn;
-            $qb->whereIn($column, $data);
-        }
-
-        return $qb;
+        $qb = self::select();
+        return $qb->wheres($this->getWheres())
+                  ->wheresIn($this->getWheresIn())
+                  ->wheresLike($this->getWheresLike());
     }
+
+
+
+
 
 
 
@@ -300,28 +340,17 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function delete(): bool
     {
-         return self::getQB()->delete([
-             self::getPrimaryKey() => $this->getId()
-         ]);
+         $qb = self::query()->delete([self::getPrimaryKey() => $this->getId()]);
+
+         return $qb->wheres($this->getWheres())
+                   ->wheresIn($this->getWheresIn())
+                   ->wheresLike($this->getWheresLike())
+                   ->execute();
     }
 
 
 
 
-
-
-
-    /**
-     * @return static
-    */
-    private static function instance(): static
-    {
-        if (! self::$instance) {
-            self::$instance = new static();
-        }
-
-        return self::$instance;
-    }
 
 
 
@@ -347,7 +376,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return QueryBuilder
     */
-    private static function getQB(): QueryBuilder
+    private static function query(): QueryBuilder
     {
         $manager   = self::getDB();
         $builder   = new SqlQueryBuilder($manager->pdoConnection(self::$connection));
@@ -384,7 +413,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @return $this
     */
-    public function setAttribute(string $name, $value): self
+    public function setAttribute(string $name, $value): static
     {
         $this->attributes[$name] = $value;
 
@@ -400,13 +429,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @param array $attributes
      *
-     * @return void
+     * @return $this
     */
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): static
     {
         foreach ($attributes as $column => $value) {
             $this->setAttribute($column, $value);
         }
+
+        return $this;
     }
 
 
@@ -621,6 +652,47 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
         return static::$table;
     }
+
+
+
+
+
+    /**
+     * @return array
+     */
+    private function getWheres(): array
+    {
+        return array_values(self::instance()->wheres['wheres']);
+    }
+
+
+
+
+
+    /**
+     * @return array
+    */
+    private function getWheresIn(): array
+    {
+        return array_values(self::instance()->wheres['whereIn']);
+    }
+
+
+
+
+
+    /**
+     * @return array
+    */
+    private function getWheresLike(): array
+    {
+        return array_values(self::instance()->wheres['whereLike']);
+    }
+
+
+
+
+
 
 
 

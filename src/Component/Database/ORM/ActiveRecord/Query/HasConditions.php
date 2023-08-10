@@ -70,6 +70,25 @@ trait HasConditions
 
 
 
+    /**
+     * @param array $wheres
+     *
+     * @return $this
+    */
+    public function wheres(array $wheres): static
+    {
+        foreach ($wheres as $conditions) {
+            [$column, $value, $operator] = $conditions;
+            $this->where($column, $value, $operator);
+        }
+
+        return $this;
+    }
+
+
+
+
+
 
     /**
      * @param string $column
@@ -89,6 +108,27 @@ trait HasConditions
 
 
     /**
+     * @param array $wheres
+     *
+     * @return $this
+    */
+    public function wheresIn(array $wheres): static
+    {
+        foreach ($wheres as $whereIn) {
+            [$column, $data] = $whereIn;
+            $this->whereIn($column, $data);
+        }
+
+        return $this;
+    }
+
+
+
+
+
+
+
+    /**
      * @param string $column
      *
      * @param string $expression
@@ -100,6 +140,28 @@ trait HasConditions
         return $this->where($column, $expression, "LIKE");
     }
 
+
+
+
+
+
+
+
+
+    /**
+     * @param array $wheres
+     *
+     * @return $this
+    */
+    public function wheresLike(array $wheres): static
+    {
+        foreach ($wheres as $whereLike) {
+            [$column, $expression] = $whereLike;
+            $this->whereLike($column, $expression);
+        }
+
+        return $this;
+    }
 
 
 

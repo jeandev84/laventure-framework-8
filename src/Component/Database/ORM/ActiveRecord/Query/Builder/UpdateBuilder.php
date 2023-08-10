@@ -32,6 +32,9 @@ class UpdateBuilder implements HasConditionInterface
      */
      public function execute(): int|bool
      {
+         $this->builder->wheres($this->wheres)
+                       ->setParameters($this->parameters);
+
           return $this->builder->execute();
      }
 }

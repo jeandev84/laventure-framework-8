@@ -29,6 +29,9 @@ class DeleteBuilder implements HasConditionInterface
      */
      public function execute(): bool
      {
+         $this->builder->wheres($this->wheres)
+                       ->setParameters($this->parameters);
+
           return $this->builder->execute();
      }
 }
