@@ -22,7 +22,7 @@ class Model extends ActiveRecord
     /**
      * @var array|string[]
     */
-    protected array $guard = ['id'];
+    protected array $guarded = ['id'];
 
 
 

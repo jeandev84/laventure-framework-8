@@ -21,6 +21,24 @@ trait HasConditions
 
 
 
+      /**
+       * @var array|string[]
+      */
+      protected array $operators = [
+          '=',
+          '>',
+          '>=',
+          '<',
+          '>=',
+          'LIKE'
+      ];
+
+
+
+
+
+
+
      /**
       * @param string $column
       *
@@ -32,9 +50,13 @@ trait HasConditions
     */
     public function where(string $column, $value, string $operator = "="): static
     {
-         $binding = is_array($value) ? "(:$column)" : ":$column";
+         $condition = "$column $operator :$column";
 
-         $this->wheres[$column] = "$column $operator $binding";
+         if (! $this->hasOperator($operator)) {
+             $condition = "$column $operator";
+         }
+
+         $this->wheres[$column] = $condition;
 
          $this->parameters[$column] = $value;
 
@@ -45,12 +67,17 @@ trait HasConditions
 
 
 
+
     /**
-     * @return array
+     * @param string $column
+     *
+     * @param array $value
+     *
+     * @return $this
     */
-    public function getParameters(): array
+    public function whereIn(string $column, array $value): static
     {
-        return $this->parameters;
+         return $this->where($column, $value, "IN :($column)");
     }
 
 
@@ -59,10 +86,29 @@ trait HasConditions
 
 
     /**
-     * @return array
+     * @param string $column
+     *
+     * @param string $value
+     *
+     * @return $this
     */
-    public function getConditions(): array
+    public function whereLike(string $column, string $value): static
     {
-        return $this->wheres;
+        return $this->where($column, $value, "LIKE");
+    }
+
+
+
+
+
+
+    /**
+     * @param string $operator
+     *
+     * @return bool
+    */
+    protected function hasOperator(string $operator): bool
+    {
+        return in_array($operator, $this->operators);
     }
 }

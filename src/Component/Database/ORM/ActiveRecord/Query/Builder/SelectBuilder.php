@@ -281,11 +281,16 @@ class SelectBuilder implements HasConditionInterface
 
 
 
+
     /**
      * @return mixed
     */
     public function one(): mixed
     {
+        $this->builder->wheres($this->wheres)
+                      ->setParameters($this->parameters)
+                      ->limit(1);
+
         return $this->builder->fetch()->one();
     }
 }
