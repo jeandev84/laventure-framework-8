@@ -29,4 +29,35 @@ abstract class SQLBuilderHasConditions extends SQlBuilder implements HasCriteria
 
          return $this->setParameters($wheres);
      }
+
+
+
+
+
+     /**
+      * @param string $name
+      *
+      * @param $value
+      *
+      * @return $this
+     */
+     public function setParameter(string $name, $value): static
+     {
+         return parent::setParameter($name, $value);
+     }
+
+
+
+
+
+
+     /**
+      * @param array $parameters
+      *
+      * @return $this
+     */
+     public function setParameters(array $parameters): static
+     {
+         return parent::setParameters($parameters);
+     }
 }

@@ -5,6 +5,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
 
 
@@ -52,6 +53,23 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+    /**
+     * @var array
+    */
+    protected array $wheres = [];
+
+
+
+
+
+    /**
+     * @var static
+    */
+    private static $instance;
+
+
+
+
 
 
     /**
@@ -86,11 +104,30 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @param string $operator
      *
-     * @return SelectBuilder
+     * @return static
     */
-    public static function where(string $column, $value, string $operator = '='): SelectBuilder
+    public static function where(string $column, $value, string $operator = '='): static
     {
-          return self::select()->where($column, $value, $operator);
+          $instance = self::instance();
+          $instance->wheres['wheres'][$column] = [$column, $value, $operator];
+          return $instance;
+    }
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param array $data
+     *
+     * @return static
+    */
+    public static function whereIn(string $column, array $data): static
+    {
+        $instance = self::instance();
+        $instance->wheres['whereIn'][$column] = [$column, $data];
+        return $instance;
     }
 
 
@@ -152,7 +189,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function create(array $attributes): int|bool
     {
-        return self::getQB()->insert($attributes);
+        return self::getQB()->create($attributes);
     }
 
 
@@ -170,6 +207,60 @@ abstract class ActiveRecord implements ActiveRecordInterface
          return self::getQB()->update($attributes, [self::getPrimaryKey() => $this->getId()]);
     }
 
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function get(): array
+    {
+       $qb = self::select();
+       $qb = $this->resolveConditions($qb);
+       return $qb->get();
+    }
+
+
+
+
+
+
+    /**
+     * @return mixed
+    */
+    public function one(): mixed
+    {
+        $qb = self::select();
+        $qb = $this->resolveConditions($qb);
+        return $qb->one();
+    }
+
+
+
+
+
+    /**
+     * @param SelectBuilder $qb
+     *
+     * @return SelectBuilder
+    */
+    private function resolveConditions(SelectBuilder $qb): SelectBuilder
+    {
+        $instance = self::instance();
+        foreach ($instance->wheres['wheres'] as $wheres) {
+            [$column, $value, $operator] = $wheres;
+            $qb->where($column, $value, $operator);
+        }
+
+        foreach ($instance->wheres['whereIn'] as $whereIn) {
+            [$column, $data] = $whereIn;
+            $qb->whereIn($column, $data);
+        }
+
+        return $qb;
+    }
 
 
 
@@ -206,7 +297,27 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function delete(): bool
     {
-         return self::getQB()->delete([self::getPrimaryKey() => $this->getId()]);
+         return self::getQB()->delete([
+             self::getPrimaryKey() => $this->getId()
+         ]);
+    }
+
+
+
+
+
+
+
+    /**
+     * @return static
+    */
+    private static function instance(): static
+    {
+        if (! self::$instance) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
     }
 
 

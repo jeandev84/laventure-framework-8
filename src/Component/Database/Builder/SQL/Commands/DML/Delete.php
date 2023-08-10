@@ -10,6 +10,7 @@ use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
 class Delete extends SQLBuilderHasConditions
 {
 
+
     /**
      * @inheritDoc
     */

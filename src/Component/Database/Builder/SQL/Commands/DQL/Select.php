@@ -365,9 +365,12 @@ class Select extends SQLBuilderHasConditions
     }
 
 
+
+
+
     /**
      * @return QueryResultInterface
-     */
+    */
     public function fetch(): QueryResultInterface
     {
          $fetch = $this->statement()->fetch();
@@ -378,6 +381,7 @@ class Select extends SQLBuilderHasConditions
 
          return $fetch;
     }
+
 
 
     /**

@@ -222,7 +222,7 @@ class Query implements QueryInterface
     /**
      * @inheritDoc
     */
-    public function execute(): int|false
+    public function execute(): int|bool
     {
         try {
 
@@ -234,7 +234,8 @@ class Query implements QueryInterface
                     'parameters'     => $this->parameters
                 ]);
 
-                return (int)$this->pdo->lastInsertId();
+                $lastId = $this->lastId();
+                return $lastId ?: true;
             }
 
         } catch (PDOException $e) {
@@ -314,5 +315,19 @@ class Query implements QueryInterface
         (function () use ($e) {
             throw new QueryException($e->getMessage(), $e->getCode());
         })();
+    }
+
+
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function lastId(): int
+    {
+        return (int)$this->pdo->lastInsertId();
     }
 }

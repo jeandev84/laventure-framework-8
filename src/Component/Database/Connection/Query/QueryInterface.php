@@ -85,9 +85,12 @@ interface QueryInterface
         /**
          * Execute query
          *
-         * @return int|false
+         * Returns last insert id or boolean
+         *
+         * @return int|bool
         */
-        public function execute(): int|false;
+        public function execute(): int|bool;
+
 
 
 
@@ -119,6 +122,19 @@ interface QueryInterface
         public function fetch(): QueryResultInterface;
 
 
+
+
+
+
+
+
+
+        /**
+         * Returns last inserted ID
+         *
+         * @return int
+        */
+        public function lastId(): int;
 
 
 

@@ -43,6 +43,16 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
 
 
 
+    /**
+     * @return ConnectionInterface
+    */
+    public function getConnection(): ConnectionInterface
+    {
+        return $this->connection;
+    }
+
+
+
 
     /**
      * @inheritDoc
@@ -79,8 +89,7 @@ class SqlQueryBuilder implements SqlQueryBuilderInterface
     public function update(string $table, array $attributes, array $criteria): Update
     {
          $command = new Update($this->connection, $table);
-         $command->update($attributes);
-         $command->criteria($criteria);
+         $command->update($attributes, $criteria);
          return $command;
     }
 

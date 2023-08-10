@@ -66,7 +66,7 @@ abstract class SQlBuilder
        *
        * @return $this
       */
-      public function setParameter(string $name, $value): static
+      protected function setParameter(string $name, $value): static
       {
            $this->parameters[$name] = $value;
 
@@ -82,7 +82,7 @@ abstract class SQlBuilder
        *
        * @return SQlBuilder
       */
-      public function setParameters(array $parameters): static
+      protected function setParameters(array $parameters): static
       {
            $this->parameters = array_merge($this->parameters, $parameters);
 
@@ -98,7 +98,7 @@ abstract class SQlBuilder
        *
        * @return array
       */
-      public function getParameters(): array
+      protected function getParameters(): array
       {
            return $this->parameters;
       }

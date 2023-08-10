@@ -54,6 +54,8 @@ class Insert extends SQlBuilder
     }
 
 
+
+
     /**
      * @return array
     */
@@ -61,6 +63,9 @@ class Insert extends SQlBuilder
     {
          return $this->columns;
     }
+
+
+
 
 
     /**
@@ -89,9 +94,9 @@ class Insert extends SQlBuilder
 
 
     /**
-     * @return false|int
+     * @return int|bool
     */
-    public function execute(): false|int
+    public function execute(): int|bool
     {
         return $this->statement()->execute();
     }

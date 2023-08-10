@@ -1,6 +1,16 @@
 <?php
 namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
 
+
+/**
+ * @HasConditions
+ *
+ * @author Jean-Claude <jeanyao@ymail.com>
+ *
+ * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
+ *
+ * @package Laventure\Component\Database\ORM\ActiveRecord\Query
+*/
 trait HasConditions
 {
 
@@ -24,14 +34,7 @@ trait HasConditions
       /**
        * @var array|string[]
       */
-      protected array $operators = [
-          '=',
-          '>',
-          '>=',
-          '<',
-          '>=',
-          'LIKE'
-      ];
+      protected array $operators = ['=', '>', '>=', '<', '>=', 'LIKE'];
 
 
 
@@ -71,13 +74,13 @@ trait HasConditions
     /**
      * @param string $column
      *
-     * @param array $value
+     * @param array $data
      *
      * @return $this
     */
-    public function whereIn(string $column, array $value): static
+    public function whereIn(string $column, array $data): static
     {
-         return $this->where($column, $value, "IN :($column)");
+         return $this->where($column, $data, "IN :($column)");
     }
 
 
@@ -88,13 +91,13 @@ trait HasConditions
     /**
      * @param string $column
      *
-     * @param string $value
+     * @param string $expression
      *
      * @return $this
     */
-    public function whereLike(string $column, string $value): static
+    public function whereLike(string $column, string $expression): static
     {
-        return $this->where($column, $value, "LIKE");
+        return $this->where($column, $expression, "LIKE");
     }
 
 
