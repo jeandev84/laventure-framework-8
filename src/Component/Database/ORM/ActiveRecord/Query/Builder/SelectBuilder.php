@@ -2,9 +2,8 @@
 namespace Laventure\Component\Database\ORM\ActiveRecord\Query\Builder;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
-use Laventure\Component\Database\Connection\ConnectionInterface;
-use Laventure\Component\Database\ORM\ActiveRecord\HasConditionInterface;
-use Laventure\Component\Database\ORM\ActiveRecord\HasConditions;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditions;
 
 
 /**
@@ -14,7 +13,7 @@ use Laventure\Component\Database\ORM\ActiveRecord\HasConditions;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\ActiveRecord
+ * @package Laventure\Component\Database\ORM\Query\ActiveRecord
 */
 class SelectBuilder implements HasConditionInterface
 {

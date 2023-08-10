@@ -1,8 +1,7 @@
 <?php
-namespace Laventure\Component\Database\ORM\ActiveRecord;
+namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
 
 use Laventure\Component\Database\Builder\Builder;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\InsertBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
 
 class QueryBuilder

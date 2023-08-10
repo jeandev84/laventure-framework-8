@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Database\ORM\ActiveRecord;
+namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
 
 interface HasConditionInterface
 {

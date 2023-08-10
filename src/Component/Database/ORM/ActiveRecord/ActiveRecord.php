@@ -5,7 +5,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 use Laventure\Component\Database\Builder\Builder;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
-
+use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
 
 
 /**
@@ -52,21 +52,6 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-    /**
-     * @var array
-    */
-    protected static array $wheres = [];
-
-
-
-
-    /**
-     * @var QueryBuilder
-    */
-    protected static QueryBuilder $qb;
-
-
-
 
 
     /**
@@ -81,27 +66,13 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @return QueryBuilder
-    */
-    private static function createQB(): QueryBuilder
-    {
-        $manager   = self::getDB();
-        $builder   = new Builder($manager->pdoConnection(self::$connection));
-        return new QueryBuilder($builder, static::getTableName(), self::getClassName(), self::getTableAlias());
-    }
-
-
-
-
-
-    /**
      * @param array|string|null $selects
      *
      * @return SelectBuilder
     */
     public static function select(array|string $selects = null): SelectBuilder
     {
-         return self::$qb->select($selects);
+         return self::getQB()->select($selects);
     }
 
 
@@ -181,7 +152,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function create(array $attributes): int|bool
     {
-        return self::$qb->insert($attributes);
+        return self::getQB()->insert($attributes);
     }
 
 
@@ -196,7 +167,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function update(array $attributes): bool|int
     {
-         return self::$qb->update($attributes, [self::getPrimaryKey() => $this->getId()]);
+         return self::getQB()->update($attributes, [self::getPrimaryKey() => $this->getId()]);
     }
 
 
@@ -235,7 +206,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function delete(): bool
     {
-         return self::$qb->delete([self::getPrimaryKey() => $this->getId()]);
+         return self::getQB()->delete([self::getPrimaryKey() => $this->getId()]);
     }
 
 
@@ -253,6 +224,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
         return $database;
     }
+
+
+
+
+
+
+    /**
+     * @return QueryBuilder
+    */
+    private static function getQB(): QueryBuilder
+    {
+        $manager   = self::getDB();
+        $builder   = new Builder($manager->pdoConnection(self::$connection));
+        return new QueryBuilder($builder, static::getTableName(), self::getClassName(), self::getTableAlias());
+    }
+
 
 
 
@@ -514,11 +501,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     protected static function getTableName(): string
     {
-        if (! self::$table) {
+        if (! static::$table) {
             throw new \RuntimeException("Could not detected model ". self::getClassName() . " table name.");
         }
 
-        return self::$table;
+        return static::$table;
     }
 
 
