@@ -2,7 +2,11 @@
 namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
 
 use Laventure\Component\Database\Builder\Builder;
+use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\DeleteBuilder;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\InsertBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
+use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\UpdateBuilder;
 
 
 /**
@@ -19,7 +23,7 @@ class QueryBuilder
 
 
     /**
-     * @param Builder $builder
+     * @param SqlQueryBuilder $builder
      *
      * @param string $table
      *
@@ -28,7 +32,7 @@ class QueryBuilder
      * @param string $alias
     */
     public function __construct(
-        protected Builder $builder,
+        protected SqlQueryBuilder $builder,
         protected string $table,
         protected string $model,
         protected string $alias = ''
@@ -60,11 +64,11 @@ class QueryBuilder
     /**
      * @param array $attributes
      *
-     * @return bool|int
+     * @return InsertBuilder
     */
-    public function create(array $attributes): bool|int
+    public function create(array $attributes): InsertBuilder
     {
-         return $this->builder->insert($this->table, $attributes);
+         return new InsertBuilder($this->builder->insert($this->table, $attributes));
     }
 
 
@@ -76,11 +80,11 @@ class QueryBuilder
      *
      * @param array $wheres
      *
-     * @return bool|int
+     * @return UpdateBuilder
     */
-    public function update(array $attributes, array $wheres): bool|int
+    public function update(array $attributes, array $wheres): UpdateBuilder
     {
-         return $this->builder->update($this->table, $attributes, $wheres);
+         return new UpdateBuilder($this->builder->update($this->table, $attributes, $wheres));
     }
 
 
@@ -91,10 +95,10 @@ class QueryBuilder
     /**
      * @param array $wheres
      *
-     * @return bool
+     * @return DeleteBuilder
     */
-    public function delete(array $wheres): bool
+    public function delete(array $wheres): DeleteBuilder
     {
-        return $this->builder->delete($this->table, $wheres);
+        return new DeleteBuilder($this->builder->delete($this->table, $wheres));
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Laventure\Component\Database\ORM\ActiveRecord\Query\Builder;
 
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Delete;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditions;
 
@@ -10,10 +11,24 @@ use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditions;
 */
 class DeleteBuilder implements HasConditionInterface
 {
-         use HasConditions;
+     use HasConditions;
 
 
-         public function __construct()
-         {
-         }
+     /**
+      * @param Delete $builder
+     */
+     public function __construct(protected Delete $builder)
+     {
+     }
+
+
+
+
+     /**
+      * @return bool
+     */
+     public function execute(): bool
+     {
+          return $this->builder->execute();
+     }
 }

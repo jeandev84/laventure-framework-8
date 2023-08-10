@@ -3,6 +3,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
 use Laventure\Component\Database\Builder\Builder;
+use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
@@ -189,7 +190,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function create(array $attributes): int|bool
     {
-        return self::getQB()->create($attributes);
+        return self::getQB()->create($attributes)->execute();
     }
 
 
@@ -204,7 +205,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function update(array $attributes): bool|int
     {
-         return self::getQB()->update($attributes, [self::getPrimaryKey() => $this->getId()]);
+         return self::getQB()->update($attributes, [
+             self::getPrimaryKey() => $this->getId()
+         ])->execute();
     }
 
 
@@ -347,7 +350,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     private static function getQB(): QueryBuilder
     {
         $manager   = self::getDB();
-        $builder   = new Builder($manager->pdoConnection(self::$connection));
+        $builder   = new SqlQueryBuilder($manager->pdoConnection(self::$connection));
         return new QueryBuilder($builder, static::getTableName(), self::getClassName(), self::getTableAlias());
     }
 
