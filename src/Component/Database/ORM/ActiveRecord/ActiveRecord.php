@@ -440,9 +440,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @return int
     */
-    protected function getId(): int
+    private function getId(): int
     {
-         return $this->getAttribute(self::getPrimaryKey());
+        return $this->getAttribute(self::getPrimaryKey());
     }
 
 
