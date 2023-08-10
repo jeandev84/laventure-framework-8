@@ -299,12 +299,17 @@ class SelectBuilder implements HasConditionInterface
 
 
 
+
+
+
     /**
      * @return Select
     */
     private function selected(): Select
     {
-        return  $this->builder->wheres($this->wheres)
+        $qb = $this->builder->wheres($this->wheres)
                               ->setParameters($this->parameters);
+
+        dd($qb->getSQL());
     }
 }

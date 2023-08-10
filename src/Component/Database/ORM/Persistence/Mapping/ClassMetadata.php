@@ -4,6 +4,7 @@ namespace Laventure\Component\Database\ORM\Persistence\Mapping;
 
 use DateTimeInterface;
 use Laventure\Component\Database\ORM\Collection\Collection;
+use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 use Laventure\Component\Database\ORM\Persistence\PersistenceCollection;
 use ReflectionClass;
 use ReflectionObject;
@@ -14,6 +15,10 @@ use ReflectionObject;
 */
 class ClassMetadata implements ClassMetadataInterface
 {
+
+
+        use CamelConvertor;
+
 
         /**
         * @var ReflectionClass
@@ -514,35 +519,5 @@ class ClassMetadata implements ClassMetadataInterface
     public function getProperties(): array
     {
         return $this->properties;
-    }
-
-
-
-
-
-    /**
-     * Example:
-     * Transform authorId to author_id
-     *
-     * @param string $source
-     * @return string
-    */
-    public function camelCaseToUnderscore(string $source): string
-    {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $source));
-    }
-
-
-
-
-
-
-    /**
-     * @param string $source
-     * @return string
-    */
-    public function underscoreToCamelCase(string $source): string
-    {
-        return lcfirst(str_replace('_', '', ucwords($source, '_')));
     }
 }

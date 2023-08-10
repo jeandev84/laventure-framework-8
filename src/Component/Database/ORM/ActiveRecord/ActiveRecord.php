@@ -10,6 +10,7 @@ use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\UpdateBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\HasConditionInterface;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
+use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 
 
 /**
@@ -17,6 +18,9 @@ use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
 */
 abstract class ActiveRecord implements ActiveRecordInterface
 {
+
+    use CamelConvertor;
+
 
     /**
      * @var string
@@ -65,6 +69,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
         'whereIn'   => []
     ];
 
+
+
+
+
+    /**
+     * @var array
+    */
+    protected array $joins = [];
 
 
 
@@ -121,6 +133,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+
     /**
      * @param string $column
      *
@@ -140,6 +153,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+
+
     /**
      * @param string $column
      *
@@ -147,7 +162,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @return static
     */
-    public static function whereIn(string $column, array $data): static
+    public function whereIn(string $column, array $data): static
     {
         $instance = self::instance();
         $instance->wheres['whereIn'][$column] = [$column, $data];
@@ -163,7 +178,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $expression
      * @return static
     */
-    public static function whereLike(string $column, string $expression): static
+    public function whereLike(string $column, string $expression): static
     {
         $instance = self::instance();
         $instance->wheres['whereLike'][$column] = [$column, $expression];
@@ -415,6 +430,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function setAttribute(string $name, $value): static
     {
+        $name = $this->camelCaseToUnderscore($name);
+
         $this->attributes[$name] = $value;
 
         return $this;

@@ -18,7 +18,13 @@ trait HasConditions
       /**
        * @var array
       */
-      protected array $wheres = [];
+      protected array $wheres = [
+          'and'  => [],
+          'or'   => [],
+          'like' => [],
+          'not'  => [],
+          'in'   => []
+      ];
 
 
 
@@ -34,7 +40,17 @@ trait HasConditions
       /**
        * @var array|string[]
       */
-      protected array $operators = ['=', '>', '>=', '<', '>=', 'LIKE'];
+      protected array $operators = [
+          '=',
+          '>',
+          '>=',
+          '<',
+          '>=',
+          'LIKE',
+          'OR',
+          'NOT',
+          'AND'
+      ];
 
 
 
@@ -120,6 +136,37 @@ trait HasConditions
         }
 
         return $this;
+    }
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @return $this
+    */
+    public function orWhere(string $column, $value): static
+    {
+         return $this->where($column, $value, 'OR');
+    }
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @return $this
+    */
+    public function andWhere(string $column, $value): static
+    {
+        return $this->where($column, $value, 'AND');
     }
 
 
