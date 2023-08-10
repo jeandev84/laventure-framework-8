@@ -352,7 +352,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @return array
+     * @inheritdoc
     */
     public function getAttributes(): array
     {
@@ -507,7 +507,6 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
         return static::$table;
     }
-
 
 
 

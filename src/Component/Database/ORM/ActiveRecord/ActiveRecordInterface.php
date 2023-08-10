@@ -65,9 +65,22 @@ interface ActiveRecordInterface extends \ArrayAccess
 
 
       /**
-       * Update or Delete object
+       * Update or Insert records
        *
        * @return int
       */
       public function save(): int;
+
+
+
+
+
+
+
+      /**
+       * Get all attributes
+       *
+       * @return array
+      */
+      public function getAttributes(): array;
 }
