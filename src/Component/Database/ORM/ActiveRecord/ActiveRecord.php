@@ -17,14 +17,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @var string
     */
-    protected string $table = '';
+    protected static $table = '';
 
-
-
-    /**
-     * @var string
-    */
-    protected string $alias = '';
 
 
 
@@ -41,7 +35,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @var string|null
     */
-    protected ?string $connection = null;
+    protected static ?string $connection = null;
 
 
 
@@ -53,6 +47,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @var array
     */
     protected array $attributes = [];
+
+
+
+
+
+    /**
+     * @var array
+    */
+    protected static array $wheres = [];
 
 
 
@@ -69,11 +72,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * ActiveRecord constructor
     */
-    private function __construct()
+    private function __construct() {}
+
+
+
+
+
+
+
+    /**
+     * @return QueryBuilder
+    */
+    private static function createQB(): QueryBuilder
     {
-         $manager   = self::getManager();
-         $builder   = new Builder($manager->pdoConnection($this->connection));
-         self::$qb  = new QueryBuilder($builder, $this->getTable(), self::getClassName(), $this->alias);
+        $manager   = self::getDB();
+        $builder   = new Builder($manager->pdoConnection(self::$connection));
+        return new QueryBuilder($builder, static::getTableName(), self::getClassName(), self::getTableAlias());
     }
 
 
@@ -89,6 +103,43 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
          return self::$qb->select($selects);
     }
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return SelectBuilder
+    */
+    public static function where(string $column, $value, string $operator = '='): SelectBuilder
+    {
+          return self::select()->where($column, $value, $operator);
+    }
+
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param string $direction
+     *
+     * @return SelectBuilder
+    */
+    public static function orderBy(string $column, string $direction = 'asc'): SelectBuilder
+    {
+         return self::select()->orderBy($column, $direction);
+    }
+
+
 
 
 
@@ -154,11 +205,37 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
+     * Save data
+     *
+     * @return int
+    */
+    public function save(): int
+    {
+         if (! $attributes = $this->mapAttributes()) {
+              throw new \RuntimeException("No attributes mapped for saving in : ". self::getClassName());
+         }
+
+         if ($id = $this->getId()) {
+             $this->update($attributes);
+         } else {
+             $id = static::create($attributes);
+         }
+
+         return $id;
+    }
+
+
+
+
+
+
+
+    /**
      * @inheritDoc
     */
     public function delete(): bool
     {
-
+         return self::$qb->delete([self::getPrimaryKey() => $this->getId()]);
     }
 
 
@@ -168,7 +245,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return Manager
     */
-    protected static function getManager(): Manager
+    protected static function getDB(): Manager
     {
         if(! $database = Manager::instance()) {
             throw new \RuntimeException("No connection to database detected in : ". self::getClassName());
@@ -181,65 +258,18 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+
     /**
+     * Return table columns
+     *
      * @return array
     */
     protected function getColumnsFromTable(): array
     {
-        return $this->getManager()
-                    ->schema($this->connection)
-                    ->getColumns($this->getTable());
+        return $this->getDB()
+                    ->schema(self::$connection)
+                    ->getColumns(self::getTableName());
     }
-
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    private static function getClassName(): string
-    {
-        return get_called_class();
-    }
-
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    protected function getTable(): string
-    {
-        if (! $this->table) {
-            throw new \RuntimeException("Could not detected model ". $this->getClassName() . " table name.");
-        }
-
-        return $this->table;
-    }
-
-
-
-
-
-
-    /**
-     * @return string
-    */
-    private function getTableAlias(): string
-    {
-        if ($this->alias) {
-            return $this->alias;
-        }
-
-        return mb_substr($this->getTable(), 0, 1, "UTF-8");
-    }
-
 
 
 
@@ -268,6 +298,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * Set attributes
      *
      * @param array $attributes
+     *
      * @return void
     */
     public function setAttributes(array $attributes)
@@ -301,10 +332,13 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $column
      * @return void
     */
-    public function removeAttribute(string $column)
+    public function removeAttribute(string $column): void
     {
-        unset($this->attributes[$column]);
+        if ($this->hasAttribute($column)) {
+            unset($this->attributes[$column]);
+        }
     }
+
 
 
 
@@ -350,6 +384,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         $this->setAttribute($field, $value);
     }
+
+
+
 
 
 
@@ -410,21 +447,6 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-    /**
-     * @return string
-    */
-    private static function getPrimaryKey(): string
-    {
-         if (! self::$primaryKey) {
-              throw new \RuntimeException("Could not find primary key in : ". self::getClassName());
-         }
-
-         return self::$primaryKey;
-
-    }
-
-
-
 
     /**
      * Returns id
@@ -433,7 +455,70 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     protected function getId(): int
     {
-         return $this->getAttribute($this->getPrimaryKey());
+         return $this->getAttribute(self::getPrimaryKey());
+    }
+
+
+
+
+
+
+
+
+    /**
+     * @return string
+     */
+    private static function getTableAlias(): string
+    {
+        return mb_substr(static::getTableName(), 0, 1, "UTF-8");
+    }
+
+
+
+
+
+
+    /**
+     * Returns class name
+     *
+     * @return string
+    */
+    private static function getClassName(): string
+    {
+         return get_called_class();
+    }
+
+
+
+
+
+
+    /**
+     * @return string
+    */
+    protected static function getPrimaryKey(): string
+    {
+        if (! self::$primaryKey) {
+            throw new \RuntimeException("Could not find primary key in : ". self::getClassName());
+        }
+
+        return self::$primaryKey;
+    }
+
+
+
+
+
+    /**
+     * @return string
+    */
+    protected static function getTableName(): string
+    {
+        if (! self::$table) {
+            throw new \RuntimeException("Could not detected model ". self::getClassName() . " table name.");
+        }
+
+        return self::$table;
     }
 
 
@@ -443,7 +528,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
+     * Map attributes to save
+     *
      * @return array
     */
-    protected abstract function mapAttributes(): array;
+    abstract protected function mapAttributes(): array;
 }

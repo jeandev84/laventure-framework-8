@@ -30,18 +30,27 @@ class SelectBuilder implements HasConditionInterface
 
 
 
+
+    /**
+     * @var string
+    */
+    protected string $classname;
+
+
+
+
     /**
      * @param Select $builder
      *
-     * @param string $model
-     *
-     * @param string $alias
+     * @param string $classname
     */
-    public function __construct(Select $builder, string $model, string $alias = '')
+    public function __construct(Select $builder, string $classname)
     {
-         $this->builder = $builder;
-         $this->builder->map($model);
+         $this->builder   = $builder;
+         $this->builder->map($classname);
     }
+
+
 
 
 
@@ -58,6 +67,7 @@ class SelectBuilder implements HasConditionInterface
 
         return $this;
     }
+
 
 
 
