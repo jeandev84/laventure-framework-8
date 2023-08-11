@@ -18,49 +18,42 @@ abstract class Migration implements MigrationInterface
 {
 
 
-    /**
-     * @var string
-    */
-    private string $name;
-
-
-
 
     /**
-     * @var string
-    */
-    private string $path;
-
-
-
-
-
-    /**
-     * @param string $name
-     *
-     * @return $this
-    */
-    public function version(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-
-
-
-
-    /**
-     * Returns name or version of migration
+     * Returns migration name, this may be the version migration
      *
      * @return string
     */
     public function getName(): string
     {
-          return $this->name ?? $this->reflection()->getShortName();
+         return $this->reflection()->getShortName();
     }
 
+
+
+
+
+
+    /**
+     * Returns the migration path
+     *
+     * @return string
+    */
+    public function getPath(): string
+    {
+         return $this->reflection()->getFileName();
+    }
+
+
+
+
+    /**
+     * @return string
+    */
+    public function getFullName(): string
+    {
+        return $this->reflection()->getName();
+    }
 
 
 
