@@ -31,7 +31,7 @@ class Model extends ActiveRecord
     /**
      * @inheritDoc
     */
-    protected function mapAttributes(): array
+    protected function mapAttributesToSave(): array
     {
         $attributes = [];
 

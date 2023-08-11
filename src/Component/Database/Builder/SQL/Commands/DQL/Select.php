@@ -5,6 +5,7 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\NullObjectPersistence;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
+use Laventure\Component\Database\Builder\SQL\JoinType;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 
@@ -90,12 +91,6 @@ class Select extends SQLBuilderHasConditions
 
 
 
-    /**
-     * @var array|string[]
-    */
-    protected array $joinTypes = ['LEFT', 'RIGHT', 'FULL', 'INNER'];
-
-
 
 
     /**
@@ -163,11 +158,13 @@ class Select extends SQLBuilderHasConditions
     }
 
 
+
+
     /**
      * @param string $table
      * @param string $alias
      * @return $this
-     */
+    */
     public function from(string $table, string $alias = ''): static
     {
          $this->from[$table] = $alias ? "$table $alias" : $table;
@@ -176,11 +173,13 @@ class Select extends SQLBuilderHasConditions
     }
 
 
+
+
     /**
      * @param string $column
      * @param string $direction
      * @return $this
-     */
+    */
     public function orderBy(string $column, string $direction = 'asc'): static
     {
         $this->orderBy[] = sprintf('%s %s', $column, strtoupper($direction));
@@ -207,23 +206,33 @@ class Select extends SQLBuilderHasConditions
 
     /**
      * @param string $table
+     *
      * @param string $condition
+     *
      * @param string|null $type
+     *
      * @return $this
-     */
+    */
     public function join(string $table, string $condition, string $type = null): static
     {
-          if ($type && ! in_array($type, $this->joinTypes)) {
-              throw new \RuntimeException("Join table required types: ". join(", ", $this->joinTypes));
-          }
+         return $this->addJoin(sprintf('%s %s ON %s', $type ?: JoinType::JOIN, $table, $condition));
+    }
 
-          $type = $type ? "$type JOIN" : "JOIN";
 
-         $this->joins[] = sprintf('%s %s ON %s', $type, $table, $condition);
+
+
+
+    /**
+     * @param string $join
+     *
+     * @return $this
+    */
+    public function addJoin(string $join): static
+    {
+         $this->joins[] = $join;
 
          return $this;
     }
-
 
 
 
@@ -244,6 +253,9 @@ class Select extends SQLBuilderHasConditions
     }
 
 
+
+
+
     /**
      * @param string $table
      * @param string $condition
@@ -251,8 +263,11 @@ class Select extends SQLBuilderHasConditions
      */
     public function innerJoin(string $table, string $condition): static
     {
-        return $this->join($table, $condition, "INNER");
+        return $this->join($table, $condition, JoinType::INNER);
     }
+
+
+
 
 
     /**
@@ -262,7 +277,7 @@ class Select extends SQLBuilderHasConditions
      */
     public function leftJoin(string $table, string $condition): static
     {
-        return $this->join($table, $condition, "LEFT");
+        return $this->join($table, $condition, JoinType::LEFT);
     }
 
 
@@ -277,7 +292,7 @@ class Select extends SQLBuilderHasConditions
     */
     public function rightJoin(string $table, string $condition): static
     {
-        return $this->join($table, $condition, "RIGHT");
+        return $this->join($table, $condition, JoinType::RIGHT);
     }
 
 
@@ -291,7 +306,7 @@ class Select extends SQLBuilderHasConditions
     */
     public function fullJoin(string $table, string $condition): static
     {
-        return $this->join($table, $condition, "FULL");
+        return $this->join($table, $condition, JoinType::FULL);
     }
 
 

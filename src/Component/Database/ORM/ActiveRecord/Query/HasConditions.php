@@ -20,10 +20,7 @@ trait HasConditions
     */
     protected array $wheres = [
         'AND'  => [],
-        'OR'   => [],
-        'LIKE' => [],
-        'not'  => [],
-        'in'   => []
+        'OR'   => []
     ];
 
 
@@ -51,6 +48,7 @@ trait HasConditions
         'NOT',
         'AND'
     ];
+
 
 
 
@@ -160,24 +158,6 @@ trait HasConditions
 
 
     /**
-     * @param array $wheres
-     *
-     * @return $this
-    */
-    public function orWheres(array $wheres): static
-    {
-        foreach ($wheres as $orWheres) {
-             [$column, $value, $operator] = $orWheres;
-             static::instance()->orWhere($column, $value, $operator);
-        }
-
-        return static::instance();
-    }
-
-
-
-
-    /**
      * @param string $column
      *
      * @param $value
@@ -203,7 +183,7 @@ trait HasConditions
      * @param string $expression
      *
      * @return $this
-     */
+    */
     public function whereLike(string $column, string $expression): static
     {
         return $this->where($column, $expression, "LIKE");
@@ -221,7 +201,7 @@ trait HasConditions
      * @param array $wheres
      *
      * @return $this
-     */
+    */
     public function wheresLike(array $wheres): static
     {
         foreach ($wheres as $whereLike) {

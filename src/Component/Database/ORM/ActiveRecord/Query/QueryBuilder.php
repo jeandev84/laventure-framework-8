@@ -6,6 +6,7 @@ use Laventure\Component\Database\Builder\SQL\Commands\DML\Insert;
 use Laventure\Component\Database\Builder\SQL\Commands\DML\Update;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
+use Laventure\Component\Database\Connection\ConnectionInterface;
 
 
 /**
@@ -21,23 +22,87 @@ class QueryBuilder
 {
 
 
+    protected SqlQueryBuilder $builder;
+
+
+
     /**
-     * @param SqlQueryBuilder $builder
+     * @var string
+    */
+    protected string $table;
+
+
+
+    /**
+     * @var string
+    */
+    protected string $alias = '';
+
+
+
+    /**
+     * @var string
+    */
+    protected string $classname;
+
+
+
+
+    /**
+     * @var string
+    */
+    protected string $primaryKey;
+
+
+
+
+    /**
+     * @param ConnectionInterface $connection
      *
      * @param string $table
      *
-     * @param string $model
-     *
-     * @param string $alias
-     */
-    public function __construct(
-        protected SqlQueryBuilder $builder,
-        protected string $table,
-        protected string $model,
-        protected string $alias = ''
-    )
+     * @param string $classname
+    */
+    public function __construct(ConnectionInterface $connection, string $table, string $classname)
     {
+          $this->builder   = new SqlQueryBuilder($connection);
+          $this->table     = $table;
+          $this->classname = $classname;
     }
+
+
+
+
+
+    /**
+     * @param string $primaryKey
+     *
+     * @return $this
+    */
+    public function primaryKey(string $primaryKey): static
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param string $alias
+     *
+     * @return $this
+    */
+    public function alias(string $alias): static
+    {
+        $this->alias = $alias;
+
+        return $this;
+    }
+
 
 
 
@@ -46,14 +111,19 @@ class QueryBuilder
     /**
      * @param array|string|null $selects
      *
+     * @param array $criteria
+     *
      * @return Select
-     */
-    public function select(array|string $selects = null): Select
+    */
+    public function select(array|string $selects = null, array $criteria = []): Select
     {
-        return $this->builder->select($selects)
-                             ->map($this->model)
-                             ->from($this->table, $this->alias);
+         $qb = $this->builder->select($selects);
+         $qb->from($this->table, $this->alias);
+         $qb->map($this->classname);
+         $qb->criteria($criteria);
+         return $qb;
     }
+
 
 
 

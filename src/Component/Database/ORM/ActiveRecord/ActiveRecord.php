@@ -2,7 +2,13 @@
 namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Delete;
+use Laventure\Component\Database\Builder\SQL\Commands\DML\Update;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
+use Laventure\Component\Database\Builder\SQL\JoinType;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
+use Laventure\Component\Database\Connection\Query\QueryInterface;
+use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\Builder\SelectBuilder;
 use Laventure\Component\Database\ORM\ActiveRecord\Query\QueryBuilder;
@@ -21,8 +27,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @var string
      */
-    protected static $table = '';
-
+    protected string $table = '';
 
 
 
@@ -30,6 +35,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @var string
     */
+    protected string $alias = '';
+
+
+
+
+    /**
+     * @var string
+     */
     protected static string $primaryKey = 'id';
 
 
@@ -38,8 +51,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var string|null
-    */
-    protected static ?string $connection = null;
+     */
+    protected ?string $connection = null;
 
 
 
@@ -49,7 +62,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * ActiveRecord attributes
      *
      * @var array
-    */
+     */
     protected array $attributes = [];
 
 
@@ -57,7 +70,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var string[]
-    */
+     */
     private array $selected = [];
 
 
@@ -65,22 +78,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var bool
-    */
-    private bool $distinct = false;
+     */
+    private ?bool $distinct = false;
 
 
 
     /**
-     * @var array
+     * @var array[]
     */
-    private array $from = [];
+    private ?array $from = [];
 
 
 
 
     /**
      * @var string[]
-    */
+     */
     private array $orderBy = [];
 
 
@@ -90,6 +103,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @var string[]
     */
     private array $joins = [];
+
+
 
 
 
@@ -103,7 +118,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var string[]
-    */
+     */
     private array $having = [];
 
 
@@ -112,7 +127,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var int
-    */
+     */
     private int $offset = 0;
 
 
@@ -120,7 +135,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**s
      * @var int
-    */
+     */
     private int $limit = 0;
 
 
@@ -128,10 +143,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var array
-    */
+     */
     private array $wheres = [
         'AND'   => [],
-        'WHERE' => []
+        'OR' => []
     ];
 
 
@@ -139,7 +154,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var array
-    */
+     */
     protected array $parameters = [];
 
 
@@ -148,7 +163,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @var array|string[]
-    */
+     */
     private array $operators = [
         '=',
         '>',
@@ -159,14 +174,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
         'OR',
         'NOT',
         'AND'
-   ];
+    ];
 
 
 
 
     /**
      * @var static
-    */
+     */
     private static $instance;
 
 
@@ -176,25 +191,20 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * ActiveRecord constructor
-    */
+     */
     private function __construct() {}
 
 
 
 
-
-
-
-
     /**
-     * @param array|string|null $selects
+     * @param string|null $selects
      *
      * @return static
-     */
-    public static function select(array|string $selects = null): static
+    */
+    public static function select(string $selects = null): static
     {
-         dd(self::instance());
-         return self::instance()->addSelect($selects);
+        return self::model()->addSelect($selects);
     }
 
 
@@ -202,18 +212,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-
     /**
-     * @param string $table
-     *
-     * @param string $alias
+     * @param string|null $selects
      *
      * @return $this
-     */
-    public function from(string $table, string $alias = ''): static
+    */
+    public function addSelect(string $selects = null): static
     {
-        $model = self::instance();
-        $model->from[$table] = $alias;
+        $model = self::model();
+        $model->selected[] = $selects;
         return $model;
     }
 
@@ -223,14 +230,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @param array|string|null $selects
+     * @param bool $distinct
      *
      * @return $this
-    */
-    public function addSelect(array|string $selects = null): static
+     */
+    public function distinct(bool $distinct): static
     {
-        $model = self::instance();
-        $model->selected[] = array($selects) ? join(', ', $selects) : $selects;
+        $model = self::model();
+        $model->distinct = $distinct;
         return $model;
     }
 
@@ -243,12 +250,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @param string $condition
      *
+     * @param string|null $type
+     *
      * @return $this
-     */
-    public function join(string $table, string $condition): static
+    */
+    public function join(string $table, string $condition, string $type = null): static
     {
-        $model = self::instance();
-        $model->joins['JOIN'][$table] = $condition;
+        $model = self::model();
+        $model->joins[] = [$table, $condition, $type ?: JoinType::JOIN];
         return $model;
     }
 
@@ -267,9 +276,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function leftJoin(string $table, string $condition): static
     {
-        $model = self::instance();
-        $model->joins['LEFT'][$table] = $condition;
-        return $model;
+         return self::model()->join($table, $condition, JoinType::LEFT);
     }
 
 
@@ -285,10 +292,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function rightJoin(string $table, string $condition): static
     {
-        $model = self::instance();
-        $model->joins['RIGHT'][$table] = $condition;
-        return $model;
+        return self::model()->join($table, $condition, JoinType::RIGHT);
     }
+
+
+
 
 
 
@@ -300,12 +308,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $condition
      *
      * @return $this
-     */
+    */
     public function innerJoin(string $table, string $condition): static
     {
-        $model = self::instance();
-        $model->joins['INNER'][$table] = $condition;
-        return $model;
+        return self::model()->join($table, $condition, JoinType::INNER);
     }
 
 
@@ -319,12 +325,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $condition
      *
      * @return $this
-     */
+    */
     public function fullJoin(string $table, string $condition): static
     {
-        $model = self::instance();
-        $model->joins['FULL'][$table] = $condition;
-        return $model;
+        return self::model()->join($table, $condition, JoinType::FULL);
     }
 
 
@@ -341,8 +345,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function orderBy(string $column, string $direction = 'asc'): static
     {
-        $model = self::instance();
-        $model->orderBy[$column] = $direction;
+        $model = self::model();
+        $model->orderBy[] = "$column $direction";
         return $model;
     }
 
@@ -358,7 +362,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function groupBy(string $column): static
     {
-        $model = self::instance();
+        $model = self::model();
         $model->groupBy[] = $column;
         return $model;
     }
@@ -373,13 +377,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $condition
      *
      * @return $this
-     */
+    */
     public function having(string $condition): static
     {
-        $model = self::instance();
+        $model = self::model();
         $model->having[] = $condition;
         return $model;
     }
+
 
 
 
@@ -389,10 +394,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param int $limit
      *
      * @return $this
-     */
+    */
     public function limit(int $limit): static
     {
-        $model = self::instance();
+        $model = self::model();
         $model->limit = $limit;
         return $model;
     }
@@ -409,7 +414,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public function offset(int $offset): static
     {
-        $model = self::instance();
+        $model = self::model();
         $model->offset = $offset;
         return $model;
     }
@@ -426,10 +431,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param string $operator
      *
      * @return static
-     */
+    */
     public static function where(string $column, $value, string $operator = "="): static
     {
-        return static::instance()->andWhere($column, $value, $operator);
+        return static::model()->andWhere($column, $value, $operator);
     }
 
 
@@ -444,31 +449,12 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param array $data
      *
      * @return $this
-     */
+    */
     public function whereIn(string $column, array $data): static
     {
-        return static::instance()->where($column, $data, "IN :($column)");
+        return static::model()->where($column, $data, "IN :($column)");
     }
 
-
-
-
-
-
-    /**
-     * @param array $wheres
-     *
-     * @return $this
-     */
-    public function wheresIn(array $wheres): static
-    {
-        foreach ($wheres as $whereIn) {
-            [$column, $data] = $whereIn;
-            return static::instance()->whereIn($column, $data);
-        }
-
-        return $this;
-    }
 
 
 
@@ -487,29 +473,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function orWhere(string $column, $value, string $operator = "="): static
     {
-        return static::instance()->addCondition("OR", $column, $value, $operator);
+        return static::model()->criteria("OR", $column, $value, $operator);
     }
 
 
-
-
-
-
-
-    /**
-     * @param array $wheres
-     *
-     * @return $this
-     */
-    public function orWheres(array $wheres): static
-    {
-        foreach ($wheres as $orWheres) {
-            [$column, $value, $operator] = $orWheres;
-            static::instance()->orWhere($column, $value, $operator);
-        }
-
-        return static::instance();
-    }
 
 
 
@@ -525,7 +492,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function andWhere(string $column, $value, string $operator = '='): static
     {
-        return $this->addCondition("AND", $column, $value, $operator);
+        return $this->criteria("AND", $column, $value, $operator);
     }
 
 
@@ -552,32 +519,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-
-
-    /**
-     * @param array $wheres
-     *
-     * @return $this
-     */
-    public function wheresLike(array $wheres): static
-    {
-        foreach ($wheres as $whereLike) {
-            [$column, $expression] = $whereLike;
-            $this->whereLike($column, $expression);
-        }
-
-        return $this;
-    }
-
-
-
-
-
     /**
      * @param string $operator
      *
      * @return bool
-     */
+    */
     private function hasOperator(string $operator): bool
     {
         return in_array($operator, $this->operators);
@@ -588,46 +534,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-
-    /**
-     * @param string $operand
-     *
-     * @param string $column
-     *
-     * @param $value
-     *
-     * @param string $operator
-     *
-     * @return $this
-    */
-    private function addCondition(string $operand, string $column, $value, string $operator = "="): static
-    {
-        $instance = self::instance();
-
-        $condition = "$column $operator :$column";
-
-        if (! $instance->hasOperator($operator)) {
-            $condition = "$column $operator";
-        }
-
-        $instance->wheres[$operand][$column] = $condition;
-
-        $instance->parameters[$column] = $value;
-
-        return $instance;
-    }
-
-
-
-
-
-
-
     /**
      * @param int $id
      *
      * @return mixed
-    */
+     */
     public static function find(int $id): mixed
     {
         return static::select()->where(self::getPrimaryKey(), $id)->one();
@@ -660,7 +571,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public static function create(array $attributes): int|bool
     {
-        return self::query()->create($attributes)->execute();
+        return self::model()->createQueryBuilder()
+                            ->create($attributes)
+                            ->execute();
     }
 
 
@@ -675,13 +588,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function update(array $attributes): bool|int
     {
-        $qb = self::query()->update($attributes, [
-            self::getPrimaryKey() => $this->getId()
-        ]);
+        $qb = self::model()->createQueryBuilder()
+                           ->update($attributes, [self::getPrimaryKey() => $this->getId()]);
 
-        $qb = $qb->wheres($this->getWheres())
-                 ->wheresIn($this->getWheresIn())
-                 ->wheresLike($this->getWheresLike());
+        $qb =$this->addConditions($qb);
 
         return $qb->execute();
     }
@@ -694,11 +604,10 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @return array
-    */
+     */
     public function get(): array
     {
-        dd(self::instance());
-        //return $this->selectQuery()->get();
+         return $this->selectQuery()->all();
     }
 
 
@@ -710,10 +619,73 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @return mixed
-     */
+    */
     public function one(): mixed
     {
-//        return $this->selectQuery()->one();
+         return $this->selectQuery()
+                     ->one();
+    }
+
+
+
+
+
+    /**
+     * @return QueryResultInterface
+    */
+    private function selectQuery(): QueryResultInterface
+    {
+        $qb = $this->createQueryBuilder()
+                   ->select(join(', ', self::model()->selected))
+                   ->from($this->getTable(), $this->getTableAlias())
+                   ->distinct($this->distinct)
+                   ->map($this->getClassName());
+
+        $qb = $this->addConditions($qb);
+        $qb = $this->addJoins($qb);
+
+        return $qb->setParameters($this->parameters)
+                  ->fetch();
+    }
+
+
+    /**
+     * @param Select|Update|Delete $qb
+     *
+     * @param array $defaults
+     *
+     * @return Select|Update|Delete
+    */
+    private function addConditions(Select|Update|Delete $qb): Select|Update|Delete
+    {
+        $model = self::model();
+
+        if ($model->hasConditions()) {
+            foreach (self::model()->wheres['AND'] as $condition) {
+                $qb->andWhere($condition);
+            }
+            foreach (self::model()->wheres['OR'] as $condition) {
+                $qb->orWhere($condition);
+            }
+        } else {
+           $qb->criteria([$model]);
+        }
+
+        return $qb;
+    }
+
+
+
+
+
+    /**
+     * @return bool
+    */
+    private function hasConditions(): bool
+    {
+        $model = self::model();
+
+        return $model->wheres['AND'] || $model->wheres['OR'];
     }
 
 
@@ -723,17 +695,19 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @return SelectBuilder
-     */
-    private function selectQuery(): SelectBuilder
+     * @param Select $qb
+     *
+     * @return Select
+    */
+    private function addJoins(Select $qb): Select
     {
-//        $qb = self::select();
-//        return $qb->wheres($this->getWheres())
-//            ->wheresIn($this->getWheresIn())
-//            ->wheresLike($this->getWheresLike());
+         foreach (self::model()->joins as $joined) {
+             [$table, $condition, $type] = $joined;
+             $qb->join($table, $condition, $type);
+         }
+
+         return $qb;
     }
-
-
 
 
 
@@ -748,7 +722,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     public function save(): int
     {
-        if (! $attributes = $this->mapAttributes()) {
+        if (! $attributes = $this->mapAttributesToSave()) {
             throw new \RuntimeException("No attributes mapped for saving in : ". self::getClassName());
         }
 
@@ -769,15 +743,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @inheritDoc
-     */
+    */
     public function delete(): bool
     {
-        $qb = self::query()->delete([self::getPrimaryKey() => $this->getId()]);
+        $qb = self::model()->createQueryBuilder()
+                           ->delete([self::getPrimaryKey() => $this->getId()]);
 
-//        return $qb->wheres($this->getWheres())
-//            ->wheresIn($this->getWheresIn())
-//            ->wheresLike($this->getWheresLike())
-//            ->execute();
+        $qb = $this->addConditions($qb);
+
+        return $qb->execute();
     }
 
 
@@ -791,7 +765,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return Manager
      */
-    protected static function getDB(): Manager
+    protected function getManager(): Manager
     {
         if(! $database = Manager::instance()) {
             throw new \RuntimeException("No connection to database detected in : ". self::getClassName());
@@ -807,13 +781,14 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @return QueryBuilder
-     */
-    private static function query(): QueryBuilder
+    */
+    private function createQueryBuilder(): QueryBuilder
     {
-        $manager   = self::getDB();
-        $builder   = new SqlQueryBuilder($manager->pdoConnection(self::$connection));
-        return new QueryBuilder($builder, static::getTableName(), self::getClassName(), self::getTableAlias());
+        $manager    = $this->getManager();
+        $connection = $manager->pdoConnection($this->connection);
+        return new QueryBuilder($connection, $this->getTable());
     }
+
 
 
 
@@ -828,9 +803,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
      */
     protected function getColumnsFromTable(): array
     {
-        return $this->getDB()
-            ->schema(self::$connection)
-            ->getColumns(self::getTableName());
+        return $this->getManager()
+                   ->schema($this->connection)
+                   ->getColumns(self::getTable());
     }
 
 
@@ -1034,9 +1009,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return string
      */
-    private static function getTableAlias(): string
+    private function getTableAlias(): string
     {
-        return mb_substr(static::getTableName(), 0, 1, "UTF-8");
+        return mb_substr($this->getTable(), 0, 1, "UTF-8");
     }
 
 
@@ -1048,7 +1023,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * Returns class name
      *
      * @return string
-     */
+    */
     private static function getClassName(): string
     {
         return get_called_class();
@@ -1061,8 +1036,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @return string
-     */
-    protected static function getPrimaryKey(): string
+    */
+    protected function getPrimaryKey(): string
     {
         if (! self::$primaryKey) {
             throw new \RuntimeException("Could not find primary key in : ". self::getClassName());
@@ -1078,49 +1053,13 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return string
     */
-    protected static function getTableName(): string
+    protected function getTable(): string
     {
-        if (! static::$table) {
+        if (!$this->table) {
             throw new \RuntimeException("Could not detected model ". self::getClassName() . " table name.");
         }
 
-        return static::$table;
-    }
-
-
-
-
-
-    /**
-     * @return array
-     */
-    private function getWheres(): array
-    {
-        return array_values(self::instance()->wheres['AND']);
-    }
-
-
-
-
-
-    /**
-     * @return array
-    */
-    private function getWheresIn(): array
-    {
-        return array_values(self::instance()->wheres['IN']);
-    }
-
-
-
-
-
-    /**
-     * @return array
-    */
-    private function getWheresLike(): array
-    {
-        return array_values(self::instance()->wheres['LIKE']);
+        return $this->table;
     }
 
 
@@ -1130,8 +1069,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
     /**
      * @return static
-    */
-    protected static function instance(): static
+     */
+    private static function model(): static
     {
         if (! static::$instance) {
             static::$instance = new static();
@@ -1144,11 +1083,43 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+    /**
+     * @param string $operand
+     *
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return $this
+    */
+    private function criteria(string $operand, string $column, $value, string $operator = "="): static
+    {
+        $instance = self::model();
+
+        $condition = "$column $operator :$column";
+
+        if (! $instance->hasOperator($operator)) {
+            $condition = "$column $operator";
+        }
+
+        $instance->wheres[$operand][] = $condition;
+
+        $instance->parameters[$column] = $value;
+
+        return $instance;
+    }
+
+
+
+
+
 
     /**
      * Map attributes to save
      *
      * @return array
      */
-    abstract protected function mapAttributes(): array;
+    abstract protected function mapAttributesToSave(): array;
 }
