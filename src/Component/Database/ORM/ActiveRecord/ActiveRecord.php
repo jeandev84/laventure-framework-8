@@ -87,12 +87,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         $manager = $this->getManager();
         $connection = $manager->pdoConnection($this->connection);
-        return new Query(
-            $connection,
-            $this->getTable(),
-            $this->getClassName(),
-            $this->getTableAlias()
-        );
+        return new Query($connection, $this->getTable(), $this->getClassName(), $this->getTableAlias());
     }
 
 
