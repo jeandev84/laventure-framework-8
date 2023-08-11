@@ -132,11 +132,11 @@ class Query
 
 
     /**
-     * @param array|string|null $selects
+     * @param array|string $selects
      *
      * @return $this
     */
-    public function select(array|string $selects = null): static
+    public function select(array|string $selects = ''): static
     {
          $selects = is_array($selects) ? join(', ', $selects) : $selects;
 

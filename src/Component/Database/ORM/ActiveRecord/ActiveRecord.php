@@ -101,11 +101,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @param string|array|null $selects
+     * @param string|array $selects
      *
      * @return Query
     */
-    public static function select(string|array $selects = null): Query
+    public static function select(string|array $selects = ''): Query
     {
          return self::model()->query()->select($selects);
     }
