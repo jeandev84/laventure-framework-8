@@ -101,6 +101,43 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+    /**
+     * @param string|array|null $selects
+     *
+     * @return Query
+    */
+    public static function select(string|array $selects = null): Query
+    {
+         return self::model()->query()->select($selects);
+    }
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return Query
+    */
+    public static function where(string $column, $value, string $operator): Query
+    {
+        return self::model()->query()->where($column, $value, $operator);
+    }
+
+
+
+    public function update(array $attributes): int
+    {
+
+    }
+
+
+
 
 
 
