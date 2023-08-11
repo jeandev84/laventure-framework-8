@@ -9,13 +9,13 @@ use Laventure\Component\Database\ORM\Persistence\EntityManager;
 use Laventure\Component\Database\ORM\Persistence\Manager\EntityManagerInterface;
 
 /**
- * @QueryBuilder
+ * @Query
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\Persistence\QueryBuilder
+ * @package Laventure\Component\Database\ORM\Persistence\Query
 */
 class QueryBuilder extends Builder
 {

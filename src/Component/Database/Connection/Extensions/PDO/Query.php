@@ -12,7 +12,7 @@ use PDOStatement;
 
 
 /**
- * @QueryBuilder
+ * @Query
  *
  * @author Jean-Claude <jeanyao@ymail.com>
  *
