@@ -39,7 +39,7 @@ class PaginatedQuery implements PaginatedQueryInterface
        /**
         * @inheritdoc
        */
-       public function paginate(int $page, int $limit): array
+       public function paginate(int $page, int $limit = 5): array
        {
              $offset = $limit * abs($page - 1);
 
