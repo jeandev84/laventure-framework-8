@@ -91,7 +91,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
             $connection,
             $this->getTable(),
             $this->getClassName(),
-            $this->primaryKey()
+            $this->getTableAlias()
         );
     }
 
@@ -475,6 +475,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+
+
     /**
      * @return Manager
      */
@@ -503,6 +505,17 @@ abstract class ActiveRecord implements ActiveRecordInterface
         return $this->table;
     }
 
+
+
+
+
+    /**
+     * @return string
+    */
+    protected function getTableAlias(): string
+    {
+        return $this->alias ?: mb_substr(static::getTable(), 0, 1, "UTF-8");
+    }
 
 
 
