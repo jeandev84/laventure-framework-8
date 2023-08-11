@@ -4,6 +4,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\JoinType;
+use Laventure\Component\Database\Builder\SQL\Commands\Expr\Expr;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 
@@ -47,6 +48,13 @@ class Query
 
 
 
+    /**
+     * @var string
+    */
+    protected string $primaryKey;
+
+
+
 
     /**
      * @var array
@@ -63,6 +71,7 @@ class Query
      * @var array
     */
     protected array $parameters = [];
+
 
 
 
@@ -94,6 +103,13 @@ class Query
 
 
 
+    /**
+     * @var Expr
+    */
+    protected Expr $expr;
+
+
+
 
     /**
      * @param ConnectionInterface $connection
@@ -114,6 +130,7 @@ class Query
           $this->builder    = new SqlQueryBuilder($connection);
           $this->table      = $table;
           $this->alias      = $alias;
+          $this->expr       = new Expr();
           $this->selects    = $this->builder->select();
           $this->selects->from($table, $alias);
           $this->selects->map($classname);

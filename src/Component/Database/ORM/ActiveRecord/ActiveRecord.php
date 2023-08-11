@@ -158,10 +158,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function find(int $id): mixed
     {
-        $model = self::model();
-
-        return self::select()->where($model->primaryKey(), $id)->one();
+        return self::model()->getById($id);
     }
+
 
 
 
@@ -534,6 +533,20 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         return $this->getAttribute(self::primaryKey(), 0);
     }
+
+
+
+
+    /**
+     * @param int $id
+     *
+     * @return mixed
+    */
+    private function getById(int $id): mixed
+    {
+        return self::select()->where($this->primaryKey(), $id)->one();
+    }
+
 
 
     /**
