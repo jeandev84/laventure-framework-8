@@ -186,7 +186,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     public static function paginate(int $page, int $limit): array
     {
-         return self::model()->query()->select("COUNT(*)")->paginate($page, $limit);
+         return self::model()->query()->select()->paginate($page, $limit);
     }
 
 
