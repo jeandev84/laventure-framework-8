@@ -3,7 +3,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
-use Laventure\Component\Database\Builder\SQL\JoinType;
+use Laventure\Component\Database\Builder\SQL\Commands\DQL\JoinType;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 
@@ -44,13 +44,6 @@ class Query
     */
     protected string $classname;
 
-
-
-
-    /**
-     * @var string
-    */
-    protected string $primaryKey;
 
 
 

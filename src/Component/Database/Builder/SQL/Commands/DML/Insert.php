@@ -1,14 +1,14 @@
 <?php
 namespace Laventure\Component\Database\Builder\SQL\Commands\DML;
 
-use Laventure\Component\Database\Builder\SQL\Commands\ExecutableSQlCommand;
+use Laventure\Component\Database\Builder\SQL\Commands\HasExecutableCommand;
 use Laventure\Component\Database\Builder\SQL\Commands\SQlBuilder;
 
 
 /**
  * @inheritdoc
 */
-class Insert extends SQlBuilder implements ExecutableSQlCommand
+class Insert extends SQlBuilder implements HasExecutableCommand
 {
 
 

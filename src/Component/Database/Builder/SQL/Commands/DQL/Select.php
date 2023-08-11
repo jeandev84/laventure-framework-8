@@ -5,7 +5,6 @@ namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\NullObjectPersistence;
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Persistence\ObjectPersistenceInterface;
 use Laventure\Component\Database\Builder\SQL\Commands\SQLBuilderHasConditions;
-use Laventure\Component\Database\Builder\SQL\JoinType;
 use Laventure\Component\Database\Connection\ConnectionInterface;
 use Laventure\Component\Database\Connection\Query\QueryResultInterface;
 

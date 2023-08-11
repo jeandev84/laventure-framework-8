@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Database\Builder\SQL;
+namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 class JoinType
 {
