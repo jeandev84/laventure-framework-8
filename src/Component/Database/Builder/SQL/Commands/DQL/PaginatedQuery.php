@@ -1,9 +1,8 @@
 <?php
-namespace Laventure\Component\Database\Builder;
+namespace Laventure\Component\Database\Builder\SQL\Commands\DQL;
 
 
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Contract\PaginatedQueryInterface;
-use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 
 
 /**

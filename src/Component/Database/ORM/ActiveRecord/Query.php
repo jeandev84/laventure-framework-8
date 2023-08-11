@@ -563,13 +563,13 @@ class Query
     */
     public function one(): mixed
     {
-         $this->selects
-              ->andWheres($this->andWheres())
-              ->orWheres($this->orWheres())
-              ->limit(1)
-              ->setParameters($this->parameters);
-
-         return $this->selects->fetch()->one();
+         return $this->selects
+                     ->andWheres($this->andWheres())
+                     ->orWheres($this->orWheres())
+                     ->setParameters($this->parameters)
+                     ->limit(1)
+                     ->fetch()
+                     ->one();
     }
 
 
@@ -589,10 +589,25 @@ class Query
 
 
 
-    public function paginate()
-    {
 
+    /**
+     * @param int $page
+     *
+     * @param int $limit
+     *
+     * @return array
+    */
+    public function paginate(int $page, int $limit): array
+    {
+         return $this->selects
+                     ->andWheres($this->andWheres())
+                     ->orWheres($this->orWheres())
+                     ->setParameters($this->parameters)
+                     ->getPaginatedQuery()
+                     ->paginate($page, $limit);
     }
+
+
 
 
 
