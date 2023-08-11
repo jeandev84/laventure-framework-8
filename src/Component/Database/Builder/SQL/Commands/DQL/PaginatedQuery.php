@@ -45,7 +45,7 @@ class PaginatedQuery implements PaginatedQueryInterface
 
              return $this->select->offset($offset)
                                  ->limit($limit)
-                                 ->getQuery()
-                                 ->getResult();
+                                 ->fetch()
+                                 ->all();
        }
 }
