@@ -2,7 +2,6 @@
 namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
-use Laventure\Component\Database\Builder\PaginatedQuery;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 
@@ -173,6 +172,11 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     }
 
 
+
+
+
+
+
     /**
      * @param int $page
      *
@@ -184,6 +188,25 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     {
 
     }
+
+
+
+
+
+
+    /**
+     * @param array $data
+     *
+     * @return Collection
+    */
+    public static function collection(array $data): Collection
+    {
+        return new Collection($data);
+    }
+
+
+
+
 
 
 
@@ -228,6 +251,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
                             ->where($this->primaryKey(), $this->getId())
                             ->delete();
     }
+
 
 
 
