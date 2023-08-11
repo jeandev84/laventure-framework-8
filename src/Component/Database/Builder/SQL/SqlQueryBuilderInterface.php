@@ -62,11 +62,9 @@ interface SqlQueryBuilderInterface
       *
       * @param array $attributes
       *
-      * @param array $criteria
-      *
       * @return Update
      */
-     public function update(string $table, array $attributes, array $criteria): Update;
+     public function update(string $table, array $attributes): Update;
 
 
 
@@ -81,9 +79,8 @@ interface SqlQueryBuilderInterface
      /**
       * @param string $table
       *
-      * @param array $criteria
       *
       * @return Delete
      */
-     public function delete(string $table, array $criteria): Delete;
+     public function delete(string $table): Delete;
 }

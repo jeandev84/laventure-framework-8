@@ -1,9 +1,7 @@
 <?php
-namespace Laventure\Component\Database\ORM\ActiveRecord\Query;
+namespace Laventure\Component\Database\ORM\ActiveRecord;
 
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Delete;
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Insert;
-use Laventure\Component\Database\Builder\SQL\Commands\DML\Update;
+
 use Laventure\Component\Database\Builder\SQL\Commands\DQL\Select;
 use Laventure\Component\Database\Builder\SQL\JoinType;
 use Laventure\Component\Database\Builder\SQL\SqlQueryBuilder;
@@ -17,7 +15,7 @@ use Laventure\Component\Database\Connection\ConnectionInterface;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Database\ORM\ActiveRecord\Query
+ * @package Laventure\Component\Database\ORM\ActiveRecord
  */
 class Query
 {
@@ -57,10 +55,6 @@ class Query
 
 
 
-
-
-
-
     /**
      * @var array
     */
@@ -69,6 +63,13 @@ class Query
         'OR'  => []
     ];
 
+
+
+
+    /**
+     * @var array
+    */
+    protected array $parameters = [];
 
 
 
@@ -109,20 +110,16 @@ class Query
      * @param string $classname
      *
      * @param string $alias
-     *
-     * @param string $primaryKey
     */
     public function __construct(
         ConnectionInterface $connection,
         string $table,
         string $classname,
         string $alias = '',
-        string $primaryKey = ''
     )
     {
           $this->builder    = new SqlQueryBuilder($connection);
           $this->table      = $table;
-          $this->primaryKey = $primaryKey;
           $this->alias      = $alias;
           $this->selects    = $this->builder->select();
           $this->selects->from($table, $alias);
@@ -393,13 +390,11 @@ class Query
      *
      * @param string $operator
      *
-     * @return $this
+     * @return static
     */
     public function where(string $column, $value, string $operator = "="): static
     {
-          $this->wheres['AND'][] = "";
-
-          return $this;
+         return $this->andWhere($column, $value, $operator);
     }
 
 
@@ -409,6 +404,84 @@ class Query
 
 
     /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return $this
+    */
+    public function andWhere(string $column, $value, string $operator = "="): static
+    {
+          return $this->criteria("AND", $column, $value, $operator);
+    }
+
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return $this
+    */
+    public function orWhere(string $column, $value, string $operator = "="): static
+    {
+        return $this->criteria("OR", $column, $value, $operator);
+    }
+
+
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param string $expression
+     *
+     * @return $this
+    */
+    public function whereLike(string $column, string $expression): static
+    {
+         return $this->where($column, $expression, "LIKE :$column");
+    }
+
+
+
+
+
+
+
+
+    /**
+     * @param string $column
+     *
+     * @param array $data
+     *
+     * @return $this
+    */
+    public function whereIn(string $column, array $data): static
+    {
+         return $this->where($column, $data, "IN :($column)");
+    }
+
+
+
+
+
+
+
+    /**
+     * Returns last inserted id
+     *
      * @param array $attributes
      *
      * @return int
@@ -432,9 +505,13 @@ class Query
     */
     public function update(array $attributes): int
     {
-        return $this->builder->update($this->table, $attributes, [])
+        return $this->builder->update($this->table, $attributes)
+                             ->andWheres($this->andWheres())
+                             ->orWheres($this->orWheres())
+                             ->setParameters($this->parameters)
                              ->execute();
     }
+
 
 
 
@@ -447,7 +524,10 @@ class Query
     */
     public function delete(): bool
     {
-        return $this->builder->delete($this->table, [])
+        return $this->builder->delete($this->table)
+                             ->andWheres($this->andWheres())
+                             ->orWheres($this->orWheres())
+                             ->setParameters($this->parameters)
                              ->execute();
     }
 
@@ -460,7 +540,12 @@ class Query
     */
     public function get(): array
     {
-         return $this->selects->fetch()->all();
+         return $this->selects
+                     ->andWheres($this->andWheres())
+                     ->orWheres($this->orWheres())
+                     ->setParameters($this->parameters)
+                     ->fetch()
+                     ->all();
     }
 
 
@@ -473,8 +558,78 @@ class Query
     */
     public function one(): mixed
     {
-         $this->selects->limit(1);
+         $this->selects
+              ->andWheres($this->andWheres())
+              ->orWheres($this->orWheres())
+              ->limit(1)
+              ->setParameters($this->parameters);
 
          return $this->selects->fetch()->one();
+    }
+
+
+
+
+    /**
+     * @param string $operand
+     *
+     * @param string $column
+     *
+     * @param $value
+     *
+     * @param string $operator
+     *
+     * @return $this
+    */
+    private function criteria(string $operand, string $column, $value, string $operator): static
+    {
+          $condition = "$column $operator :$column";
+
+          if (! in_array($operator, $this->operators)) {
+                $condition = "$column $operator";
+          }
+
+          $this->wheres[$operand][] = $condition;
+
+          $this->parameters[$column] = $value;
+
+          return $this;
+    }
+
+
+
+
+
+    /**
+     * @return array|array[]
+    */
+    private function wheres(): array
+    {
+        return $this->wheres;
+    }
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    private function andWheres(): array
+    {
+         return $this->wheres['AND'];
+    }
+
+
+
+
+
+    /**
+     * @return array
+    */
+    private function orWheres(): array
+    {
+        return $this->wheres['OR'];
     }
 }

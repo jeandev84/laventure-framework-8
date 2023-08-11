@@ -37,16 +37,21 @@ abstract class SQLBuilderHasConditions extends SQlBuilder implements HasCriteria
              if ($this->hasPdoConnection()) {
                  if (is_array($value)) {
                       $this->where($this->expr()->in($column, "(:$column)"));
+                      $this->setParameter($column, $value);
                  } else {
                      $this->where("$column = :$column");
+                     $this->setParameter($column, $value);
                  }
              } else {
                  $this->where("$column = '$value'");
              }
          }
 
-         return $this->setParameters($wheres);
+         return $this;
      }
+
+
+
 
 
 
@@ -85,6 +90,39 @@ abstract class SQLBuilderHasConditions extends SQlBuilder implements HasCriteria
 
 
 
+
+    /**
+     * @param array $conditions
+     *
+     * @return $this
+    */
+    public function andWheres(array $conditions): static
+    {
+         foreach ($conditions as $condition) {
+             $this->andWhere($condition);
+         }
+
+         return $this;
+    }
+
+
+
+
+
+
+    /**
+     * @param array $conditions
+     *
+     * @return $this
+    */
+    public function orWheres(array $conditions): static
+    {
+         foreach ($conditions as $condition) {
+              $this->orWhere($condition);
+         }
+
+         return $this;
+    }
 
     /**
      * @param string $condition

@@ -3,7 +3,6 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
 use Laventure\Component\Database\Manager;
-use Laventure\Component\Database\ORM\ActiveRecord\Query\Query;
 use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 
 
@@ -133,6 +132,25 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+
+    /**
+     * @param string $column
+     *
+     * @param string $direction
+     *
+     * @return Query
+    */
+    public static function orderBy(string $column, string $direction): Query
+    {
+         return self::select()->orderBy($column, $direction);
+    }
+
+
+
+
+
+
+
     /**
      * @param int $id
      *
@@ -142,9 +160,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         $model = self::model();
 
-        return self::select()
-                    ->where($model->primaryKey(), $id)
-                    ->one();
+        return self::select()->where($model->primaryKey(), $id)->one();
     }
 
 
@@ -158,8 +174,11 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function all(): array
     {
-
+        return self::select()->get();
     }
+
+
+
 
 
 
@@ -170,7 +189,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     */
     public static function create(array $attributes): int
     {
-          return self::model()->query()->create($attributes);
+        return self::model()->query()->create($attributes);
     }
 
 
@@ -190,6 +209,45 @@ abstract class ActiveRecord implements ActiveRecordInterface
                              ->update($attributes);
     }
 
+
+
+
+
+    /**
+     * @return bool
+    */
+    public function delete(): bool
+    {
+        return self::model()->query()
+                            ->where($this->primaryKey(), $this->getId())
+                            ->delete();
+    }
+
+
+
+
+
+
+
+    /**
+     * Save data
+     *
+     * @return int
+    */
+    public function save(): int
+    {
+        if (! $attributes = $this->mapAttributesToSave()) {
+            throw new \RuntimeException("No attributes mapped for saving in : ". self::getClassName());
+        }
+
+        if ($id = $this->getId()) {
+            $this->update($attributes);
+        } else {
+            $id = static::create($attributes);
+        }
+
+        return $id;
+    }
 
 
 
@@ -445,6 +503,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
         return $this->table;
     }
+
+
+
 
 
 

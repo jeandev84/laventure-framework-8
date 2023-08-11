@@ -113,7 +113,9 @@ class Builder
     */
     public function update(string $table, array $attributes, array $criteria): int
     {
-         return $this->builder->update($table, $attributes, $criteria)->execute();
+         return $this->builder->update($table, $attributes)
+                              ->criteria($criteria)
+                              ->execute();
     }
 
 
@@ -133,6 +135,8 @@ class Builder
     */
     public function delete(string $table, array $criteria): bool
     {
-         return $this->builder->delete($table, $criteria)->execute();
+         return $this->builder->delete($table)
+                              ->criteria($criteria)
+                              ->execute();
     }
 }
