@@ -231,7 +231,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     public function save(): int
     {
         if (! $attributes = $this->mapAttributesToSave()) {
-            throw new \RuntimeException("No attributes mapped for saving in : ". self::getClassName());
+            throw new \RuntimeException("No attributes mapped for saving in : ". $this->getClassName());
         }
 
         if ($id = $this->getId()) {
