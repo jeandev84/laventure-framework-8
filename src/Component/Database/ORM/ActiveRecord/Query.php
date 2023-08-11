@@ -48,13 +48,6 @@ class Query
 
 
 
-    /**
-     * @var string
-    */
-    protected string $primaryKey;
-
-
-
 
     /**
      * @var array
