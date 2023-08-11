@@ -545,7 +545,7 @@ class Query
     */
     public function get(): array
     {
-         return $this->selectQuery()
+         return $this->selectQueryBuilder()
                      ->fetch()
                      ->all();
     }
@@ -560,7 +560,7 @@ class Query
     */
     public function one(): mixed
     {
-         return $this->selectQuery()
+         return $this->selectQueryBuilder()
                      ->limit(1)
                      ->fetch()
                      ->one();
@@ -593,7 +593,7 @@ class Query
     */
     public function paginate(int $page, int $limit): array
     {
-         return $this->selectQuery()
+         return $this->selectQueryBuilder()
                      ->getPaginatedQuery()
                      ->paginate($page, $limit);
     }
@@ -607,7 +607,7 @@ class Query
     /**
      * @return Select
     */
-    private function selectQuery(): Select
+    private function selectQueryBuilder(): Select
     {
         return $this->selects->andWheres($this->andWheres())
                            ->orWheres($this->orWheres())
