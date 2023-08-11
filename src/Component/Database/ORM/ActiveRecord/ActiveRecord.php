@@ -186,7 +186,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     public static function paginate(int $page, int $limit): array
     {
-         return self::model()->query()->select()->paginate($page, $limit);
+         return self::select()->paginate($page, $limit);
     }
 
 
@@ -245,9 +245,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     public function delete(): bool
     {
-        return self::model()->query()
-                            ->where($this->primaryKey(), $this->getId())
-                            ->delete();
+        return self::where($this->primaryKey(), $this->getId())->delete();
     }
 
 
