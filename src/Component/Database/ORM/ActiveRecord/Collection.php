@@ -14,11 +14,11 @@ class Collection
 
 
       /**
-       * @param array $items
+       * @param object[] $items
       */
       public function __construct(array $items)
       {
-          $this->items = $items;
+           $this->items = $items;
       }
 
 
@@ -37,12 +37,23 @@ class Collection
 
 
 
-
       /**
        * @return array
       */
       public function toArray(): array
       {
-           return $this->items;
+           return json_decode($this->toJson(), true);
       }
+
+
+
+
+
+     /**
+      * @return array
+     */
+     public function getItems(): array
+     {
+        return $this->items;
+     }
 }

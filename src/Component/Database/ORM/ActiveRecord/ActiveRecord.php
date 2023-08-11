@@ -60,6 +60,22 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 
 
     /**
+     * @var array
+    */
+    protected array $hidden = [];
+
+
+
+
+    /**
+     * @var array
+    */
+    protected static array $collected = [];
+
+
+
+
+    /**
      * @var static
     */
     protected static $instance;
@@ -201,7 +217,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     public static function collection(array $data): Collection
     {
-        return new Collection($data);
+         return new Collection($data);
     }
 
 
@@ -414,7 +430,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 
     /**
      * @inheritDoc
-     */
+    */
     public function offsetExists($offset)
     {
         return $this->hasAttribute($offset);
@@ -596,9 +612,37 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     public function jsonSerialize(): mixed
     {
-        return $this->getAttributes();
+        return $this->getSerializable();
     }
 
+
+
+
+
+    /**
+     * @return array
+    */
+    private function getSerializable(): array
+    {
+         foreach ($this->hidden as $column) {
+              if ($this->hasAttribute($column)) {
+                  $this->removeAttribute($column);
+              }
+         }
+
+         return $this->attributes;
+    }
+
+
+
+
+    /**
+     * @return bool
+    */
+    protected function convertSerializableUnderscore(): bool
+    {
+          return true;
+    }
 
 
 
