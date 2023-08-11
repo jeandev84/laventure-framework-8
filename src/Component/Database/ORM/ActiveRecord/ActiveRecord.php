@@ -2,6 +2,7 @@
 namespace Laventure\Component\Database\ORM\ActiveRecord;
 
 
+use Laventure\Component\Database\Builder\PaginatedQuery;
 use Laventure\Component\Database\Manager;
 use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 
@@ -9,7 +10,7 @@ use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 /**
  * @inheritdoc
 */
-abstract class ActiveRecord implements ActiveRecordInterface
+abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 {
 
     use CamelConvertor;
@@ -173,20 +174,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
     /**
-     * @param int $offset
+     * @param int $page
      *
-     * @param int $perPage
+     * @param int $limit
      *
      * @return array
     */
-    public static function paginate(int $offset, int $perPage): array
+    public static function paginate(int $page, int $limit): array
     {
-         /*
-         return self::select()
-                      ->offset()
-                      ->limit()
-                      ->get();
-         */
+
     }
 
 
@@ -570,6 +566,21 @@ abstract class ActiveRecord implements ActiveRecordInterface
     {
         return self::select()->where($this->primaryKey(), $id)->one();
     }
+
+
+
+
+
+    /**
+     * @inheritDoc
+    */
+    public function jsonSerialize(): mixed
+    {
+        return $this->getAttributes();
+    }
+
+
+
 
 
 

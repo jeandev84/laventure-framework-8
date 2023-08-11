@@ -103,6 +103,15 @@ class Select extends SQLBuilderHasConditions
 
 
     /**
+     * @var QueryResultInterface
+    */
+    protected QueryResultInterface $fetch;
+
+
+
+
+
+    /**
      * @param ConnectionInterface $connection
      *
      * @param string|null $selects
@@ -113,6 +122,7 @@ class Select extends SQLBuilderHasConditions
          $this->persistence = new NullObjectPersistence();
          $this->addSelect($selects ?: "*");
     }
+
 
 
 

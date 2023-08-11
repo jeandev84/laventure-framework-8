@@ -573,21 +573,6 @@ class Query
     }
 
 
-    /**
-     * @param int $offset
-     *
-     * @param int $limit
-     *
-     * @return array
-    */
-    public function paginate(int $offset, int $limit): array
-    {
-          return $this->offset($offset)
-                      ->limit($limit)
-                      ->get();
-    }
-
-
 
 
 
@@ -603,6 +588,11 @@ class Query
 
 
 
+
+    public function paginate()
+    {
+
+    }
 
 
 
