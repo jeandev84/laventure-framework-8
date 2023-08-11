@@ -373,13 +373,13 @@ class Query
 
 
     /**
-     * @param int $limit
+     * @param int $offset
      *
      * @return $this
     */
-    public function offset(int $limit): static
+    public function offset(int $offset): static
     {
-        $this->selects->limit($limit);
+        $this->selects->offset($offset);
 
         return $this;
     }
@@ -571,6 +571,23 @@ class Query
 
          return $this->selects->fetch()->one();
     }
+
+
+    /**
+     * @param int $offset
+     *
+     * @param int $limit
+     *
+     * @return array
+    */
+    public function paginate(int $offset, int $limit): array
+    {
+          return $this->offset($offset)
+                      ->limit($limit)
+                      ->get();
+    }
+
+
 
 
 

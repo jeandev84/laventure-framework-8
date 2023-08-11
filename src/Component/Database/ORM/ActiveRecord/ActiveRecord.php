@@ -172,6 +172,22 @@ abstract class ActiveRecord implements ActiveRecordInterface
     }
 
 
+    /**
+     * @param int $offset
+     *
+     * @param int $perPage
+     *
+     * @return array
+    */
+    public static function paginate(int $offset, int $perPage): array
+    {
+         /*
+         return self::select()
+                      ->offset()
+                      ->limit()
+                      ->get();
+         */
+    }
 
 
 
