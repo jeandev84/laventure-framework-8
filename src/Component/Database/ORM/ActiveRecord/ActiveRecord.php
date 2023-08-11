@@ -92,7 +92,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
             $connection,
             $this->getTable(),
             $this->getClassName(),
-            $this->getPrimaryKey()
+            $this->primaryKey()
         );
     }
 
@@ -131,9 +131,63 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
-    public function update(array $attributes): int
+
+
+    /**
+     * @param int $id
+     *
+     * @return mixed
+    */
+    public static function find(int $id): mixed
+    {
+        $model = self::model();
+
+        return self::select()
+                    ->where($model->primaryKey(), $id)
+                    ->one();
+    }
+
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public static function all(): array
     {
 
+    }
+
+
+
+    /**
+     * @param array $attributes
+     *
+     * @return int
+    */
+    public static function create(array $attributes): int
+    {
+          return self::model()->query()->create($attributes);
+    }
+
+
+
+
+
+
+    /**
+     * @param array $attributes
+     *
+     * @return int
+    */
+    public function update(array $attributes): int
+    {
+         return self::model()->query()
+                             ->where($this->primaryKey(), $this->getId())
+                             ->update($attributes);
     }
 
 
@@ -147,7 +201,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      * @param $value
      *
      * @return $this
-     */
+    */
     public function setAttribute(string $name, $value): static
     {
         $name = $this->camelCaseToUnderscore($name);
@@ -156,6 +210,8 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
         return $this;
     }
+
+
 
 
 
@@ -348,7 +404,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @return string
      */
-    protected function getPrimaryKey(): string
+    protected function primaryKey(): string
     {
         if (! $this->primaryKey) {
             throw new \RuntimeException("Could not find primary key in : ". $this->getClassName());
@@ -408,6 +464,15 @@ abstract class ActiveRecord implements ActiveRecordInterface
 
 
 
+    /**
+     * Returns id
+     *
+     * @return int
+    */
+    private function getId(): int
+    {
+        return $this->getAttribute(self::primaryKey(), 0);
+    }
 
 
     /**

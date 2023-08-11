@@ -58,6 +58,9 @@ class Query
 
 
 
+
+
+
     /**
      * @var array
     */
@@ -70,11 +73,30 @@ class Query
 
 
 
+    /**
+     * @var array|string[]
+    */
+    private array $operators = [
+        '=',
+        '>',
+        '>=',
+        '<',
+        '>=',
+        'LIKE',
+        'OR',
+        'NOT',
+        'AND'
+    ];
+
+
+
+
 
     /**
      * @var Select
     */
     protected Select $selects;
+
 
 
 
@@ -101,10 +123,15 @@ class Query
           $this->builder    = new SqlQueryBuilder($connection);
           $this->table      = $table;
           $this->primaryKey = $primaryKey;
-          $this->selects   = $this->builder->select();
+          $this->alias      = $alias;
+          $this->selects    = $this->builder->select();
           $this->selects->from($table, $alias);
           $this->selects->map($classname);
     }
+
+
+
+
 
 
     /**
@@ -118,6 +145,8 @@ class Query
 
          return $this->addSelect($selects);
     }
+
+
 
 
 
@@ -287,6 +316,8 @@ class Query
 
 
 
+
+
     /**
      * @param string $column
      *
@@ -366,6 +397,8 @@ class Query
     */
     public function where(string $column, $value, string $operator = "="): static
     {
+          $this->wheres['AND'][] = "";
+
           return $this;
     }
 
@@ -378,12 +411,15 @@ class Query
     /**
      * @param array $attributes
      *
-     * @return Insert
-     */
-    public function create(array $attributes): Insert
+     * @return int
+    */
+    public function create(array $attributes): int
     {
-        return $this->builder->insert($this->table, $attributes);
+        return $this->builder->insert($this->table, $attributes)
+                             ->execute();
     }
+
+
 
 
 
@@ -392,13 +428,39 @@ class Query
     /**
      * @param array $attributes
      *
-     * @param array $wheres
-     *
-     * @return Update
+     * @return int
     */
-    public function update(array $attributes, array $wheres): Update
+    public function update(array $attributes): int
     {
-        return $this->builder->update($this->table, $attributes, $wheres);
+        return $this->builder->update($this->table, $attributes, [])
+                             ->execute();
+    }
+
+
+
+
+
+
+
+    /**
+     * @return bool
+    */
+    public function delete(): bool
+    {
+        return $this->builder->delete($this->table, [])
+                             ->execute();
+    }
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function get(): array
+    {
+         return $this->selects->fetch()->all();
     }
 
 
@@ -407,12 +469,12 @@ class Query
 
 
     /**
-     * @param array $wheres
-     *
-     * @return Delete
+     * @return mixed
     */
-    public function delete(array $wheres): Delete
+    public function one(): mixed
     {
-        return $this->builder->delete($this->table, $wheres);
+         $this->selects->limit(1);
+
+         return $this->selects->fetch()->one();
     }
 }
