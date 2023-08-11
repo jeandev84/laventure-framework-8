@@ -118,7 +118,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
      *
      * @return Query
     */
-    public static function where(string $column, $value, string $operator): Query
+    public static function where(string $column, $value, string $operator = '='): Query
     {
         return self::model()->query()->where($column, $value, $operator);
     }
@@ -229,13 +229,11 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     /**
      * @param array $attributes
      *
-     * @return mixed
+     * @return false|int
     */
-    public function update(array $attributes): mixed
+    public function update(array $attributes): false|int
     {
-         return self::model()->query()
-                             ->where($this->primaryKey(), $this->getId())
-                             ->update($attributes);
+         return self::where($this->primaryKey(), $this->getId())->update($attributes);
     }
 
 
