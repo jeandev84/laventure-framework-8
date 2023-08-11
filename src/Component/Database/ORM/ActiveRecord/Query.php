@@ -121,12 +121,11 @@ class Query
     )
     {
           $this->builder    = new SqlQueryBuilder($connection);
-          $this->table      = $table;
-          $this->alias      = $alias;
           $this->expr       = new Expr();
+          $this->table      = $table;
+          $this->classname  = $classname;
+          $this->alias      = $alias;
           $this->selects    = $this->builder->select();
-          $this->selects->from($table, $alias);
-          $this->selects->map($classname);
     }
 
 
@@ -142,6 +141,9 @@ class Query
     public function select(array|string $selects = ''): static
     {
          $selects = is_array($selects) ? join(', ', $selects) : $selects;
+
+         $this->selects->from($this->table, $this->alias);
+         $this->selects->map($this->classname);
 
          return $this->addSelect($selects);
     }
@@ -417,7 +419,7 @@ class Query
     */
     public function andWhere(string $column, $value, string $operator = "="): static
     {
-          return $this->criteria("AND", $column, $value, $operator);
+          return $this->criteria( $column, $value, $operator, "AND");
     }
 
 
@@ -436,7 +438,7 @@ class Query
     */
     public function orWhere(string $column, $value, string $operator = "="): static
     {
-        return $this->criteria("OR", $column, $value, $operator);
+        return $this->criteria($column, $value, $operator, "OR");
     }
 
 
@@ -504,9 +506,9 @@ class Query
     /**
      * @param array $attributes
      *
-     * @return int
+     * @return false|int
     */
-    public function update(array $attributes): int
+    public function update(array $attributes): false|int
     {
         return $this->builder->update($this->table, $attributes)
                              ->andWheres($this->andWheres())
@@ -573,6 +575,20 @@ class Query
 
 
 
+
+    /**
+     * @return mixed
+    */
+    public function first(): mixed
+    {
+        return $this->get()[0] ?? null;
+    }
+
+
+
+
+
+
     /**
      * @param string $operand
      *
@@ -584,12 +600,12 @@ class Query
      *
      * @return $this
     */
-    private function criteria(string $operand, string $column, $value, string $operator): static
+    private function criteria(string $column, $value, string $operator, string $operand): static
     {
           $condition = "$column $operator :$column";
 
           if (! in_array($operator, $this->operators)) {
-                $condition = "$column $operator";
+              $condition = "$column $operator";
           }
 
           $this->wheres[$operand][] = $condition;

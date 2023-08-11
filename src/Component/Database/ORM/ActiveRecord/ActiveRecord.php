@@ -135,7 +135,7 @@ abstract class ActiveRecord implements ActiveRecordInterface
      *
      * @return Query
     */
-    public static function orderBy(string $column, string $direction): Query
+    public static function orderBy(string $column, string $direction = 'asc'): Query
     {
          return self::select()->orderBy($column, $direction);
     }
@@ -194,9 +194,9 @@ abstract class ActiveRecord implements ActiveRecordInterface
     /**
      * @param array $attributes
      *
-     * @return int
+     * @return mixed
     */
-    public function update(array $attributes): int
+    public function update(array $attributes): mixed
     {
          return self::model()->query()
                              ->where($this->primaryKey(), $this->getId())

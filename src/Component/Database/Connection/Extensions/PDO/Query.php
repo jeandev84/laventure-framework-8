@@ -227,20 +227,13 @@ class Query implements QueryInterface
         try {
 
             if ($status = $this->statement->execute($this->parameters)) {
-
-                $this->logger->log([
-                    'sql'            => $this->statement->queryString,
-                    'bindings'       => $this->bindings,
-                    'parameters'     => $this->parameters
-                ]);
-
+                $this->logQuery();
                 $lastId = $this->lastId();
                 return $lastId ?: true;
             }
 
         } catch (PDOException $e) {
-
-            $this->abort($e);
+            $this->logError($e);
         }
 
         return $status;
@@ -265,10 +258,10 @@ class Query implements QueryInterface
 
         } catch (PDOException $e) {
 
-            (function () use ($e) {
-                throw new QueryException($e->getMessage(), $e->getCode());
-            })();
+            $this->abort($e);
         }
+
+        return false;
     }
 
 
@@ -329,5 +322,44 @@ class Query implements QueryInterface
     public function lastId(): int
     {
         return (int)$this->pdo->lastInsertId();
+    }
+
+
+
+
+    /**
+     * @return void
+    */
+    protected function logQuery()
+    {
+        $this->logger->log([
+            'sql'            => $this->statement->queryString,
+            'bindings'       => $this->bindings,
+            'parameters'     => $this->parameters
+        ]);
+    }
+
+
+
+
+
+
+
+    /**
+     * @param Exception $e
+     *
+     * @return void
+    */
+    protected function logError(Exception $e): void
+    {
+        $this->logger->log([
+            'sql'            => $this->statement->queryString,
+            'bindings'       => $this->bindings,
+            'parameters'     => $this->parameters,
+            'code'           => $e->getCode(),
+            'message'        => $e->getMessage(),
+        ]);
+
+        $this->abort($e);
     }
 }
