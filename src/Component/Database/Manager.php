@@ -70,8 +70,12 @@ class Manager extends DatabaseManager
        /**
         * @return static
        */
-       public static function instance(): static
+       public static function capsule(): static
        {
+           if (! self::$instance) {
+               throw new \RuntimeException("No connection to database detected in:". get_called_class());
+           }
+
            return self::$instance;
        }
 

@@ -518,12 +518,9 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
      */
     protected function getManager(): Manager
     {
-        if(! $database = Manager::instance()) {
-            throw new \RuntimeException("No connection to database detected in : ". $this->getClassName());
-        }
-
-        return $database;
+        return Manager::capsule();
     }
+
 
 
 
