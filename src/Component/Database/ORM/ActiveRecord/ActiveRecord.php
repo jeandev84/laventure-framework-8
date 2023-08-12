@@ -67,13 +67,6 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 
 
 
-    /**
-     * @var array
-    */
-    protected static array $collected = [];
-
-
-
 
     /**
      * @var static
