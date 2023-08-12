@@ -515,8 +515,8 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 
     /**
      * @return Manager
-     */
-    protected function getManager(): Manager
+    */
+    private function getManager(): Manager
     {
         return Manager::capsule();
     }
