@@ -81,13 +81,13 @@ class EntityRepository implements EntityRepositoryInterface
     /**
      * @inheritDoc
     */
-    public function findOneBy(array $criteria, array $oderBy = null): mixed
+    public function findOneBy(array $criteria, array $oderBy = []): mixed
     {
         $persistence = $this->em->getUnitOfWork()->getPersistence($this->getClassName());
 
         return $persistence->select()
                            ->criteria($criteria)
-                           ->addOrderBy($oderBy ?: [])
+                           ->addOrderBy($oderBy)
                            ->getQuery()
                            ->getOneOrNullResult();
     }
@@ -116,11 +116,12 @@ class EntityRepository implements EntityRepositoryInterface
     /**
      * @inheritDoc
     */
-    public function findBy(array $criteria, array $orderBy = null, int $limit = null, int $offset = null): mixed
+    public function findBy(array $criteria, array $orderBy = [], int $limit = null, int $offset = null): mixed
     {
           return $this->em->getUnitOfWork()
                           ->getPersistence($this->getClassName())
                           ->select()
+                          ->criteria($criteria)
                           ->addOrderBy($orderBy)
                           ->limit($limit)
                           ->offset($offset)

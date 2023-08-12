@@ -38,6 +38,17 @@ class Persistence
 
 
 
+
+
+    /**
+     * @var array
+    */
+    protected array $cache = [];
+
+
+
+
+
     /**
      * @param EntityManager $em
      *
@@ -53,19 +64,17 @@ class Persistence
 
 
 
+
     /**
      * @param string|null $selects
      *
-     * @param array $criteria
-     *
      * @return Select
     */
-    public function select(string $selects = null, array $criteria = []): Select
+    public function select(string $selects = null): Select
     {
          return $this->createQueryBuilder()
                      ->select($selects)
                      ->from($this->getTableName())
-                     ->criteria($criteria)
                      ->map($this->getClassname());
     }
 
@@ -82,9 +91,13 @@ class Persistence
     */
     public function find(int $id): mixed
     {
-        return $this->select("*", [$this->identifier() => $id])
-                    ->getQuery()
-                    ->getOneOrNullResult();
+        if(isset($this->cache[$id])) {
+             return $this->cache[$id];
+        }
+
+        return $this->cache[$id] = $this->select()->criteria([$this->identifier() => $id])
+                                                  ->getQuery()
+                                                  ->getOneOrNullResult();
     }
 
 
