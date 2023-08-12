@@ -95,9 +95,10 @@ class Persistence
              return $this->cache[$id];
         }
 
-        return $this->cache[$id] = $this->select()->criteria([$this->identifier() => $id])
-                                                  ->getQuery()
-                                                  ->getOneOrNullResult();
+        return $this->cache[$id] = $this->select()
+                                        ->criteria([$this->identifier() => $id])
+                                        ->getQuery()
+                                        ->getOneOrNullResult();
     }
 
 
