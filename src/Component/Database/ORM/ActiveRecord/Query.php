@@ -22,7 +22,11 @@ class Query
 {
 
 
+    /**
+     * @var SqlQueryBuilder
+    */
     protected SqlQueryBuilder $builder;
+
 
 
 
@@ -99,12 +103,7 @@ class Query
      *
      * @param string $alias
     */
-    public function __construct(
-        ConnectionInterface $connection,
-        string $table,
-        string $classname,
-        string $alias = '',
-    )
+    public function __construct(ConnectionInterface $connection, string $table, string $classname, string $alias = '',)
     {
           $this->builder    = new SqlQueryBuilder($connection);
           $this->expr       = new Expr();
@@ -126,9 +125,7 @@ class Query
     */
     public function select(array|string $selects = ''): static
     {
-         $selects = is_array($selects) ? join(', ', $selects) : $selects;
-
-         return $this->addSelect($selects);
+         return $this->addSelect($this->resolveSelects($selects));
     }
 
 
@@ -660,5 +657,19 @@ class Query
     private function orWheres(): array
     {
         return $this->wheres['OR'];
+    }
+
+
+
+
+
+    /**
+     * @param array|string $selects
+     *
+     * @return string
+    */
+    private function resolveSelects(array|string $selects): string
+    {
+        return is_array($selects) ? join(', ', $selects) : $selects;
     }
 }
