@@ -33,20 +33,6 @@ class Query
 
 
 
-    /**
-     * @var string
-    */
-    protected string $alias = '';
-
-
-
-    /**
-     * @var string
-    */
-    protected string $classname;
-
-
-
 
 
     /**
@@ -123,9 +109,9 @@ class Query
           $this->builder    = new SqlQueryBuilder($connection);
           $this->expr       = new Expr();
           $this->table      = $table;
-          $this->classname  = $classname;
-          $this->alias      = $alias;
           $this->selects    = $this->builder->select();
+          $this->selects->from($table, $alias);
+          $this->selects->map($classname);
     }
 
 
@@ -141,9 +127,6 @@ class Query
     public function select(array|string $selects = ''): static
     {
          $selects = is_array($selects) ? join(', ', $selects) : $selects;
-
-         $this->selects->from($this->table, $this->alias);
-         $this->selects->map($this->classname);
 
          return $this->addSelect($selects);
     }
