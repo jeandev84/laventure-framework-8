@@ -54,13 +54,13 @@ class Manager extends DatabaseManager
        */
        public function __construct(array $config)
        {
-            $this->config = new Configuration($config);
-            $connection   = $this->config->required('connection');
-            $credentials  = $this->config->required('configurations');
-
-            $this->open($connection, $credentials);
-
-            self::$instance = $this;
+            if (! self::$instance) {
+                $this->config = new Configuration($config);
+                $connection   = $this->config->required('connection');
+                $credentials  = $this->config->required('configurations');
+                $this->open($connection, $credentials);
+                self::$instance = $this;
+            }
        }
 
 
