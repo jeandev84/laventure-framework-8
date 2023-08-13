@@ -87,7 +87,7 @@ class EntityRepository implements EntityRepositoryInterface
 
         return $persistence->select()
                            ->criteria($criteria)
-                           ->addOrderBy($oderBy)
+                           ->ordersBy($oderBy)
                            ->getQuery()
                            ->getOneOrNullResult();
     }
@@ -122,7 +122,7 @@ class EntityRepository implements EntityRepositoryInterface
                           ->getPersistence($this->getClassName())
                           ->select()
                           ->criteria($criteria)
-                          ->addOrderBy($orderBy)
+                          ->ordersBy($orderBy)
                           ->limit($limit)
                           ->offset($offset)
                           ->getQuery()

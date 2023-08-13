@@ -53,7 +53,7 @@ class Query
     /**
      * @var array
     */
-    protected array $parameters = [];
+    protected array $params = [];
 
 
 
@@ -399,7 +399,7 @@ class Query
     */
     public function andWhere(string $column, $value, string $operator = "="): static
     {
-          return $this->criteria( $column, $value, $operator, "AND");
+          return $this->criteria($column, $value, $operator, "AND");
     }
 
 
@@ -493,7 +493,7 @@ class Query
         return $this->builder->update($this->table, $attributes)
                              ->andWheres($this->andWheres())
                              ->orWheres($this->orWheres())
-                             ->setParameters($this->parameters)
+                             ->setParameters($this->params)
                              ->execute();
     }
 
@@ -512,7 +512,7 @@ class Query
         return $this->builder->delete($this->table)
                              ->andWheres($this->andWheres())
                              ->orWheres($this->orWheres())
-                             ->setParameters($this->parameters)
+                             ->setParameters($this->params)
                              ->execute();
     }
 
@@ -525,7 +525,7 @@ class Query
     */
     public function get(): array
     {
-         return $this->selectQueryBuilder()
+         return $this->selected()
                      ->fetch()
                      ->all();
     }
@@ -540,7 +540,7 @@ class Query
     */
     public function one(): mixed
     {
-         return $this->selectQueryBuilder()
+         return $this->selected()
                      ->limit(1)
                      ->fetch()
                      ->one();
@@ -573,7 +573,7 @@ class Query
     */
     public function paginate(int $page, int $limit): array
     {
-         return $this->selectQueryBuilder()
+         return $this->selected()
                      ->getPaginatedQuery()
                      ->paginate($page, $limit);
     }
@@ -587,17 +587,18 @@ class Query
     /**
      * @return Select
     */
-    private function selectQueryBuilder(): Select
+    private function selected(): Select
     {
         return $this->selects->andWheres($this->andWheres())
-                           ->orWheres($this->orWheres())
-                          ->setParameters($this->parameters);
+                             ->orWheres($this->orWheres())
+                             ->setParameters($this->params);
     }
 
 
 
+
     /**
-     * @param string $operand
+     * @param string $type
      *
      * @param string $column
      *
@@ -607,17 +608,16 @@ class Query
      *
      * @return $this
     */
-    private function criteria(string $column, $value, string $operator, string $operand): static
+    private function criteria(string $column, $value, string $operator, string $type): static
     {
           $condition = "$column $operator :$column";
 
-          if (! in_array($operator, $this->operators)) {
+          if (! $this->hasOperator($operator)) {
               $condition = "$column $operator";
           }
 
-          $this->wheres[$operand][] = $condition;
-
-          $this->parameters[$column] = $value;
+          $this->wheres[$type][] = $condition;
+          $this->params[$column] = $value;
 
           return $this;
     }
@@ -626,14 +626,16 @@ class Query
 
 
 
-    /**
-     * @return array|array[]
-    */
-    private function wheres(): array
-    {
-        return $this->wheres;
-    }
 
+    /**
+     * @param string $operator
+     *
+     * @return bool
+    */
+    private function hasOperator(string $operator): bool
+    {
+        return in_array($operator, $this->operators);
+    }
 
 
 

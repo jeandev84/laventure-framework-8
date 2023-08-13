@@ -184,14 +184,17 @@ class Select extends SQLBuilderHasConditions
 
 
 
+
+
+
     /**
-     * @param string $column
-     * @param string $direction
+     * @param string $orderBy
+     *
      * @return $this
     */
-    public function orderBy(string $column, string $direction = 'asc'): static
+    public function addOrderBy(string $orderBy): static
     {
-        $this->orderBy[] = sprintf('%s %s', $column, strtoupper($direction));
+        $this->orderBy[] = $orderBy;
 
         return $this;
     }
@@ -200,17 +203,34 @@ class Select extends SQLBuilderHasConditions
 
 
 
+
+    /**
+     * @param string $column
+     * @param string $direction
+     * @return $this
+    */
+    public function orderBy(string $column, string $direction = 'asc'): static
+    {
+        return $this->orderBy(sprintf('%s %s', $column, strtoupper($direction)));
+    }
+
+
+
+
+
     /**
      * @return $this
     */
-    public function addOrderBy(array $orderBy): static
+    public function ordersBy(array $orders): static
     {
-         foreach ($orderBy as $column => $direction) {
+         foreach ($orders as $column => $direction) {
              $this->orderBy($column, $direction);
          }
 
          return $this;
     }
+
+
 
 
     /**
