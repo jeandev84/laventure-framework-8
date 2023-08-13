@@ -20,7 +20,7 @@ interface AssetInterface
         *
         * @return string
        */
-       public function resource(string $path): string;
+       public function resourcePath(string $path): string;
 
 
 

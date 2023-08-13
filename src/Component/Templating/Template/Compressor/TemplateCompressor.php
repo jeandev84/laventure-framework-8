@@ -1,7 +1,6 @@
 <?php
 namespace Laventure\Component\Templating\Template\Compressor;
 
-use Laventure\Component\Templating\Template\TemplateInterface;
 
 /**
  * @TemplateCompressor
@@ -10,7 +9,7 @@ use Laventure\Component\Templating\Template\TemplateInterface;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Templating\Template\Cache
+ * @package Laventure\Component\Templating\Template\Caching
 */
 class TemplateCompressor implements TemplateCompressorInterface
 {

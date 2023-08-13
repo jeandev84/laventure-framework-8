@@ -51,7 +51,7 @@ class Asset implements AssetInterface
     /**
      * @inheritDoc
     */
-    public function resource(string $path): string
+    public function resourcePath(string $path): string
     {
         return  $this->baseUrl . '/' . trim($path, '/');
     }
@@ -150,7 +150,7 @@ class Asset implements AssetInterface
     public function css(array $stylesheets): static
     {
          foreach ($stylesheets as $stylesheet) {
-              $this->addStyle(sprintf('<link href="%s" rel="stylesheet">', $this->resource($stylesheet)));
+              $this->addStyle(sprintf('<link href="%s" rel="stylesheet">', $this->resourcePath($stylesheet)));
          }
 
          return $this;
@@ -169,7 +169,7 @@ class Asset implements AssetInterface
     public function js(array $scripts): static
     {
           foreach ($scripts as $script) {
-              $this->addScript(sprintf('<script src="%s" type="application/javascript"></script>', $this->resource($script)));
+              $this->addScript(sprintf('<script src="%s" type="application/javascript"></script>', $this->resourcePath($script)));
           }
 
           return $this;
