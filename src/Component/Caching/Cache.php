@@ -70,6 +70,12 @@ class Cache
 
 
 
+
+
+
+
+
+
     /**
      * @param string $key
      *
@@ -81,6 +87,8 @@ class Cache
     {
         return $this->cache->hasItem($key);
     }
+
+
 
 
 
