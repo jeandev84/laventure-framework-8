@@ -3,6 +3,7 @@ namespace Laventure\Component\Caching\Pool;
 
 
 use Laventure\Component\Caching\Exception\InvalidArgumentException;
+use Laventure\Component\Caching\Item\CacheItemInterface;
 
 /**
  * @CacheItemPoolInterface
