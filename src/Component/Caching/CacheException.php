@@ -4,8 +4,10 @@ namespace Laventure\Component\Caching;
 
 /**
  * @inheritdoc
+ *
+ * Exception interface for all exceptions thrown by an Implementing Library.
 */
-class CacheException extends \Exception
+interface CacheException extends \Throwable
 {
 
 }
