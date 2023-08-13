@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Caching;
+namespace Laventure\Component\Caching\Item;
 
 
 /**
@@ -14,7 +14,7 @@ namespace Laventure\Component\Caching;
  *
  * @license https://github.com/jeandev84/laventure-framework/blob/master/LICENSE
  *
- * @package Laventure\Component\Caching
+ * @package Laventure\Component\Caching\Item
 */
 interface CacheItemInterface
 {

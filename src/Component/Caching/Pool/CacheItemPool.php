@@ -1,5 +1,5 @@
 <?php
-namespace Laventure\Component\Caching;
+namespace Laventure\Component\Caching\Pool;
 
 /**
  * @inheritdoc

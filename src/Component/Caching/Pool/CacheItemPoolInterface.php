@@ -1,8 +1,8 @@
 <?php
-namespace Laventure\Component\Caching;
+namespace Laventure\Component\Caching\Pool;
 
 
-use InvalidArgumentException;
+use Laventure\Component\Caching\Exception\InvalidArgumentException;
 
 /**
  * @CacheItemPoolInterface
