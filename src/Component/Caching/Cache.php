@@ -1,9 +1,9 @@
 <?php
 namespace Laventure\Component\Caching;
 
+use Laventure\Component\Caching\Adapter\CacheAdapter;
 use Laventure\Component\Caching\Exception\InvalidArgumentException;
 use Laventure\Component\Caching\Item\CacheItemInterface;
-use Laventure\Component\Caching\Pool\CacheItemPoolInterface;
 
 /**
  * @Cache
@@ -20,9 +20,9 @@ class Cache
 
 
     /**
-     * @param CacheItemPoolInterface $cache
+     * @param CacheAdapter $cache
     */
-    public function __construct(protected CacheItemPoolInterface $cache)
+    public function __construct(protected CacheAdapter $cache)
     {
 
     }
@@ -42,8 +42,6 @@ class Cache
     {
         return $this->cache->getItem($key);
     }
-
-
 
 
 
