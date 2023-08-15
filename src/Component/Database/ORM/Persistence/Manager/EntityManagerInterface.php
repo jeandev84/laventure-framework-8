@@ -17,21 +17,6 @@ interface EntityManagerInterface extends ObjectManager
 
 
     /**
-     * Open entity manager
-     *
-     * @param bool $enabled
-     *
-     * @return static
-    */
-    public function open(bool $enabled): static;
-
-
-
-
-
-
-
-    /**
      * Determine if the entity manager opened
      *
      * @return bool

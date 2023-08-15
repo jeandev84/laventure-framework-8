@@ -78,7 +78,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     /**
      * @var bool
     */
-    protected bool $enabled = false;
+    protected bool $closed = false;
 
 
 
@@ -135,22 +135,6 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
 
 
 
-    /**
-     * @inheritDoc
-    */
-    public function open(bool $enabled): static
-    {
-        $this->connection->reconnect();
-        $this->enabled = $enabled;
-
-        return $this;
-    }
-
-
-
-
-
-
 
 
     /**
@@ -158,10 +142,12 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function isOpen(): bool
     {
-        $connected = $this->connection->connected();
-
-        return ($this->enabled || $connected);
+        return ! $this->closed;
     }
+
+
+
+
 
 
 
@@ -487,7 +473,7 @@ class EntityManager implements EntityManagerInterface, ObjectPersistenceInterfac
     */
     public function close(): void
     {
-        $this->enabled = false;
+        $this->closed = false;
         $this->connection->disconnect();
     }
 }
