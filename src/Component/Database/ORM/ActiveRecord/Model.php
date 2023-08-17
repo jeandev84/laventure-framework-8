@@ -9,20 +9,23 @@ class Model extends ActiveRecord
 {
 
     /**
-     * Store attributes we can save
+     * attributes to save
      *
      * @var array
     */
-    protected array $map = [];
+    protected array $saved = [];
 
 
 
 
 
     /**
+     * attributes to keep
+     *
      * @var array|string[]
     */
     protected array $guarded = ['id'];
+
 
 
 
@@ -38,8 +41,8 @@ class Model extends ActiveRecord
         $columns = $this->getColumnsFromTable();
 
         foreach ($columns as $column) {
-            if (! empty($this->fillable)) {
-                if (\in_array($column, $this->fillable)) {
+            if (! empty($this->saved)) {
+                if (\in_array($column, $this->saved)) {
                     $attributes[$column] = $this->{$column};
                 }
             } else {

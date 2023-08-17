@@ -272,7 +272,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     public function save(): int
     {
         if (! $attributes = $this->mapAttributesToSave()) {
-            throw new \RuntimeException("No attributes mapped for saving in : ". $this->getClassName());
+            $this->abortIfIsNotMapped();
         }
 
         if ($id = $this->getId()) {
@@ -635,6 +635,16 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     }
 
 
+
+
+
+    /**
+     * @return mixed
+    */
+    private function abortIfIsNotMapped(): mixed
+    {
+        throw new \RuntimeException("No attributes mapped for saving in : ". $this->getClassName());
+    }
 
 
 
