@@ -9,7 +9,7 @@ use Laventure\Component\Database\ORM\Convertor\CamelConvertor;
 /**
  * @inheritdoc
 */
-abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
+abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable, \ArrayAccess
 {
 
     use CamelConvertor;

@@ -24,6 +24,8 @@ interface ColumnInterface
 
 
 
+
+
     /**
      * Returns column type
      *
@@ -79,6 +81,10 @@ interface ColumnInterface
      * @return bool
     */
     public function isPrimary(): bool;
+
+
+
+
 
 
 

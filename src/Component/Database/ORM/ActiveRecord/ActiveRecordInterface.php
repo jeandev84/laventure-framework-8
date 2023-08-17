@@ -11,7 +11,7 @@ namespace Laventure\Component\Database\ORM\ActiveRecord;
  *
  * @package Laventure\Component\Database\ORM\ActiveRecord
 */
-interface ActiveRecordInterface extends \ArrayAccess
+interface ActiveRecordInterface
 {
 
 

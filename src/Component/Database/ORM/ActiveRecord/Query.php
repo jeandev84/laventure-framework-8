@@ -125,7 +125,7 @@ class Query
     */
     public function select(array|string $selects = ''): static
     {
-         return $this->addSelect($this->resolveSelects($selects));
+         return $this->addSelect($selects);
     }
 
 
@@ -152,14 +152,16 @@ class Query
 
 
 
+
+
     /**
-     * @param string $selects
+     * @param array|string $selects
      *
      * @return $this
     */
-    public function addSelect(string $selects): static
+    public function addSelect(array|string $selects): static
     {
-        $this->selects->addSelect($selects);
+        $this->selects->addSelect($this->resolveSelects($selects));
 
         return $this;
     }
@@ -185,6 +187,10 @@ class Query
 
 
 
+
+
+
+
     /**
      * @param string $table
      *
@@ -193,13 +199,15 @@ class Query
      * @param string $type
      *
      * @return $this
-     */
+    */
     public function join(string $table, string $condition, string $type = JoinType::JOIN): static
     {
          $this->selects->join($table, $condition, $type);
 
          return $this;
     }
+
+
 
 
 
@@ -544,6 +552,35 @@ class Query
                      ->limit(1)
                      ->fetch()
                      ->one();
+    }
+
+
+
+
+
+    /**
+     * @return int
+    */
+    public function count(): int
+    {
+         return $this->selected()
+                     ->fetch()
+                     ->numRows();
+    }
+
+
+
+
+
+
+    /**
+     * @return array
+    */
+    public function columns(): array
+    {
+        return $this->selected()
+                    ->fetch()
+                    ->columns();
     }
 
 

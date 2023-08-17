@@ -20,7 +20,7 @@ class Column implements ColumnInterface
 
 
     /**
-     * Column type
+     * Column data type
      *
      * @var string
     */
@@ -49,10 +49,13 @@ class Column implements ColumnInterface
 
 
 
+
     /**
      * @var string
     */
     protected string $collation = '';
+
+
 
 
 
