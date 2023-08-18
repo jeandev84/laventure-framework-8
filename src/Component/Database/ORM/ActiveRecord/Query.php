@@ -38,6 +38,13 @@ class Query
 
 
 
+    /**
+     * @var string
+    */
+    protected string $alias;
+
+
+
 
     /**
      * @var array
@@ -100,18 +107,18 @@ class Query
      * @param string $table
      *
      * @param string $classname
-     *
-     * @param string $alias
     */
-    public function __construct(ConnectionInterface $connection, string $table, string $classname, string $alias = '',)
+    public function __construct(ConnectionInterface $connection, string $table, string $classname)
     {
           $this->builder    = new SqlQueryBuilder($connection);
           $this->expr       = new Expr();
           $this->table      = $table;
+          $this->alias      = $this->makeTableAlias($table);
           $this->selects    = $this->builder->select();
-          $this->selects->from($table, $alias);
+          $this->selects->from($table, $this->alias);
           $this->selects->map($classname);
     }
+
 
 
 
@@ -710,5 +717,18 @@ class Query
     private function resolveSelects(array|string $selects): string
     {
         return is_array($selects) ? join(', ', $selects) : $selects;
+    }
+
+
+
+
+    /**
+     * @param string $table
+     *
+     * @return string
+    */
+    private function makeTableAlias(string $table): string
+    {
+        return mb_substr($table, 0, 1, "UTF-8");
     }
 }

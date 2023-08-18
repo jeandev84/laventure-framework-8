@@ -17,16 +17,8 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
 
     /**
      * @var string
-     */
-    protected string $table = '';
-
-
-
-
-    /**
-     * @var string
     */
-    protected string $alias = '';
+    protected string $table = '';
 
 
 
@@ -96,7 +88,7 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     {
         $manager = $this->getManager();
         $connection = $manager->pdoConnection($this->connection);
-        return new Query($connection, $this->getTable(), $this->getClassName(), $this->getTableAlias());
+        return new Query($connection, $this->getTable(), $this->getClassName());
     }
 
 
@@ -531,24 +523,9 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     */
     protected function getTable(): string
     {
-        if (!$this->table) {
-            throw new \RuntimeException("Could not detected model ". $this->getClassName() . " table name.");
-        }
-
         return $this->table;
     }
 
-
-
-
-
-    /**
-     * @return string
-    */
-    protected function getTableAlias(): string
-    {
-        return $this->alias ?: mb_substr(static::getTable(), 0, 1, "UTF-8");
-    }
 
 
 
@@ -562,9 +539,11 @@ abstract class ActiveRecord implements ActiveRecordInterface,  \JsonSerializable
     protected function getColumnsFromTable(): array
     {
         return $this->getManager()
-                   ->schema($this->connection)
-                   ->getColumns($this->getTable());
+                    ->schema($this->connection)
+                    ->getColumns($this->getTable());
     }
+
+
 
 
 
